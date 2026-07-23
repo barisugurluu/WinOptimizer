@@ -29,7 +29,7 @@ Installers:
   - Architecture: x64
     InstallerType: wix
     InstallerUrl: https://github.com/WinOptimizer/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup.msi
-    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    InstallerSha256: 3FEA64820A787AF68F30941A95B999564FF0375E1496E0E621353A74A496675E
     ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'  # UpgradeCode ile aynı (Product ID)
     AppsAndFeaturesEntries:
       - DisplayName: WinOptimizer

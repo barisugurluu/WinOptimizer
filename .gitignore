@@ -11,6 +11,9 @@
 
 # Kurulum derlemesi
 installer/build/
+installer/wix/Payload.wxs   # generate-payload.ps1 tarafından üretilir (commit edilmez)
+installer/wix/bin/
+installer/wix/obj/
 
 # Paket önbelleği
 *.nupkg

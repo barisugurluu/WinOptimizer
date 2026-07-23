@@ -55,8 +55,12 @@ if (-not $SkipSign) {
     Write-Host "[3/4] Imzalama ATLANDI (-SkipSign)" -ForegroundColor DarkYellow
 }
 
-# --- 4) WiX MSI ---
-Write-Host "[4/4] WiX MSI paketi..." -ForegroundColor Yellow
+# --- 4) Payload.wxs üret (heat alternatifi) + WiX MSI ---
+Write-Host "[4/5] Payload.wxs uretiliyor (generate-payload.ps1)..." -ForegroundColor Yellow
+& (Join-Path $PSScriptRoot 'generate-payload.ps1') -PublishDir $publishBase
+if ($LASTEXITCODE -ne 0) { throw "Payload.wxs uretimi basarisiz." }
+
+Write-Host "[5/5] WiX MSI paketi..." -ForegroundColor Yellow
 $wixProj = Join-Path $root 'installer\wix\WinOptimizer.wixproj'
 if (-not (Test-Path $wixProj)) { throw "WiX proje yok: $wixProj" }
 dotnet build $wixProj -c $Configuration

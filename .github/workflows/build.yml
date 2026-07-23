@@ -37,6 +37,10 @@ jobs:
       - name: Setup WiX v4
         run: dotnet tool install --global wix
 
+      - name: Generate Payload.wxs
+        run: .\build\generate-payload.ps1 -PublishDir publish -OutputFile installer\wix\Payload.wxs
+        shell: pwsh
+
       - name: Build MSI
         working-directory: installer/wix
         run: dotnet build WinOptimizer.wixproj -c Release -p:PublishSourceDir=${{ github.workspace }}\publish

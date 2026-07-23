@@ -20,7 +20,7 @@
 
     <!-- Türkçe (TR) varsayılan dil; Codepage 1254 (Türkçe Windows). -->
     <SummaryInformation
-      Description="WinOptimizer $(sys.SYSTEMSHORTVERSION) Kurulum"
+      Description="WinOptimizer 0.1.0 Kurulum"
       Manufacturer="WinOptimizer Team"
       Codepage="1254" />
 
@@ -31,21 +31,17 @@
 
     <Media Id="1" Cabinet="WinOptimizer.cab" EmbedCab="yes" CompressionLevel="high" />
 
-    <!-- Klasik InstallDir sihirbazı (hedef klasör seçimi). -->
+    <!-- UI: varsayilan Windows Installer UI (msiexec /i). Custom sihirbaz (WixUI_InstallDir)
+         icin WixToolset.UI.wixext extension + <WixExtension> ItemGroup ekleyin (Bolum 20.3). -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    <UI>
-      <UIRef Id="WixUI_InstallDir" />
-      <UIRef Id="WixUI_FeatureTree" />
-      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" />
-    </UI>
+    <Property Id="MSIFASTINSTALL" Value="7" />
 
-    <!-- EULA (master plan §22 — kullanım koşulları). Boşsa atlanır. -->
-    <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)license.rtf" Overridable="yes" />
-    <WixVariable Id="WixUIDialogBmp" Value="$(sys.SOURCEFILEDIR)dialog.bmp" Overridable="yes" />
+    <!-- EULA/dialog dosyaları opsiyonel; kullanıcı isterse installer\wix\ altına
+         license.rtf ve dialog.bmp koyup WixVariable ekleyebilir (Overridable). -->
 
     <!-- Feature ağacı: Uygulama (zorunlu) + Servis (opsiyonel, varsayılan açık). -->
     <Feature Id="Complete" Title="WinOptimizer" Level="1" Display="expand" AllowAdvertise="no">
-      <Feature Id="AppFeature" Title="WinOptimizer Uygulaması" Level="1" Absent="disallow">
+      <Feature Id="AppFeature" Title="WinOptimizer Uygulaması" Level="1">
         <ComponentGroupRef Id="PayloadFiles" />
       </Feature>
       <Feature Id="ServiceFeature" Title="RealtimeGuard Servisi" Level="1" Description="Arka plan gerçek zamanlı koruma servisi (LocalSystem)">

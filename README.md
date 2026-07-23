@@ -134,9 +134,22 @@ WinOptimizer/
 
 ## Sonraki Adımlar (üretim sertleştirme)
 
-Planın ana iskeleti tamamlandı. Üretim dağıtımı için kalan adımlar:
-- **Kod imzalama** — EV sertifikası ile `signtool` (installer'da hazır bırakıldı)
+Üretim dağıtım hat altyapısı kuruldu (M9):
+- ✅ **Kod imzalama** — `src/WinOptimizer.Native/WinTrust.cs` (WinVerifyTrust P/Invoke) + `build/sign-release.ps1` (signtool EV/PFX) — *EV sertifikası ile etkinleştir*
+- ✅ **WiX v4 MSI** — `installer/wix/` (per-machine, Service LocalSystem, CLI tek kurulum) — *0 uyarı/hata ile derlendi, 4.77 MB*
+- ✅ **Winget manifest** — `installer/winget/*.yaml` × 3 — *SHA256 doğrulandı*
+- ✅ **Deterministic + SourceLink** — `Directory.Build.props` (snupkg, GitHub kaynak bağlantısı)
+- ✅ **CI/CD** — `.github/workflows/build.yml` (publish + Payload + MSI + imza + Release + Winget PR)
+
+Kalan adımlar (üretim sertleştirme):
 - **Performans benchmark** — boot/RAM/disk önce/sonra ölçümü (Bölüm 13)
-- **i18n/a11y** — `.resx` kaynak dosyaları (TR/EN), ekran okuyucu desteği
-- **Yerelleştirme** — WPF UI metinlerini `x:Static` ile kaynaklara taşıma
-- **CI/CD** — GitHub Actions: `dotnet build` + `dotnet test` her commit'te
+- **a11y** — ekran okuyucu desteği, klavye akışı (WCAG 2.1 AA)
+- **Otomatik güncelleme** — kademeli staged sürüm + geri alma (Bölüm 20.6)
+
+### Paketleme Hattı
+```powershell
+# Tam hat: derle + test + publish + imzala + WiX MSI
+.\build\build-installer.ps1
+# Sadece geliştirme: imzasız
+.\build\build-installer.ps1 -SkipSign
+```

@@ -1,44 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  WinOptimizer — WiX v4 SDK-style proje (master plan Bölüm 20.3).
-  dotnet build ile derlenir; Payload.wxs build öncesi heat ile üretilir (build-installer.ps1).
-
-  Gereksinim: WiX v4 — `dotnet tool install --global wix` ile CLI, veya NuGet restore.
--->
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- WinOptimizer - WiX v4 SDK-style proje (Bolum 20.3). -->
 <Project Sdk="WixToolset.Sdk/4.0.5">
 
   <PropertyGroup>
     <OutputName>WinOptimizer</OutputName>
     <OutputType>Package</OutputType>
-    <!-- Payload.wxs build öncesi heat tarafından üretilir; yoksa derleme atlar. -->
-    <PublishSourceDir>$(MSBuildThisFileDirectory)..\..\src\WinOptimizer.App\bin\Release\net8.0-windows\publish</PublishSourceDir>
+    <Platform>x64</Platform>
+    <!-- publish klasoru (build-installer.ps1 veya -p:PublishSourceDir ile override). -->
+    <PublishSourceDir Condition=" '$(PublishSourceDir)' == '' ">$(MSBuildThisFileDirectory)..\..\src\WinOptimizer.App\bin\Release\net8.0-windows\publish\</PublishSourceDir>
     <DefineConstants>PublishSourceDir=$(PublishSourceDir)</DefineConstants>
     <SuppressIces>ICE61</SuppressIces>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Product.wxs" />
-    <!-- Payload.wxs heat ile generate edilir; ilk derlemede henüz yoksa atlanır. -->
-    <Compile Include="Payload.wxs" Condition="Exists('Payload.wxs')" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Klasik InstallDir sihirbaz UI kütüphanesi. -->
-    <PackageReference Include="WixToolset.UI.wixlib" Version="4.0.5" />
-  </ItemGroup>
-
-  <!-- Build öncesi heat ile payload'ı harvest et (publish çıktısını Payload.wxs'e dönüştür).
-       Bu, App+Service+CLI exe'leri ve tüm DLL'leri tek ComponentGroup halinde paketler. -->
-  <Target Name="HarvestPayload" BeforeTargets="Compile" Inputs="$(PublishSourceDir)" Outputs="Payload.wxs">
-    <Message Importance="high" Text="Heat: publish klasoru Payload.wxs'e donusturuluyor..." />
-    <Exec Command='wix heat dir "$(PublishSourceDir)" -cg PayloadFiles -dr INSTALLFOLDER -scom -sreg -srd -gg -template fragment -out Payload.wxs'
-          WorkingDirectory="$(MSBuildProjectDirectory)" IgnoreExitCode="false"
-          Condition="Exists('$(PublishSourceDir)')" />
-  </Target>
-
-  <!-- Temizlik: Payload.wxs generate artifact'tir, commit edilmez. -->
-  <Target Name="CleanPayload" AfterTargets="Clean">
-    <Delete Files="Payload.wxs" />
-  </Target>
+  <!-- Payload.wxs build oncesi generate-payload.ps1 tarafindan uretilir (heat alternatifi).
+       WiX v4 wix CLI heat sikintili oldugundan PowerShell generator kullaniriz. -->
 
 </Project>
