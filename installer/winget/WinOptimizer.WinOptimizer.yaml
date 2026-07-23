@@ -1,0 +1,8 @@
+# Winget manifest — Package version (master plan Bölüm 20.5)
+# Dökümantasyon: https://learn.microsoft.com/windows/package-manager/package/manifest
+# Validation: winget validate <klasor>  (winget CLI gerekir)
+PackageIdentifier: WinOptimizer.WinOptimizer
+PackageVersion: 0.1.0
+DefaultLocale: en-US
+ManifestType: version
+ManifestVersion: 1.4.0

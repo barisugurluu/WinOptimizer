@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.BackupRestore</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Yedekleme &amp; geri yükleme — wbadmin sistem görüntüsü, sistem durumu, restore point.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+  </ItemGroup>
+
+</Project>

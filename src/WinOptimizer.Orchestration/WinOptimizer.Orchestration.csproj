@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Orchestration</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>JobOrchestrationEngine — modülleri paralel, iptal edilebilir şekilde koordine eder.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+  </ItemGroup>
+
+</Project>

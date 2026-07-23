@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.BenchmarkEngine</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Performans benchmark — boot süresi, RAM, disk, güvenlik skoru (önce/sonra).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

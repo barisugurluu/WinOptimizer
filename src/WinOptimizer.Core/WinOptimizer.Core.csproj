@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>WinOptimizer.Core</RootNamespace>
+    <Description>Çekirdek modeller, arayüzler ve enum'lar — IOptimizationModule sözleşmesi.</Description>
+  </PropertyGroup>
+
+</Project>

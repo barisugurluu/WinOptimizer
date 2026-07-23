@@ -1,0 +1,46 @@
+# Winget manifest — Installer (master plan Bölüm 20.5)
+# SHA256, GitHub Release yayınlandıktan sonra güncellenir:
+#   (Get-FileHash .\WinOptimizer-0.1.0-setup.msi -Algorithm SHA256).Hash
+PackageIdentifier: WinOptimizer.WinOptimizer
+PackageVersion: 0.1.0
+InstallerLocale: en-US
+Platform:
+  - Windows.Desktop
+MinimumOSVersion: 10.0.19041.0
+InstallerType: wix
+Scope: machine
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+InstallerSwitches:
+  Silent: /qn /norestart
+  SilentWithProgress: /qb /norestart
+  Interactive: /passive /norestart
+  InstallLocation: INSTALLFOLDER="<INSTALLPATH>"
+  Log: /log "<LOGPATH>"
+UpgradeBehavior: install                              # MajorUpgrade zaten eskiyi kaldırır
+Commands:
+  - WinOptimizer.App
+  - WinOptimizer.Cli
+Protocols:
+  - winoptimizer
+Installers:
+  - Architecture: x64
+    InstallerType: wix
+    InstallerUrl: https://github.com/WinOptimizer/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup.msi
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'  # UpgradeCode ile aynı (Product ID)
+    AppsAndFeaturesEntries:
+      - DisplayName: WinOptimizer
+        DisplayVersion: 0.1.0
+        Publisher: WinOptimizer Team
+        ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
+        UpgradeCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
+  - Architecture: arm64
+    InstallerType: wix
+    InstallerUrl: https://github.com/WinOptimizer/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup-arm64.msi
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
+ManifestType: installer
+ManifestVersion: 1.4.0

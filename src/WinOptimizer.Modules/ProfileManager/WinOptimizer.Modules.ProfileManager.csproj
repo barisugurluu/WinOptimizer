@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.ProfileManager</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Profil sistemi — Oyun / İş / Pil / Dengeli profilleri.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

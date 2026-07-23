@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.NetworkOptimizer</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Ağ optimizasyonu — DNS, TCP tweaks, winsock reset.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+  </ItemGroup>
+
+</Project>

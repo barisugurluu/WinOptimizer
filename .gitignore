@@ -1,0 +1,28 @@
+# Build çıktıları
+**/bin/
+**/obj/
+**/publish/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# Kurulum derlemesi
+installer/build/
+
+# Paket önbelleği
+*.nupkg
+*.snupkg
+
+# Sertifikalar (ASLA commit etme)
+*.pfx
+*.p12
+*.cer
+codesign.pfx
+
+# OS dosyaları
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.UpdateEngine</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Windows Update yönetimi — WU sıfırlama, usoclient, /ResetBase (onaylı).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+  </ItemGroup>
+
+</Project>

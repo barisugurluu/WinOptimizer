@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.Modules.SecurityHardening</RootNamespace>
+    <UseWPF>false</UseWPF>
+    <Description>Güvenlik sertleştirme — Defender, ASR kuralları, Controlled Folder Access, PUA, HVCI/VBS.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+  </ItemGroup>
+
+</Project>

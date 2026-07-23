@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "language": "tr-TR",
+  "theme": "dark",
+  "activeProfile": "balanced",
+  "safetyNet": {
+    "autoRestorePoint": true,
+    "autoRegistryBackup": true,
+    "requireConfirmationForHighRisk": true
+  },
+  "realtimeGuard": {
+    "enabled": true,
+    "thresholds": {
+      "ramUsagePercent": 85,
+      "diskFreePercent": 15,
+      "diskFreeCriticalPercent": 5,
+      "cpuPerProcessPercent": 80,
+      "tempCelsius": 85
+    }
+  },
+  "scheduler": {
+    "weeklyOptimize": {
+      "enabled": true,
+      "day": "Sunday",
+      "time": "03:00"
+    }
+  }
+}

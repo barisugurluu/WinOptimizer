@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>WinOptimizer.Native</RootNamespace>
+    <Description>Win32 P/Invoke sarmalayıcıları (psapi, kernel32, shell32, advapi32).</Description>
+  </PropertyGroup>
+
+</Project>

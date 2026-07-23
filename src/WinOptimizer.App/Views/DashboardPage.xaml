@@ -1,0 +1,52 @@
+<Page x:Class="WinOptimizer.App.Views.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:p="clr-namespace:WinOptimizer.App.Resources"
+      Title="{x:Static p:Strings.Dashboard}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <StackPanel Orientation="Vertical" MaxWidth="900">
+
+            <!-- Başlık (i18n: x:Static ile kaynak bağlama — Bölüm 12.5) -->
+            <TextBlock Text="{x:Static p:Strings.AppTitle}"
+                       FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+            <!-- Sistem Durumu kartı -->
+            <ui:Card Margin="0,0,0,16">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.SystemStatus}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{Binding StatusSummary}" FontSize="14" Opacity="0.8"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Tek Tıkla En İyi Hale Getir -->
+            <ui:Card Margin="0,0,0,16">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.OneClickOptimize}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12" />
+                    <TextBlock Text="{Binding AnalysisSummary}" TextWrapping="Wrap" Opacity="0.85" Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <ui:Button Content="{x:Static p:Strings.Preview}" Command="{Binding AnalyzeCommand}"
+                                   Appearance="Secondary" Margin="0,0,8,0" />
+                        <ui:Button Content="{x:Static p:Strings.Apply}" Command="{Binding OptimizeCommand}"
+                                   Appearance="Primary" />
+                    </StackPanel>
+                    <ProgressBar Value="{Binding Progress}" Maximum="100"
+                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,0,0,8" />
+                    <ui:InfoBar Title="{x:Static p:Strings.Result}" Message="{Binding ResultSummary}"
+                                IsOpen="{Binding HasResult}" Severity="Success" />
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Hızlı İşlemler -->
+            <ui:Card Margin="0,0,0,16">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.QuickActions}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{Binding AvailableModules}" TextWrapping="Wrap" Opacity="0.75" />
+                </StackPanel>
+            </ui:Card>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

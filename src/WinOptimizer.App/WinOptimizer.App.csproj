@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.App</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>WinOptimizer</AssemblyTitle>
+    <Description>Windows Sistem Bakım &amp; Optimizasyon yazılımı — giriş noktası.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- i18n: .resx kaynak dosyaları (TR varsayılan + EN) — master plan Bölüm 12.5
+         Strings.cs elle yazılmış strongly-typed erişimci kullanır (Generator gerekmez). -->
+    <EmbeddedResource Update="Resources\Strings.resx" />
+    <EmbeddedResource Update="Resources\Strings.en.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WinOptimizer.Native\WinOptimizer.Native.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Orchestration\WinOptimizer.Orchestration.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\CleanEngine\WinOptimizer.Modules.CleanEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\MemoryEngine\WinOptimizer.Modules.MemoryEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\CpuEngine\WinOptimizer.Modules.CpuEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\RepairEngine\WinOptimizer.Modules.RepairEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\SystemTweaker\WinOptimizer.Modules.SystemTweaker.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\HardwareMonitor\WinOptimizer.Modules.HardwareMonitor.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\StorageOptimizer\WinOptimizer.Modules.StorageOptimizer.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\ProfileManager\WinOptimizer.Modules.ProfileManager.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\PrivacyGuard\WinOptimizer.Modules.PrivacyGuard.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\NetworkOptimizer\WinOptimizer.Modules.NetworkOptimizer.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\BootOptimizer\WinOptimizer.Modules.BootOptimizer.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\AppManager\WinOptimizer.Modules.AppManager.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\UpdateEngine\WinOptimizer.Modules.UpdateEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\SecurityHardening\WinOptimizer.Modules.SecurityHardening.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\BackupRestore\WinOptimizer.Modules.BackupRestore.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\GpuOptimizer\WinOptimizer.Modules.GpuOptimizer.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\DevEnvironment\WinOptimizer.Modules.DevEnvironment.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\DeepCleanEngine\WinOptimizer.Modules.DeepCleanEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\BenchmarkEngine\WinOptimizer.Modules.BenchmarkEngine.csproj" />
+  </ItemGroup>
+
+</Project>

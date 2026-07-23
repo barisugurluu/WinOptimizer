@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WinOptimizer Ayarları",
+  "description": "master plan Bölüm 16.1 — settings.json şeması",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "language": { "type": "string", "default": "tr-TR", "enum": ["tr-TR", "en-US"] },
+    "theme": { "type": "string", "default": "dark", "enum": ["dark", "light"] },
+    "activeProfile": { "type": "string", "default": "balanced" },
+    "safetyNet": {
+      "type": "object",
+      "properties": {
+        "autoRestorePoint": { "type": "boolean", "default": true },
+        "autoRegistryBackup": { "type": "boolean", "default": true },
+        "requireConfirmationForHighRisk": { "type": "boolean", "default": true }
+      }
+    },
+    "realtimeGuard": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "thresholds": {
+          "type": "object",
+          "properties": {
+            "ramUsagePercent": { "type": "integer", "default": 85 },
+            "diskFreePercent": { "type": "integer", "default": 15 },
+            "diskFreeCriticalPercent": { "type": "integer", "default": 5 },
+            "cpuPerProcessPercent": { "type": "integer", "default": 80 },
+            "tempCelsius": { "type": "integer", "default": 85 }
+          }
+        }
+      }
+    },
+    "scheduler": {
+      "type": "object",
+      "properties": {
+        "weeklyOptimize": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "day": { "type": "string", "default": "Sunday" },
+            "time": { "type": "string", "default": "03:00" }
+          }
+        }
+      }
+    }
+  }
+}

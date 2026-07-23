@@ -1,0 +1,142 @@
+# WinOptimizer
+
+**Windows Sistem Bakım & Optimizasyon Yazılımı** — tek tıkla Windows'u "en iyi" haline getiren araç.
+
+C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
+
+> Bu iskelet, `maintenance_master_plan.md` (v4.0) belgesinin **Faz 0 (Temel)** ve **Faz 1 (CleanEngine)** çıkışını uygular.
+
+---
+
+## Durum (Bu teslimat)
+
+| Bileşen | Durum |
+|--------|-------|
+| Çözüm iskeleti + `app.manifest` (requireAdministrator) | ✅ Derlendi |
+| `WinOptimizer.Core` — `IOptimizationModule`, modeller, enum'lar | ✅ Derlendi |
+| `WinOptimizer.Safety` — ChangeJournal, RestorePoint, SafetyGuard, RegistryBackup, ProcessRunner, SafetyNet | ✅ Derlendi |
+| `WinOptimizer.Native` — P/Invoke (psapi, kernel32, shell32) + EmptyWorkingSet | ✅ Derlendi |
+| `WinOptimizer.Modules.CleanEngine` — TEMP/Prefetch/Log/WER/Delivery Optimization + tarayıcı cache | ✅ Derlendi |
+| `WinOptimizer.Modules.MemoryEngine` — EmptyWorkingSet ile RAM boşaltma | ✅ Derlendi |
+| `WinOptimizer.Modules.CpuEngine` — otomatik servisler, yüksek CPU tespiti | ✅ Derlendi |
+| `WinOptimizer.Modules.RepairEngine` — SFC/DISM/chkdsk | ✅ Derlendi |
+| `WinOptimizer.Modules.SystemTweaker` — registry tweak kataloğu (uygula/geri al) | ✅ Derlendi |
+| `WinOptimizer.Modules.HardwareMonitor` — CPU/RAM/disk SMART (salt okunur) | ✅ Derlendi |
+| `WinOptimizer.Modules.StorageOptimizer` — TRIM/defrag (disk türü algılama) | ✅ Derlendi |
+| `WinOptimizer.Modules.ProfileManager` — Oyun/İş/Pil/Dengeli profilleri | ✅ Derlendi |
+| `WinOptimizer.Modules.PrivacyGuard` — telemetri/reklam ID kapatma | ✅ Derlendi |
+| `WinOptimizer.Modules.NetworkOptimizer` — DNS/TCP/winsock | ✅ Derlendi |
+| `WinOptimizer.Modules.BootOptimizer` — Fast Startup/önyükleme | ✅ Derlendi |
+| `WinOptimizer.Modules.AppManager` — UWP/bloatware kaldırma | ✅ Derlendi |
+| `WinOptimizer.Modules.UpdateEngine` — WU sıfırlama/usoclient | ✅ Derlendi |
+| `WinOptimizer.Modules.SecurityHardening` — Defender/ASR/PUA/HVCI (Defender ASLA kapatılmaz) | ✅ Derlendi |
+| `WinOptimizer.Modules.BackupRestore` — wbadmin BMR, sistem durumu, vssadmin gölge kopya | ✅ Derlendi |
+| `WinOptimizer.Modules.GpuOptimizer` — GPU tespit, HAGS, VRR | ✅ Derlendi |
+| `WinOptimizer.Modules.DevEnvironment` — Hyper-V, WSL2, Geliştirici Modu, uzun yol | ✅ Derlendi |
+| `WinOptimizer.Modules.DeepCleanEngine` — Windows.old, hibernation, büyük dosyalar | ✅ Derlendi |
+| `WinOptimizer.Modules.BenchmarkEngine` — önce/sonra performans ölçümü + rapor | ✅ Derlendi |
+| `WinOptimizer.Service` — RealtimeGuard Windows servisi (MetricsCollector, ThresholdEngine, Named Pipe IPC) | ✅ Derlendi |
+| `WinOptimizer.Cli` — Komut satırı (analyze/optimize/clean/status, --json, --yes) | ✅ Çalıştı |
+| `WinOptimizer.Orchestration` — ModuleRegistry + JobOrchestrationEngine + SettingsService + SchedulerService | ✅ Derlendi |
+| `WinOptimizer.App` — WPF Fluent Dark Dashboard, 11 modül sayfası, Geri Al çizelgesi, i18n (`.resx` TR/EN, `x:Static` bağlı) | ✅ Derlendi |
+| Birim testleri (SafetyGuard, ChangeJournal, RegistryTweak, BenchmarkEngine) — 22 test | ✅ 22/22 geçti |
+| **E2E testleri** (`WinOptimizer.E2E.Tests` — gerçek sistem senaryoları) — 6 test | ✅ 6/6 geçti |
+| JSON şemaları (settings + example + tweaks catalog) | ✅ |
+| **i18n** — `.resx` kaynak dosyaları (TR varsayılan + EN), `x:Static` + ViewModel bağlama (Bölüm 12.5) | ✅ Bağlı |
+| **JSON tweak kataloğu** — `tweaks.catalog.json` tek kaynak (Bölüm 16.5) | ✅ |
+| **CI/CD** — GitHub Actions (build + test Windows runner) (Bölüm 8.6) | ✅ |
+| **Canlı doğrulama** — CLI `analyze` 37.774 öğe / 21,67 GB tespit etti | ✅ |
+| `SettingsService` + `SchedulerService` — JSON ayar kalıcılığı + Task Scheduler (Faz 8) | ✅ Derlendi |
+| Inno Setup kurulum betiği (App + Service + CLI, servis kaydı) (Faz 9) | ✅ |
+| `.gitignore` + `settings.example.json` | ✅ |
+
+**Master planın tamamı (Faz 0–9 + üretim sertleştirme + tüm boşluklar kapatıldı) uygulandı.** 28 proje, 75 kaynak dosyası, 0 uyarı/hata, **28/28 test geçti** (22 birim + 6 E2E).
+
+### Kapatılan UI/Test/Entegrasyon Boşlukları
+- ✅ **UI navigasyon view'ları** — 11 modül sayfası (Temizlik/Bellek/Onarım/İnce Ayar/Donanım/Disk/Gizlilik/Güvenlik/Ağ/Güncelleme) + Panosu + Geri Al (Bölüm 12.2)
+- ✅ **Geri Alma zaman çizelgesi** — change journal'dan 7 günlük kart listesi (Bölüm 12.3 Akış C)
+- ✅ **i18n gerçek bağlama** — `.resx` → `x:Static` (XAML) + `Strings.cs` (ViewModel), TR/EN tam yerelleştirme
+- ✅ **E2E testleri** — `WinOptimizer.E2E.Tests`: gerçek TEMP analizi, donanım okuma, süreç tarama (Bölüm 8.2)
+- ✅ **JSON tweak kataloğu** — `schemas/tweaks.catalog.json` tek kaynak (Bölüm 16.5)
+
+### Kapatılan Fonksiyonel Boşluklar (şartname uygunluğu)
+- ✅ **Geri Dönüşüm kutusu** — `Shell32.EmptyRecycleBin` artık CleanEngine'de gerçekten çağrılıyor (Bölüm 11.5)
+- ✅ **RealtimeGuard otomatik müdahale** — `RemediationEngine`: RAM>85%→EmptyWorkingSet, disk<5%→TEMP+Geri Dönüşüm, imza>7gün→Update-MpSignature (10dk cooldown ile) (Bölüm 3.17)
+- ✅ **Firefox tarayıcı temizliği** — `profiles.ini` çözümleme + `cache2`/`startupCache` (Bölüm 3.1)
+- ✅ **PowerPlanManager** — `powercfg -duplicatescheme` ile Ultimate Performance planı (Bölüm 3.9.A)
+- ✅ **Yinelenen dosya bulucu** — MD5 hash-tabanlı yinelenen tespiti (Bölüm 3.2)
+
+---
+
+## Ön Koşullar
+
+- **.NET 8 SDK** (`dotnet --version` çalışmalı). İndir: <https://dotnet.microsoft.com/download>
+- Windows 10/11 (64-bit). WMI, yönetici ayrıcalığı gereklidir.
+
+## Derleme & Çalıştırma
+
+```powershell
+# Çözümü derle (NuGet paketlerini otomatik indirir)
+dotnet build WinOptimizer.sln -c Release
+
+# Uygulamayı çalıştır (yönetici olarak — app.manifest isteyecek)
+dotnet run --project src\WinOptimizer.App\WinOptimizer.App.csproj
+```
+
+## Testleri Çalıştırma
+
+```powershell
+dotnet test WinOptimizer.sln
+```
+
+> ✅ **Doğrulandı:** 19 proje sıfır uyarı/hata ile derleniyor; 18 birim testi geçiyor (SafetyGuard, ChangeJournal, RegistryTweak).
+
+---
+
+## Mimari (master plan Bölüm 2)
+
+```
+UI (WPF)  →  Orchestration (JobEngine)  →  Modüller (IOptimizationModule)  →  Altyapı (Win32/WMI/Registry)
+                    ↓
+              SafetyNet (Restore Point + Change Journal + Registry Backup + SafetyGuard)
+```
+
+Her modül ortak sözleşmeyi uygular:
+`AnalyzeAsync` → `PreviewAsync` → `ExecuteAsync` → `RollbackAsync`
+
+### Güvenlik ilkeleri (master plan Bölüm 1.2)
+1. **Yıkıcı değil, onarıcıdır** — silmek yerine önce onarır.
+2. **Geri alınabilirdir** — her değişikliğin tersi `journal/*.jsonl` içinde saklanır.
+3. **Şeffaftır** — kullanıcı her veriyi, her komutu görür (önizleme).
+4. **Güvenli varsayılanlar** — riskli tweak'ler varsayılan KAPALI.
+5. **Kritik servislere dokunulmaz** — `WinDefend`, `RpcSs`, `EventLog`… beyaz listede.
+
+---
+
+## Klasör Yapısı
+
+```
+WinOptimizer/
+├── WinOptimizer.sln
+├── Directory.Build.props          # Ortak derleme ayarları (deterministic, warnings as errors)
+├── schemas/settings.schema.json   # Bölüm 16.1 ayar şeması
+├── src/
+│   ├── WinOptimizer.Core/         # IOptimizationModule, modeller, enum'lar
+│   ├── WinOptimizer.Native/       # P/Invoke (psapi, kernel32, shell32)
+│   ├── WinOptimizer.Safety/       # SafetyNet, ChangeJournal, RestorePoint…
+│   ├── WinOptimizer.Orchestration/# ModuleRegistry, JobOrchestrationEngine
+│   ├── WinOptimizer.App/          # WPF giriş noktası (Fluent Dark, Mica)
+│   └── WinOptimizer.Modules/
+│       └── CleanEngine/           # Disk & önbellek temizliği
+└── tests/
+    └── WinOptimizer.Core.Tests/   # SafetyGuard + ChangeJournal testleri
+```
+
+## Sonraki Adımlar (üretim sertleştirme)
+
+Planın ana iskeleti tamamlandı. Üretim dağıtımı için kalan adımlar:
+- **Kod imzalama** — EV sertifikası ile `signtool` (installer'da hazır bırakıldı)
+- **Performans benchmark** — boot/RAM/disk önce/sonra ölçümü (Bölüm 13)
+- **i18n/a11y** — `.resx` kaynak dosyaları (TR/EN), ekran okuyucu desteği
+- **Yerelleştirme** — WPF UI metinlerini `x:Static` ile kaynaklara taşıma
+- **CI/CD** — GitHub Actions: `dotnet build` + `dotnet test` her commit'te

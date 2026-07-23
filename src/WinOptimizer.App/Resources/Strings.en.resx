@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="value" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>System Maintenance &amp; Optimization</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="SystemStatus" xml:space="preserve"><value>System Status</value></data>
+  <data name="OneClickOptimize" xml:space="preserve"><value>🚀 One-Click Optimize</value></data>
+  <data name="Preview" xml:space="preserve"><value>🔍 Preview</value></data>
+  <data name="Apply" xml:space="preserve"><value>🔁 Apply</value></data>
+  <data name="QuickActions" xml:space="preserve"><value>Quick Actions</value></data>
+  <data name="Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Rollback" xml:space="preserve"><value>↩ Rollback</value></data>
+  <data name="ConfirmTitle" xml:space="preserve"><value>Confirm</value></data>
+  <data name="ConfirmMessage" xml:space="preserve"><value>Optimization will start. A system restore point will be created first.\n\nContinue?</value></data>
+  <data name="Ready" xml:space="preserve"><value>Ready.</value></data>
+  <data name="NotAnalyzed" xml:space="preserve"><value>No analysis yet. Start with "Preview".</value></data>
+  <data name="Scanning" xml:space="preserve"><value>Scanning system…</value></data>
+  <data name="ModulesActive" xml:space="preserve"><value>modules active • Running with administrator privileges.</value></data>
+  <data name="InstalledModules" xml:space="preserve"><value>Installed modules:</value></data>
+  <data name="NoModules" xml:space="preserve"><value>No modules yet.</value></data>
+  <data name="AnalysisResult" xml:space="preserve"><value>files can be cleaned. Continue with "Apply".</value></data>
+  <data name="AnalysisCanceled" xml:space="preserve"><value>Analysis canceled.</value></data>
+  <data name="OptimizeComplete" xml:space="preserve"><value>Completed: {0} items cleaned, {1} gained.</value></data>
+  <data name="OptimizeCanceled" xml:space="preserve"><value>Operation canceled.</value></data>
+  <data name="Error" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="PreparingRestorePoint" xml:space="preserve"><value>Creating restore point…</value></data>
+  <data name="CancelRequested" xml:space="preserve"><value>Cancel requested.</value></data>
+  <data name="Analyze" xml:space="preserve"><value>Analysis</value></data>
+  <data name="Optimize" xml:space="preserve"><value>Optimization</value></data>
+</root>

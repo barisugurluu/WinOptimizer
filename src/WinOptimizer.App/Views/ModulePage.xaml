@@ -1,0 +1,58 @@
+<Page x:Class="WinOptimizer.App.Views.ModulePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      Title="{Binding PageTitle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <StackPanel Orientation="Vertical" MaxWidth="900">
+
+            <!-- Başlık + risk rozeti -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <TextBlock Text="{Binding PageTitle}" FontSize="28" FontWeight="SemiBold" />
+                <Border Background="#5B5FC7" CornerRadius="8" Padding="10,2" Margin="12,4,0,8">
+                    <TextBlock Text="{Binding RiskBadge}" FontSize="12" Foreground="White" />
+                </Border>
+            </StackPanel>
+
+            <!-- Analiz özeti -->
+            <ui:Card Margin="0,0,0,16">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Analiz" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{Binding AnalysisText}" TextWrapping="Wrap" Opacity="0.85" />
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <ui:Button Content="🔍 Analiz Et" Command="{Binding AnalyzeCommand}"
+                                   Appearance="Secondary" Margin="0,0,8,0" />
+                        <ui:Button Content="🔁 Uygula" Command="{Binding ApplyCommand}"
+                                   Appearance="Primary" Margin="0,0,8,0"
+                                   IsEnabled="{Binding HasActions}" />
+                        <ui:Button Content="İptal" Command="{Binding CancelCommand}"
+                                   Appearance="Caution" />
+                    </StackPanel>
+                    <ProgressBar Value="{Binding Progress}" Maximum="100"
+                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,12,0,0" />
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Eylem listesi -->
+            <ui:Card Margin="0,0,0,16" Visibility="{Binding HasActions, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Uygulanacak Eylemler" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding Actions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2" Opacity="0.8" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Sonuç -->
+            <ui:Card Margin="0,0,0,16">
+                <ui:InfoBar Title="Sonuç" Message="{Binding ResultText}"
+                            IsOpen="{Binding HasResult}" Severity="Success" />
+            </ui:Card>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

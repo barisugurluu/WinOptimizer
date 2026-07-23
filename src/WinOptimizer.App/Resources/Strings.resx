@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="value" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Sistem Bakım &amp; Optimizasyon</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Panosu</value></data>
+  <data name="SystemStatus" xml:space="preserve"><value>Sistem Durumu</value></data>
+  <data name="OneClickOptimize" xml:space="preserve"><value>🚀 Tek Tıkla En İyi Hale Getir</value></data>
+  <data name="Preview" xml:space="preserve"><value>🔍 Önizle</value></data>
+  <data name="Apply" xml:space="preserve"><value>🔁 Uygula</value></data>
+  <data name="QuickActions" xml:space="preserve"><value>Hızlı İşlemler</value></data>
+  <data name="Result" xml:space="preserve"><value>Sonuç</value></data>
+  <data name="Rollback" xml:space="preserve"><value>↩ Geri Al</value></data>
+  <data name="ConfirmTitle" xml:space="preserve"><value>Onay</value></data>
+  <data name="ConfirmMessage" xml:space="preserve"><value>Optimizasyon başlatılacak. Devam etmeden önce sistem geri yükleme noktası alınacak.\n\nDevam?</value></data>
+  <data name="Ready" xml:space="preserve"><value>Hazır.</value></data>
+  <data name="NotAnalyzed" xml:space="preserve"><value>Henüz analiz yapılmadı. "Önizle" ile başlayın.</value></data>
+  <data name="Scanning" xml:space="preserve"><value>Sistem taranıyor…</value></data>
+  <data name="ModulesActive" xml:space="preserve"><value>modül aktif • Yönetici ayrıcalığıyla çalışıyor.</value></data>
+  <data name="InstalledModules" xml:space="preserve"><value>Yüklü modüller:</value></data>
+  <data name="NoModules" xml:space="preserve"><value>Henüz modül yok.</value></data>
+  <data name="AnalysisResult" xml:space="preserve"><value>dosya temizlenebilir. "Uygula" ile devam edin.</value></data>
+  <data name="AnalysisCanceled" xml:space="preserve"><value>Analiz iptal edildi.</value></data>
+  <data name="OptimizeComplete" xml:space="preserve"><value>Tamamlandı: {0} öğe temizlendi, {1} kazanıldı.</value></data>
+  <data name="OptimizeCanceled" xml:space="preserve"><value>İşlem iptal edildi.</value></data>
+  <data name="Error" xml:space="preserve"><value>Hata: {0}</value></data>
+  <data name="PreparingRestorePoint" xml:space="preserve"><value>Geri yükleme noktası alınıyor…</value></data>
+  <data name="CancelRequested" xml:space="preserve"><value>İptal istendi.</value></data>
+  <data name="Analyze" xml:space="preserve"><value>Analiz</value></data>
+  <data name="Optimize" xml:space="preserve"><value>Optimizasyon</value></data>
+</root>

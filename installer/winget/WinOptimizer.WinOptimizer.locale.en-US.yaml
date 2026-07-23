@@ -1,0 +1,48 @@
+# Winget manifest — Default locale (en-US) (master plan Bölüm 20.5)
+PackageIdentifier: WinOptimizer.WinOptimizer
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: WinOptimizer Team
+PublisherUrl: https://github.com/WinOptimizer/WinOptimizer
+PublisherSupportUrl: https://github.com/WinOptimizer/WinOptimizer/issues
+PrivacyUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/PRIVACY.md
+Author: WinOptimizer Team
+PackageName: WinOptimizer
+PackageUrl: https://github.com/WinOptimizer/WinOptimizer
+License: MIT
+LicenseUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/LICENSE
+Copyright: Copyright © 2026 WinOptimizer Team
+CopyrightUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/LICENSE
+ShortDescription: Single-click Windows maintenance & optimization tool with repair, cleanup and real-time protection.
+Description: |-
+  WinOptimizer is a non-destructive Windows maintenance and optimization suite.
+  It repairs (SFC/DISM), cleans (TEMP/cache), optimizes (RAM/CPU/disk), hardens
+  security (Defender/ASR), and provides a background real-time protection service
+  with threshold-based automatic remediation. Every change is reversible via
+  System Restore points and a change journal.
+Tags:
+  - optimization
+  - cleanup
+  - maintenance
+  - repair
+  - system
+  - windows
+  - tweak
+  - privacy
+  - telemetry
+  - gpu
+  - real-time
+ReleaseNotes: |-
+  Initial preview release (v0.1.0-alpha).
+  - 19 optimization modules (clean, memory, CPU, repair, GPU, security...)
+  - RealtimeGuard background service
+  - WPF Fluent Dark dashboard + CLI
+  - Turkish & English localization
+ReleaseNotesUrl: https://github.com/WinOptimizer/WinOptimizer/releases/tag/v0.1.0
+PurchaseUrl: https://github.com/WinOptimizer/WinOptimizer
+InstallationNotes: Requires administrator privileges (SFC/DISM/registry access).
+Documentations:
+  - DocumentLabel: Master Plan
+    DocumentUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/maintenance_master_plan.md
+ManifestType: defaultLocale
+ManifestVersion: 1.4.0
