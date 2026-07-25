@@ -102,6 +102,8 @@ public partial class App : Application
         services.AddSingleton<ModuleRegistry>();
         services.AddSingleton<JobOrchestrationEngine>();
         services.AddSingleton<RollbackService>();
+        services.AddSingleton<DiagnosticsPackageBuilder>(_ =>
+            new DiagnosticsPackageBuilder(baseDir, _.GetRequiredService<ILogger<DiagnosticsPackageBuilder>>()));
         services.AddSingleton<SchedulerService>();
 
         // Yönetim merkezi altyapısı

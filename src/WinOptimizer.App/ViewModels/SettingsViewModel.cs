@@ -13,6 +13,7 @@ namespace WinOptimizer.App.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _settings;
+    private readonly DiagnosticsPackageBuilder _diagnostics;
 
     /// <summary>Seçilebilir diller (değer → etiket).</summary>
     public ObservableCollection<KeyValuePair<string, string>> Languages { get; } = new()
@@ -41,10 +42,15 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int _tempThreshold;
     [ObservableProperty] private string _statusMessage = string.Empty;
     [ObservableProperty] private bool _hasStatus;
+    /// <summary>Dışa aktarma sürerken butonu devre dışı bırakır (komut CanExecute'una bağlı).</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ExportDiagnosticsCommand))]
+    private bool _isExportingDiagnostics;
 
-    public SettingsViewModel(SettingsService settings)
+    public SettingsViewModel(SettingsService settings, DiagnosticsPackageBuilder diagnostics)
     {
         _settings = settings;
+        _diagnostics = diagnostics;
         LoadFromCurrent();
     }
 
@@ -92,6 +98,50 @@ public partial class SettingsViewModel : ObservableObject
         _settings.Load();
         LoadFromCurrent();
         ShowStatus(Strings.SettingsReverted);
+    }
+
+    /// <summary>
+    /// Teşhis paketini oluşturur ve klasörünü açar (master plan Bölüm 19.5).
+    /// Gönüllüdür: paket yalnızca diske yazılır, hiçbir yere gönderilmez — telemetri yoktur.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanExportDiagnostics))]
+    private async Task ExportDiagnosticsAsync()
+    {
+        IsExportingDiagnostics = true;
+        try
+        {
+            var result = await _diagnostics.CreateAsync();
+            ShowStatus(Strings.DiagnosticsExported(result.FilePath));
+            RevealInExplorer(result.FilePath);
+        }
+        catch (Exception ex)
+        {
+            ShowStatus(Strings.Error(ex.Message));
+        }
+        finally
+        {
+            IsExportingDiagnostics = false;
+        }
+    }
+
+    private bool CanExportDiagnostics() => !IsExportingDiagnostics;
+
+    /// <summary>Üretilen paketi Dosya Gezgini'nde seçili olarak gösterir.</summary>
+    private static void RevealInExplorer(string filePath)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"/select,\"{filePath}\"",
+                UseShellExecute = true
+            })?.Dispose();
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Gezgin açılamadıysa sorun değil — yol zaten durum metninde gösteriliyor.
+        }
     }
 
     private void ShowStatus(string msg)

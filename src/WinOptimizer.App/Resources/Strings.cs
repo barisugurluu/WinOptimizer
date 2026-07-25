@@ -61,6 +61,12 @@ public static class Strings
         string.Format(_rm.GetString("OptimizeComplete") ?? "Tamamlandı: {0} öğe temizlendi, {1} kazanıldı.", items, gained);
     public static string Error(string message) =>
         string.Format(_rm.GetString("Error") ?? "Hata: {0}", message);
+    public static string DiagnosticsExported(string path) =>
+        string.Format(_rm.GetString("DiagnosticsExported") ?? "✓ Teşhis paketi oluşturuldu: {0}", path);
+
+    public static string DiagnosticsExport => _rm.GetString("DiagnosticsExport") ?? "Teşhis Paketini Dışa Aktar";
+    public static string DiagnosticsExportHelpText => _rm.GetString("DiagnosticsExportHelpText")
+        ?? "Günlükleri, değişiklik geçmişini ve sistem bilgisini bir .zip dosyasına toplar. Hiçbir yere gönderilmez.";
 
     // --- Yönetim Merkezi (Control Center) kaynakları — Bölüm 12 genişletmesi ---
     public static string Management => _rm.GetString("Management") ?? "Yönetim";

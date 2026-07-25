@@ -114,6 +114,9 @@
   <data name="SettingsSave" xml:space="preserve"><value>Kaydet</value></data>
   <data name="SettingsResetAction" xml:space="preserve"><value>Sıfırla</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>✓ Ayarlar kaydedildi.</value></data>
+  <data name="DiagnosticsExport" xml:space="preserve"><value>Teşhis Paketini Dışa Aktar</value></data>
+  <data name="DiagnosticsExportHelpText" xml:space="preserve"><value>Günlükleri, değişiklik geçmişini ve sistem bilgisini bir .zip dosyasına toplar. Hiçbir yere gönderilmez.</value></data>
+  <data name="DiagnosticsExported" xml:space="preserve"><value>✓ Teşhis paketi oluşturuldu: {0}</value></data>
   <data name="SettingsReverted" xml:space="preserve"><value>Ayarlar kayıtlı değerlere geri alındı.</value></data>
   <data name="SchedulerWeekly" xml:space="preserve"><value>Haftalık Otomatik Bakım</value></data>
   <data name="SchedulerWeeklyDesc" xml:space="preserve"><value>Her hafta belirlenen günde/saatte otomatik optimizasyon çalıştırılır (arka planda, en yüksek ayrıcalıkla).</value></data>

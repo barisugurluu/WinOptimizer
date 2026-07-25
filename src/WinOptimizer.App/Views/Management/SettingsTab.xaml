@@ -86,6 +86,21 @@
                 </StackPanel>
             </ui:Card>
 
+            <!-- Teşhis paketi — gönüllü, hiçbir yere gönderilmez (Bölüm 19.5) -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="{x:Static p:Strings.DiagnosticsExport}" FontWeight="SemiBold"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <TextBlock Text="{x:Static p:Strings.DiagnosticsExportHelpText}" TextWrapping="Wrap"
+                               Opacity="0.7" FontSize="12" Margin="0,4,0,8" />
+                    <ui:Button Content="{x:Static p:Strings.DiagnosticsExport}"
+                               Command="{Binding ExportDiagnosticsCommand}"
+                               Appearance="Secondary" HorizontalAlignment="Left"
+                               AutomationProperties.Name="{x:Static p:Strings.DiagnosticsExport}"
+                               AutomationProperties.HelpText="{x:Static p:Strings.DiagnosticsExportHelpText}" />
+                </StackPanel>
+            </ui:Card>
+
             <!-- Aksiyonlar -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                 <ui:Button Content="{x:Static p:Strings.SettingsSave}" Command="{Binding SaveCommand}" Appearance="Primary" Margin="0,0,8,0" />

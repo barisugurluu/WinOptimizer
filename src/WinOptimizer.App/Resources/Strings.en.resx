@@ -114,6 +114,9 @@
   <data name="SettingsSave" xml:space="preserve"><value>Save</value></data>
   <data name="SettingsResetAction" xml:space="preserve"><value>Reset</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>✓ Settings saved.</value></data>
+  <data name="DiagnosticsExport" xml:space="preserve"><value>Export Diagnostics Package</value></data>
+  <data name="DiagnosticsExportHelpText" xml:space="preserve"><value>Collects logs, change history and system info into a .zip file. Nothing is sent anywhere.</value></data>
+  <data name="DiagnosticsExported" xml:space="preserve"><value>✓ Diagnostics package created: {0}</value></data>
   <data name="SettingsReverted" xml:space="preserve"><value>Settings reverted to saved values.</value></data>
   <data name="SchedulerWeekly" xml:space="preserve"><value>Weekly Automatic Maintenance</value></data>
   <data name="SchedulerWeeklyDesc" xml:space="preserve"><value>Runs an automatic optimization on the chosen day/time each week (in the background, with highest privileges).</value></data>
