@@ -22,6 +22,9 @@ OutputBaseFilename=WinOptimizer-{#MyAppVersion}-setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+; EULA ekrani. license.rtf, build\generate-license.ps1 tarafindan docs\EULA.md'den
+; uretilir (commit edilmez) — kurulumda gosterilen metin Markdown'dan ayrisamaz.
+LicenseFile=license.rtf
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin

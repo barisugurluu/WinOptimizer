@@ -73,7 +73,7 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 
 | Belge | İçerik |
 |-------|--------|
-| [`docs/EULA.md`](docs/EULA.md) | Son kullanıcı lisans sözleşmesi (taslak — dağıtım öncesi hukukçu incelemesi gerekir) |
+| [`docs/EULA.md`](docs/EULA.md) | Son kullanıcı lisans sözleşmesi — kurulum sihirbazındaki EULA ekranının **tek kaynağı** (taslak; dağıtım öncesi hukukçu incelemesi gerekir) |
 | [`docs/GIZLILIK.md`](docs/GIZLILIK.md) | Gizlilik politikası — sıfır telemetri; tek ağ isteği güncelleme denetimidir |
 
 ## Ön Koşullar

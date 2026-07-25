@@ -10,11 +10,15 @@
 
   Heat adımı build-installer.ps1 tarafından otomatik yapılır.
 -->
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <!-- Codepage 1254 (Türkçe): açıklama metinlerindeki ğ/ş/ı/ç karakterleri MSI veritabanına
+       yazılabilsin diye şart. WixUI eklendiğinde varsayılan 1252'ye düşer ve derleme kırılır. -->
   <Package
     Name="WinOptimizer"
     Manufacturer="WinOptimizer Team"
     Language="1055"
+    Codepage="1254"
     Version="0.1.0"
     UpgradeCode="{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}">
 
@@ -31,13 +35,14 @@
 
     <Media Id="1" Cabinet="WinOptimizer.cab" EmbedCab="yes" CompressionLevel="high" />
 
-    <!-- UI: varsayilan Windows Installer UI (msiexec /i). Custom sihirbaz (WixUI_InstallDir)
-         icin WixToolset.UI.wixext extension + <WixExtension> ItemGroup ekleyin (Bolum 20.3). -->
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <!-- Kurulum sihirbazı: hedef klasör seçimi + EULA onay ekranı (Bölüm 20.3). -->
     <Property Id="MSIFASTINSTALL" Value="7" />
+    <!-- InstallDirectory, WIXUI_INSTALLDIR özelliğini kendisi tanımlar; ayrıca eklenmez. -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
 
-    <!-- EULA/dialog dosyaları opsiyonel; kullanıcı isterse installer\wix\ altına
-         license.rtf ve dialog.bmp koyup WixVariable ekleyebilir (Overridable). -->
+    <!-- Lisans metni. license.rtf, build/generate-license.ps1 tarafından docs\EULA.md'den
+         üretilir (commit edilmez) — böylece kurulumda gösterilen metin Markdown'dan ayrışamaz. -->
+    <WixVariable Id="WixUILicenseRtf" Value="..\license.rtf" />
 
     <!-- Feature ağacı: Uygulama (zorunlu) + Servis (opsiyonel, varsayılan açık). -->
     <Feature Id="Complete" Title="WinOptimizer" Level="1" Display="expand" AllowAdvertise="no">

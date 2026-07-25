@@ -12,7 +12,13 @@
 
 # Kurulum derlemesi
 installer/build/
-installer/wix/Payload.wxs   # generate-payload.ps1 tarafından üretilir (commit edilmez)
+# Aşağıdakiler derleme sırasında üretilir, commit edilmez.
+# NOT: .gitignore satır sonu yorumu desteklemez — yorumlar kendi satırında olmalı,
+# aksi halde desen "dosya.adı   # yorum" olarak okunur ve hiçbir şeyle eşleşmez.
+# generate-payload.ps1 üretir:
+installer/wix/Payload.wxs
+# generate-license.ps1, docs/EULA.md'den üretir:
+installer/license.rtf
 installer/wix/bin/
 installer/wix/obj/
 

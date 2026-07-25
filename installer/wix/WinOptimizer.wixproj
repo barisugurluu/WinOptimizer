@@ -15,4 +15,10 @@
   <!-- Payload.wxs build oncesi generate-payload.ps1 tarafindan uretilir (heat alternatifi).
        WiX v4 wix CLI heat sikintili oldugundan PowerShell generator kullaniriz. -->
 
+  <!-- Kurulum sihirbazi + EULA ekrani (WixUI_InstallDir). license.rtf,
+       generate-license.ps1 tarafindan docs\EULA.md'den uretilir. -->
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.5" />
+  </ItemGroup>
+
 </Project>

@@ -37,14 +37,25 @@ jobs:
         run: dotnet test WinOptimizer.sln -c Release --no-build --verbosity normal
 
       # --- Paketleme (master plan Bölüm 20) ---
+      # Cozumun tamami publish EDILMEZ: `dotnet publish <sln>` test projelerini de ayni
+      # klasore koyar ve xunit/Moq/FluentAssertions/testhost ikilileri MSI ile son
+      # kullaniciya gonderilir. Yalnizca dagitilacak uc proje yayinlanir.
       - name: Publish (App + Service + CLI)
-        run: dotnet publish WinOptimizer.sln -c Release -o publish -p:PublishSingleFile=false
+        run: |
+          dotnet publish src\WinOptimizer.App\WinOptimizer.App.csproj -c Release -o publish -p:PublishSingleFile=false
+          dotnet publish src\WinOptimizer.Service\WinOptimizer.Service.csproj -c Release -o publish -p:PublishSingleFile=false
+          dotnet publish src\WinOptimizer.Cli\WinOptimizer.Cli.csproj -c Release -o publish -p:PublishSingleFile=false
 
       - name: Setup WiX v4
         run: dotnet tool install --global wix
 
       - name: Generate Payload.wxs
         run: .\build\generate-payload.ps1 -PublishDir publish -OutputFile installer\wix\Payload.wxs
+        shell: pwsh
+
+      # EULA ekrani icin license.rtf, docs\EULA.md'den uretilir (commit edilmez).
+      - name: Generate license.rtf
+        run: .\build\generate-license.ps1
         shell: pwsh
 
       - name: Build MSI

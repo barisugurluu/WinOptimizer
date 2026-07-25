@@ -62,9 +62,19 @@ dotnet test $solution -c $Configuration --no-build --verbosity minimal
 if ($LASTEXITCODE -ne 0) { throw "Testler basarisiz." }
 
 # --- 2) Publish (App + Service + CLI) ---
-Write-Host "[2/4] Publish..." -ForegroundColor Yellow
-dotnet publish $solution -c $Configuration -o $publishBase -p:PublishSingleFile=false
-if ($LASTEXITCODE -ne 0) { throw "Publish basarisiz." }
+# DIKKAT: cozumun tamami publish EDILMEZ. `dotnet publish <sln>` test projelerini de ayni
+# klasore koyar; bu da xunit/Moq/FluentAssertions/testhost ikililerinin MSI ile son
+# kullaniciya gonderilmesine yol acar. Yalnizca dagitilacak uc proje yayinlanir.
+Write-Host "[2/6] Publish (App + Service + CLI)..." -ForegroundColor Yellow
+$shippingProjects = @(
+    'src\WinOptimizer.App\WinOptimizer.App.csproj',
+    'src\WinOptimizer.Service\WinOptimizer.Service.csproj',
+    'src\WinOptimizer.Cli\WinOptimizer.Cli.csproj'
+)
+foreach ($proj in $shippingProjects) {
+    dotnet publish (Join-Path $root $proj) -c $Configuration -o $publishBase -p:PublishSingleFile=false
+    if ($LASTEXITCODE -ne 0) { throw "Publish basarisiz: $proj" }
+}
 
 # --- 3) İmzala (opsiyonel) ---
 if (-not $SkipSign) {
@@ -75,12 +85,17 @@ if (-not $SkipSign) {
     Write-Host "[3/4] Imzalama ATLANDI (-SkipSign)" -ForegroundColor DarkYellow
 }
 
-# --- 4) Payload.wxs üret (heat alternatifi) + WiX MSI ---
-Write-Host "[4/5] Payload.wxs uretiliyor (generate-payload.ps1)..." -ForegroundColor Yellow
+# --- 4) Payload.wxs + license.rtf üret, ardından WiX MSI ---
+Write-Host "[4/6] Payload.wxs uretiliyor (generate-payload.ps1)..." -ForegroundColor Yellow
 & (Join-Path $PSScriptRoot 'generate-payload.ps1') -PublishDir $publishBase
 if ($LASTEXITCODE -ne 0) { throw "Payload.wxs uretimi basarisiz." }
 
-Write-Host "[5/5] WiX MSI paketi..." -ForegroundColor Yellow
+# EULA: docs\EULA.md tek kaynaktir; RTF her derlemede yeniden uretilir.
+Write-Host "[5/6] Lisans RTF uretiliyor (generate-license.ps1)..." -ForegroundColor Yellow
+& (Join-Path $PSScriptRoot 'generate-license.ps1')
+if ($LASTEXITCODE -ne 0) { throw "Lisans RTF uretimi basarisiz." }
+
+Write-Host "[6/6] WiX MSI paketi..." -ForegroundColor Yellow
 $wixProj = Join-Path $root 'installer\wix\WinOptimizer.wixproj'
 if (-not (Test-Path $wixProj)) { throw "WiX proje yok: $wixProj" }
 dotnet build $wixProj -c $Configuration
