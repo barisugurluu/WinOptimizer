@@ -64,6 +64,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4E90927D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinOptimizer.E2E.Tests", "tests\WinOptimizer.E2E.Tests\WinOptimizer.E2E.Tests.csproj", "{F5419EE5-0C1B-41CD-89D6-3B8A5275EA03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinOptimizer.Updater", "src\WinOptimizer.Updater\WinOptimizer.Updater.csproj", "{C332E981-F2AB-440D-8578-78E5A066A43F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinOptimizer.Updater.Tests", "tests\WinOptimizer.Updater.Tests\WinOptimizer.Updater.Tests.csproj", "{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -182,6 +186,14 @@ Global
 		{F5419EE5-0C1B-41CD-89D6-3B8A5275EA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5419EE5-0C1B-41CD-89D6-3B8A5275EA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5419EE5-0C1B-41CD-89D6-3B8A5275EA03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C332E981-F2AB-440D-8578-78E5A066A43F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C332E981-F2AB-440D-8578-78E5A066A43F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C332E981-F2AB-440D-8578-78E5A066A43F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C332E981-F2AB-440D-8578-78E5A066A43F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,5 +212,7 @@ Global
 		{1E130E48-3DEB-4F7E-99C7-B6E7E89A2BAD} = {6F7EB9CA-04FD-4BCF-8893-BE9300958DE4}
 		{EE066E7D-6F91-4174-9C14-CB1506E35B40} = {6F7EB9CA-04FD-4BCF-8893-BE9300958DE4}
 		{F5419EE5-0C1B-41CD-89D6-3B8A5275EA03} = {4E90927D-65EC-41AF-8E23-9A763CBFFC8D}
+		{C332E981-F2AB-440D-8578-78E5A066A43F} = {CDB889E0-DD1B-4CE8-B790-EA712C1F3BB2}
+		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73} = {4E90927D-65EC-41AF-8E23-9A763CBFFC8D}
 	EndGlobalSection
 EndGlobal

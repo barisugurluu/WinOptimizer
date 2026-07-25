@@ -21,6 +21,8 @@
     <ProjectReference Include="..\WinOptimizer.Modules\MemoryEngine\WinOptimizer.Modules.MemoryEngine.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\RepairEngine\WinOptimizer.Modules.RepairEngine.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\SystemTweaker\WinOptimizer.Modules.SystemTweaker.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Modules\BenchmarkEngine\WinOptimizer.Modules.BenchmarkEngine.csproj" />
+    <ProjectReference Include="..\WinOptimizer.Updater\WinOptimizer.Updater.csproj" />
   </ItemGroup>
 
 </Project>
