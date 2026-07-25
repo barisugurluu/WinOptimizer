@@ -101,6 +101,7 @@ public partial class App : Application
         // Orchestration
         services.AddSingleton<ModuleRegistry>();
         services.AddSingleton<JobOrchestrationEngine>();
+        services.AddSingleton<RollbackService>();
         services.AddSingleton<SchedulerService>();
 
         // Yönetim merkezi altyapısı

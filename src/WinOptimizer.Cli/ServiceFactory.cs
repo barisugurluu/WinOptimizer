@@ -47,6 +47,7 @@ internal static class ServiceFactory
         // Orchestration
         services.AddSingleton<ModuleRegistry>();
         services.AddSingleton<JobOrchestrationEngine>();
+        services.AddSingleton<RollbackService>();
 
         var sp = services.BuildServiceProvider();
         var reg = sp.GetRequiredService<ModuleRegistry>();

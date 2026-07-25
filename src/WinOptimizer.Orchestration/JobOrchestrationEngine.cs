@@ -82,6 +82,9 @@ public sealed class JobOrchestrationEngine
                 : _registry.Modules.Where(m => moduleIds.Contains(m.Id, StringComparer.OrdinalIgnoreCase)))
             .ToList();
 
+        _logger.LogInformation("Optimizasyon çalıştırması başlıyor: {Count} modül ({Modules})",
+            targets.Count, string.Join(", ", targets.Select(m => m.Id)));
+
         var results = new List<ExecutionResult>(targets.Count);
         foreach (var module in targets)
         {
@@ -94,6 +97,7 @@ public sealed class JobOrchestrationEngine
                 results.Add(exec);
                 _logger.LogInformation("{Id}: {S} başarılı, {K} atlandı, {F} başarısız, {B} bayt kazanç",
                     module.Id, exec.Succeeded, exec.Skipped, exec.Failed, exec.GainBytes);
+                LogChanges(exec);
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
@@ -107,6 +111,25 @@ public sealed class JobOrchestrationEngine
                 });
             }
         }
+
+        _logger.LogInformation("Optimizasyon çalıştırması bitti: {S} başarılı, {F} başarısız, {B} bayt kazanç",
+            results.Sum(r => r.Succeeded), results.Sum(r => r.Failed), results.Sum(r => r.GainBytes));
         return results;
+    }
+
+    /// <summary>
+    /// Yapılan her değişikliği denetim izi olarak günlükler.
+    /// Change journal geri alma için kayıt tutar; günlük ise kullanıcının dışa aktardığı teşhis
+    /// paketinde "bu araç sistemimde tam olarak neyi değiştirdi?" sorusunu yanıtlar.
+    /// Tek yerde yapılır — her modüle kopyalanmaz, böylece zamanla tutarsızlaşamaz.
+    /// </summary>
+    private void LogChanges(ExecutionResult exec)
+    {
+        foreach (var c in exec.Changes)
+        {
+            _logger.LogInformation(
+                "Değişiklik {ChangeId}: {Module}/{Operation} → {Target} ({Previous} → {New})",
+                c.Id, c.Module, c.Operation, c.Target, c.PreviousValue ?? "(yok)", c.NewValue ?? "(yok)");
+        }
     }
 }

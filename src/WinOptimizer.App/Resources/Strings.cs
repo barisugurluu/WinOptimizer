@@ -50,6 +50,8 @@ public static class Strings
     public static string CancelHelpText => _rm.GetString("CancelHelpText") ?? "Çalışan işlemi iptal eder.";
     public static string ProgressHelpText => _rm.GetString("ProgressHelpText") ?? "İşlem ilerleme yüzdesi.";
     public static string RollbackListHelpText => _rm.GetString("RollbackListHelpText") ?? "Son yapılan değişiklikler.";
+    public static string RollbackAction => _rm.GetString("RollbackAction") ?? "Geri Al";
+    public static string RollbackActionHelpText => _rm.GetString("RollbackActionHelpText") ?? "Bu değişikliği geri alır.";
     public static string ActionsListHelpText => _rm.GetString("ActionsListHelpText") ?? "Uygulanacak eylemlerin listesi.";
     public static string RiskBadgeHelpText => _rm.GetString("RiskBadgeHelpText") ?? "Modül risk seviyesi.";
     public static string NavPaneHelpText => _rm.GetString("NavPaneHelpText") ?? "Modül navigasyon menüsü.";

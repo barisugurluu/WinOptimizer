@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WinOptimizer.Core\WinOptimizer.Core.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+    <ProjectReference Include="..\..\src\WinOptimizer.Orchestration\WinOptimizer.Orchestration.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Service\WinOptimizer.Service.csproj" />
   </ItemGroup>
 

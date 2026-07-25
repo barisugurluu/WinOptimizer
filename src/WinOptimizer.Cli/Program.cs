@@ -47,6 +47,7 @@ public static class Program
                 "status" => RunStatus(registry),
                 "update" => await RunUpdate(opts),
                 "benchmark" => await RunBenchmark(engine, opts),
+                "rollback" => await RunRollback(sp.GetRequiredService<RollbackService>(), opts),
                 _ => UnknownCommand(command)
             };
         }
@@ -216,6 +217,67 @@ public static class Program
         return ExitSuccess;
     }
 
+    /// <summary>
+    /// rollback komutu — change journal kayıtlarını listeler veya geri alır (master plan Bölüm 15.1).
+    /// <c>--list</c> listele · <c>--id &lt;kayıt&gt;</c> tek kayıt · <c>--last [N]</c> son N değişiklik.
+    /// Geri alma sistemi değiştirdiğinden <c>--yes</c> ister.
+    /// </summary>
+    private static async Task<int> RunRollback(RollbackService rollback, CliOptions opts)
+    {
+        // Varsayılan davranış listelemektir: yanlışlıkla geri alma yapılmasın.
+        if (opts.List || (opts.ChangeId is null && opts.Last is null))
+        {
+            var records = await rollback.ReadRecentAsync();
+            if (opts.Json)
+            {
+                Console.WriteLine(JsonSerializer.Serialize(records, JsonOutputOptions));
+            }
+            else if (records.Count == 0)
+            {
+                Console.WriteLine("Son 7 günde geri alınabilir değişiklik yok.");
+            }
+            else
+            {
+                Console.WriteLine($"Son 7 gün — {records.Count} değişiklik:\n");
+                foreach (var r in records)
+                {
+                    Console.WriteLine($"  {r.Id}  {r.Timestamp.LocalDateTime:dd.MM HH:mm}  " +
+                                      $"{r.Module,-18} {r.Operation,-18} {r.Target}");
+                }
+                Console.WriteLine("\nGeri almak için: rollback --id <kayıt> --yes   veya   rollback --last [N] --yes");
+            }
+            return ExitSuccess;
+        }
+
+        if (!opts.Yes)
+        {
+            Console.Error.WriteLine("Geri alma sistemi değiştirir. Onaylamak için --yes ekleyin.");
+            return ExitError;
+        }
+
+        var outcomes = opts.ChangeId is not null
+            ? new[] { await rollback.RollbackByIdAsync(opts.ChangeId) }
+            : (await rollback.RollbackLastAsync(opts.Last ?? 1)).ToArray();
+
+        if (opts.Json)
+        {
+            Console.WriteLine(JsonSerializer.Serialize(outcomes, JsonOutputOptions));
+        }
+        else if (outcomes.Length == 0)
+        {
+            Console.WriteLine("Geri alınacak değişiklik bulunamadı.");
+        }
+        else
+        {
+            foreach (var o in outcomes)
+            {
+                Console.WriteLine($"  [{(o.IsSuccess ? "OK " : "HATA")}] {o.ModuleId} {o.ChangeId}: {o.Message}");
+            }
+        }
+
+        return outcomes.Any(o => !o.IsSuccess) ? ExitPartial : ExitSuccess;
+    }
+
     private static int UnknownCommand(string cmd)
     {
         Console.Error.WriteLine($"Bilinmeyen komut: {cmd}");
@@ -233,12 +295,16 @@ public static class Program
         Console.WriteLine("  clean     Yalnızca temizlik (Clean + Memory)");
         Console.WriteLine("  status    Kayıtlı modülleri listele");
         Console.WriteLine("  update    Yeni sürümü denetle/indir/kur (--yes ile kur, --channel beta)");
-        Console.WriteLine("  benchmark Önce/sonra performans ölçümü (--yes ile optimize et)\n");
+        Console.WriteLine("  benchmark Önce/sonra performans ölçümü (--yes ile optimize et)");
+        Console.WriteLine("  rollback  Değişiklikleri listele/geri al (--list, --id <kayıt>, --last [N])\n");
         Console.WriteLine("SEÇENEKLER:");
         Console.WriteLine("  --json          Yapılandırılmış JSON çıktı (CI/CD)");
         Console.WriteLine("  --yes           Otomatik onay (düşük/orta riskli)");
         Console.WriteLine("  --module <id>   Belirli modül(ler) (virgülle)");
         Console.WriteLine("  --profile <id>  Profil uygula (balanced/gaming/work/battery)");
+        Console.WriteLine("  --id <kayıt>    rollback: geri alınacak değişiklik kimliği");
+        Console.WriteLine("  --last [N]      rollback: son N değişikliği geri al (varsayılan 1)");
+        Console.WriteLine("  --list          rollback: yalnızca listele (varsayılan)");
     }
 
     private static CliOptions ParseOptions(string[] args)
@@ -257,6 +323,12 @@ public static class Program
                 case "--channel" when i + 1 < args.Length:
                     o.Channel = Enum.TryParse<UpdateChannel>(args[++i], ignoreCase: true, out var ch) ? ch : UpdateChannel.Stable;
                     break;
+                case "--id" when i + 1 < args.Length: o.ChangeId = args[++i]; break;
+                case "--list": o.List = true; break;
+                case "--last":
+                    // --last tek başına 1 anlamına gelir; sayı verilirse o kadar kayıt.
+                    o.Last = i + 1 < args.Length && int.TryParse(args[i + 1], out int n) ? (++i, n).Item2 : 1;
+                    break;
             }
         }
         return o;
@@ -269,5 +341,14 @@ public static class Program
         public string[]? Modules { get; set; }
         public string? Profile { get; set; }
         public UpdateChannel? Channel { get; set; }
+
+        /// <summary>rollback: geri alınacak tek kaydın kimliği (--id).</summary>
+        public string? ChangeId { get; set; }
+
+        /// <summary>rollback: en son N değişikliği geri al (--last, varsayılan 1).</summary>
+        public int? Last { get; set; }
+
+        /// <summary>rollback: yalnızca kayıtları listele (--list).</summary>
+        public bool List { get; set; }
     }
 }

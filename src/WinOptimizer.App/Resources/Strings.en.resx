@@ -69,6 +69,8 @@
   <data name="CancelHelpText" xml:space="preserve"><value>Cancels the running operation.</value></data>
   <data name="ProgressHelpText" xml:space="preserve"><value>Operation progress percentage.</value></data>
   <data name="RollbackListHelpText" xml:space="preserve"><value>Recent changes.</value></data>
+  <data name="RollbackAction" xml:space="preserve"><value>Undo</value></data>
+  <data name="RollbackActionHelpText" xml:space="preserve"><value>Reverts this change.</value></data>
   <data name="ActionsListHelpText" xml:space="preserve"><value>List of actions to be applied.</value></data>
   <data name="RiskBadgeHelpText" xml:space="preserve"><value>Module risk level.</value></data>
   <data name="NavPaneHelpText" xml:space="preserve"><value>Module navigation menu.</value></data>

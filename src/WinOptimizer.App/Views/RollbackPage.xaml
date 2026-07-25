@@ -24,17 +24,32 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ui:Card Margin="0,0,0,8">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Timestamp}" FontWeight="SemiBold" Margin="0,0,12,0" />
-                                <TextBlock Text="{Binding Module}" Foreground="#5B5FC7" Margin="0,0,12,0" />
-                                <TextBlock Text="{Binding Operation}" Opacity="0.6" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Timestamp}" FontWeight="SemiBold" Margin="0,0,12,0" />
+                                    <TextBlock Text="{Binding Module}" Foreground="#5B5FC7" Margin="0,0,12,0" />
+                                    <TextBlock Text="{Binding Operation}" Opacity="0.6" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Target}" TextTrimming="CharacterEllipsis"
+                                           Margin="0,4,0,0" Opacity="0.8" />
+                                <TextBlock Text="{Binding Note}" TextWrapping="Wrap"
+                                           Margin="0,2,0,0" Opacity="0.6" FontSize="12" />
                             </StackPanel>
-                            <TextBlock Text="{Binding Target}" TextTrimming="CharacterEllipsis"
-                                       Margin="0,4,0,0" Opacity="0.8" />
-                            <TextBlock Text="{Binding Note}" TextWrapping="Wrap"
-                                       Margin="0,2,0,0" Opacity="0.6" FontSize="12" />
-                        </StackPanel>
+
+                            <!-- Kaydı gerçekten geri alır (Bölüm 12.3 Akış C, hedef G3). -->
+                            <ui:Button Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0"
+                                       Content="{x:Static p:Strings.RollbackAction}"
+                                       Command="{Binding DataContext.RollbackCommand,
+                                                 RelativeSource={RelativeSource AncestorType=ListView}}"
+                                       CommandParameter="{Binding}"
+                                       AutomationProperties.Name="{x:Static p:Strings.RollbackAction}"
+                                       AutomationProperties.HelpText="{x:Static p:Strings.RollbackActionHelpText}" />
+                        </Grid>
                     </ui:Card>
                 </DataTemplate>
             </ListView.ItemTemplate>

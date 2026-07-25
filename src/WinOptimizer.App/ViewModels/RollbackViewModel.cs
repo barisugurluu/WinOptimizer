@@ -2,49 +2,62 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinOptimizer.Core;
-using WinOptimizer.Safety;
+using WinOptimizer.Orchestration;
 
 namespace WinOptimizer.App.ViewModels;
 
 /// <summary>
 /// Geri alma zaman çizelgesi ViewModel (master plan Bölüm 12.3 Akış C).
-/// Change journal'dan değişiklik kayıtlarını okur ve kart olarak gösterir.
+/// Change journal kayıtlarını kart olarak listeler ve seçilen kaydı
+/// <see cref="RollbackService"/> üzerinden gerçekten geri alır.
 /// </summary>
 public partial class RollbackViewModel : ObservableObject
 {
-    private readonly ChangeJournal _journal;
+    private readonly RollbackService _rollback;
 
     [ObservableProperty] private string _statusText = "Kayıtlar yükleniyor…";
+    [ObservableProperty] private bool _isBusy;
 
     public ObservableCollection<ChangeRecordView> Records { get; } = new();
 
-    public RollbackViewModel(ChangeJournal journal) => _journal = journal;
+    public RollbackViewModel(RollbackService rollback) => _rollback = rollback;
 
-    /// <summary>Son 7 günün kayıtlarını yükler.</summary>
+    /// <summary>Son 7 günün kayıtlarını (en yeniden eskiye) yükler.</summary>
     [RelayCommand]
     public async Task LoadAsync()
     {
         Records.Clear();
-        int total = 0;
-        for (int i = 0; i < 7; i++)
+        var records = await _rollback.ReadRecentAsync();
+        foreach (var r in records)
         {
-            var day = DateTime.UtcNow.AddDays(-i);
-            var records = await _journal.ReadDayAsync(day);
-            foreach (var r in records)
-            {
-                Records.Add(new ChangeRecordView
-                {
-                    Id = r.Id,
-                    Timestamp = r.Timestamp.LocalDateTime.ToString("dd.MM.yyyy HH:mm"),
-                    Module = r.Module,
-                    Operation = r.Operation.ToString(),
-                    Target = r.Target,
-                    Note = r.Note ?? string.Empty
-                });
-                total++;
-            }
+            Records.Add(ChangeRecordView.From(r));
         }
-        StatusText = total > 0 ? $"{total} değişiklik kaydı bulundu." : "Kayıt yok.";
+        StatusText = Records.Count > 0
+            ? $"{Records.Count} değişiklik kaydı bulundu."
+            : "Kayıt yok.";
+    }
+
+    /// <summary>Seçilen değişikliği geri alır ve listeyi tazeler.</summary>
+    [RelayCommand]
+    private async Task RollbackAsync(ChangeRecordView? record)
+    {
+        if (record is null || IsBusy) return;
+
+        IsBusy = true;
+        try
+        {
+            var outcome = await _rollback.RollbackByIdAsync(record.Id);
+            StatusText = outcome.IsSuccess
+                ? $"Geri alındı: {record.Target} — {outcome.Message}"
+                : $"Geri alınamadı: {record.Target} — {outcome.Message}";
+
+            // Geri almanın kendisi de journal'a yazıldığı için listeyi tazeliyoruz.
+            await LoadAsync();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
 
@@ -57,4 +70,14 @@ public sealed class ChangeRecordView
     public string Operation { get; set; } = string.Empty;
     public string Target { get; set; } = string.Empty;
     public string Note { get; set; } = string.Empty;
+
+    public static ChangeRecordView From(ChangeRecord r) => new()
+    {
+        Id = r.Id,
+        Timestamp = r.Timestamp.LocalDateTime.ToString("dd.MM.yyyy HH:mm"),
+        Module = r.Module,
+        Operation = r.Operation.ToString(),
+        Target = r.Target,
+        Note = r.Note ?? string.Empty
+    };
 }

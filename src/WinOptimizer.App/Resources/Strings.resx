@@ -69,6 +69,8 @@
   <data name="CancelHelpText" xml:space="preserve"><value>Çalışan işlemi iptal eder.</value></data>
   <data name="ProgressHelpText" xml:space="preserve"><value>İşlem ilerleme yüzdesi.</value></data>
   <data name="RollbackListHelpText" xml:space="preserve"><value>Son yapılan değişiklikler.</value></data>
+  <data name="RollbackAction" xml:space="preserve"><value>Geri Al</value></data>
+  <data name="RollbackActionHelpText" xml:space="preserve"><value>Bu değişikliği geri alır.</value></data>
   <data name="ActionsListHelpText" xml:space="preserve"><value>Uygulanacak eylemlerin listesi.</value></data>
   <data name="RiskBadgeHelpText" xml:space="preserve"><value>Modül risk seviyesi.</value></data>
   <data name="NavPaneHelpText" xml:space="preserve"><value>Modül navigasyon menüsü.</value></data>
