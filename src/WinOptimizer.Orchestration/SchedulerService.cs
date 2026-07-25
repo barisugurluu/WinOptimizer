@@ -44,7 +44,9 @@ public sealed class SchedulerService
         {
             var psi = new ProcessStartInfo("schtasks.exe", $"/query /tn {TaskName}")
             {
-                UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
             };
             using var p = Process.Start(psi);
             p?.WaitForExit();
@@ -59,7 +61,9 @@ public sealed class SchedulerService
         {
             var psi = new ProcessStartInfo("schtasks.exe", args)
             {
-                UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
             };
             using var p = Process.Start(psi);
             p?.WaitForExit();

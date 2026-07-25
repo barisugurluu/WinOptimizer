@@ -42,7 +42,8 @@ public sealed class StorageOptimizerModule : IOptimizationModule
         }
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = optimizable,
+            ModuleId = Id,
+            ItemCount = optimizable,
             Summary = $"{drives.Count} sabit disk, {optimizable} SSD TRIM için uygun.",
             Details = new() { ["Drives"] = drives }
         });
@@ -59,7 +60,8 @@ public sealed class StorageOptimizerModule : IOptimizationModule
                 actions.Add(new PreviewAction
                 {
                     Description = $"{d.Drive} {d.Type} — {op}",
-                    Risk = RiskLevel.Low, Target = (string)d.Drive
+                    Risk = RiskLevel.Low,
+                    Target = (string)d.Drive
                 });
             }
         }
@@ -79,8 +81,11 @@ public sealed class StorageOptimizerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / Math.Max(1, total),
-                Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / Math.Max(1, total),
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             char drive = action.Target![0];
@@ -96,8 +101,11 @@ public sealed class StorageOptimizerModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = $"{drive}: ({verb})", NewValue = "optimized", Note = action.Description
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = $"{drive}: ({verb})",
+                        NewValue = "optimized",
+                        Note = action.Description
                     });
                 }
                 else failed++;
@@ -111,7 +119,9 @@ public sealed class StorageOptimizerModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "TRIM/defrag geri alınmaz; diski iyileştirir."
         });
 

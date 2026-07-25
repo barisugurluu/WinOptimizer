@@ -94,7 +94,11 @@ public sealed class MemoryEngineModule : IOptimizationModule
     {
         progress.Report(new ProgressInfo
         {
-            ModuleId = Id, Percent = 10, Message = "Boştaki süreçler taranıyor…", Current = 0, Total = 1
+            ModuleId = Id,
+            Percent = 10,
+            Message = "Boştaki süreçler taranıyor…",
+            Current = 0,
+            Total = 1
         });
 
         long before = SumAllWorkingSets();

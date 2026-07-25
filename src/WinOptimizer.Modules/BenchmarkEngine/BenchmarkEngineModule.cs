@@ -95,7 +95,9 @@ public sealed class BenchmarkEngineModule : IOptimizationModule
     {
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Benchmark ölçümü geri alınmaz (salt okunur)."
         });
     }

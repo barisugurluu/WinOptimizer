@@ -60,7 +60,10 @@ public sealed class SecurityHardeningModule : IOptimizationModule
         string summary = warnings.Count > 0 ? "⚠ " + string.Join(" | ", warnings) : "Güvenlik durumu sağlıklı.";
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = RecommendedAsrRules.Length + 1, Summary = summary, Details = details
+            ModuleId = Id,
+            ItemCount = RecommendedAsrRules.Length + 1,
+            Summary = summary,
+            Details = details
         });
     }
 
@@ -98,7 +101,11 @@ public sealed class SecurityHardeningModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -131,8 +138,11 @@ public sealed class SecurityHardeningModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = action.Target ?? string.Empty, NewValue = "enabled", Note = action.Description
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = action.Target ?? string.Empty,
+                        NewValue = "enabled",
+                        Note = action.Description
                     });
                 }
                 else failed++;
@@ -148,7 +158,9 @@ public sealed class SecurityHardeningModule : IOptimizationModule
         // Defender güçlendirme geri alınmaz (zaten güvenliği artırır).
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Güvenlik sertleştirme geri alınmaz; zaten sistemi korur."
         });
     }

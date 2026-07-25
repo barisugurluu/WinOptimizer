@@ -84,7 +84,11 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
             : "Derin temizlik için büyük hedef bulunamadı.";
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = items, TotalBytes = total, Summary = summary, Details = details
+            ModuleId = Id,
+            ItemCount = items,
+            TotalBytes = total,
+            Summary = summary,
+            Details = details
         });
     }
 
@@ -146,7 +150,11 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -159,9 +167,12 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
                     succeeded++; gain += bytes;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.FileDelete,
-                        Target = "Windows.old", PreviousValue = DiskScanner.FormatBytes(bytes),
-                        NewValue = "removed", Note = "10+ gün eski Windows.old kaldırıldı"
+                        Module = Id,
+                        Operation = ChangeOperationType.FileDelete,
+                        Target = "Windows.old",
+                        PreviousValue = DiskScanner.FormatBytes(bytes),
+                        NewValue = "removed",
+                        Note = "10+ gün eski Windows.old kaldırıldı"
                     });
                 }
                 else if (action.Target == "Hibernation")
@@ -172,8 +183,11 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
                         succeeded++;
                         changes.Add(new ChangeRecord
                         {
-                            Module = Id, Operation = ChangeOperationType.CommandRun,
-                            Target = "hiberfil.sys", NewValue = "removed", Note = "Hibernation kapatıldı"
+                            Module = Id,
+                            Operation = ChangeOperationType.CommandRun,
+                            Target = "hiberfil.sys",
+                            NewValue = "removed",
+                            Note = "Hibernation kapatıldı"
                         });
                     }
                     else failed++;
@@ -191,8 +205,11 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "LargeFiles", NewValue = "scanned", Note = "Büyük dosyalar tarandı"
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "LargeFiles",
+                        NewValue = "scanned",
+                        Note = "Büyük dosyalar tarandı"
                     });
                 }
             }
@@ -208,7 +225,9 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
         // Windows.old / hibernation silme geri alınamaz (sistem geri yükleme noktası öner).
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = false,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = false,
             Error = "Derin temizlik geri alınamaz; sistem geri yükleme noktası kullanın."
         });
     }

@@ -47,7 +47,8 @@ public sealed class AppManagerModule : IOptimizationModule
         // Yüklü bloatware'i say (Get-AppxPackage ile)
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = KnownBloatware.Length,
+            ModuleId = Id,
+            ItemCount = KnownBloatware.Length,
             Summary = $"{KnownBloatware.Length} bilinen bloatware paketi taranabilir (kaldırma kullanıcı onayıyla)."
         });
     }
@@ -77,7 +78,11 @@ public sealed class AppManagerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             var pkg = action.Target!;
@@ -99,8 +104,11 @@ public sealed class AppManagerModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = pkg, NewValue = "removed", Note = "UWP kaldırıldı"
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = pkg,
+                        NewValue = "removed",
+                        Note = "UWP kaldırıldı"
                     });
                 }
                 else { skipped++; }
@@ -114,7 +122,9 @@ public sealed class AppManagerModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = false,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = false,
             Error = "Kaldırılan UWP'yi geri yüklemek için Microsoft Store'dan yeniden yükleyin."
         });
 }

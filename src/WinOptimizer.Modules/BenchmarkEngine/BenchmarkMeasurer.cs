@@ -45,8 +45,12 @@ public sealed class BenchmarkMeasurer
 
         return new BenchmarkSnapshot
         {
-            BootSec = boot, FreeRamMb = freeRam, DiskFreeGb = diskFree,
-            CpuLoadPct = cpuLoad, RealTimeProtection = rtp, SecurityScore = secScore
+            BootSec = boot,
+            FreeRamMb = freeRam,
+            DiskFreeGb = diskFree,
+            CpuLoadPct = cpuLoad,
+            RealTimeProtection = rtp,
+            SecurityScore = secScore
         };
     }
 

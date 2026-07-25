@@ -102,8 +102,11 @@ public sealed class CpuEngineModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / Math.Max(1, total),
-                Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / Math.Max(1, total),
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             var svc = action.Target!;
@@ -118,7 +121,9 @@ public sealed class CpuEngineModule : IOptimizationModule
             {
                 using var p = Process.Start(new ProcessStartInfo("sc.exe", $"config {svc} start= demand")
                 {
-                    UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true
                 });
                 p?.WaitForExit();
                 if (p?.ExitCode == 0)
@@ -146,7 +151,10 @@ public sealed class CpuEngineModule : IOptimizationModule
         await _safety.Journal.WriteRangeAsync(changes, ct);
         return new ExecutionResult
         {
-            ModuleId = Id, Succeeded = succeeded, Skipped = skipped, Failed = failed,
+            ModuleId = Id,
+            Succeeded = succeeded,
+            Skipped = skipped,
+            Failed = failed,
             Changes = changes
         };
     }
@@ -163,7 +171,8 @@ public sealed class CpuEngineModule : IOptimizationModule
             using var p = Process.Start(new ProcessStartInfo("sc.exe",
                 $"config {change.Target} start= {change.PreviousValue ?? "Auto"}")
             {
-                UseShellExecute = false, CreateNoWindow = true
+                UseShellExecute = false,
+                CreateNoWindow = true
             });
             p?.WaitForExit();
             bool ok = p?.ExitCode == 0;

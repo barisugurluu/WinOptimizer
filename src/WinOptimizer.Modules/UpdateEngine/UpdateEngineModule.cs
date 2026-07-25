@@ -28,7 +28,8 @@ public sealed class UpdateEngineModule : IOptimizationModule
     {
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = 2,
+            ModuleId = Id,
+            ItemCount = 2,
             Summary = "Güncelleme kontrolü başlatılabilir; SoftwareDistribution önbelleği temizlenebilir."
         });
     }
@@ -62,7 +63,11 @@ public sealed class UpdateEngineModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -73,8 +78,11 @@ public sealed class UpdateEngineModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "usoclient /StartScan", NewValue = $"exit={code}", Note = "Güncelleme taraması"
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "usoclient /StartScan",
+                        NewValue = $"exit={code}",
+                        Note = "Güncelleme taraması"
                     });
                 }
                 else if (action.Target == "ResetWU")
@@ -90,8 +98,10 @@ public sealed class UpdateEngineModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "SoftwareDistribution\\Download", NewValue = "cleared",
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "SoftwareDistribution\\Download",
+                        NewValue = "cleared",
                         Note = "WU önbelleği sıfırlandı"
                     });
                 }
@@ -105,7 +115,9 @@ public sealed class UpdateEngineModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "WU sıfırlama geçicidir; Windows önbelleği yeniden oluşturur."
         });
 }

@@ -27,7 +27,8 @@ public sealed class BootOptimizerModule : IOptimizationModule
     {
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = 2,
+            ModuleId = Id,
+            ItemCount = 2,
             Summary = "Fast Startup durumu kontrol edilebilir; gereksiz zamanlanmış görevler taranabilir."
         });
     }
@@ -61,7 +62,11 @@ public sealed class BootOptimizerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -77,8 +82,11 @@ public sealed class BootOptimizerModule : IOptimizationModule
                         succeeded++;
                         changes.Add(new ChangeRecord
                         {
-                            Module = Id, Operation = ChangeOperationType.CommandRun,
-                            Target = "BootTime", NewValue = output.Trim(), Note = "Son açılış zamanı"
+                            Module = Id,
+                            Operation = ChangeOperationType.CommandRun,
+                            Target = "BootTime",
+                            NewValue = output.Trim(),
+                            Note = "Son açılış zamanı"
                         });
                     }
                 }
@@ -90,8 +98,10 @@ public sealed class BootOptimizerModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "FastStartup", NewValue = output.Contains("0x1") ? "On" : "Off",
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "FastStartup",
+                        NewValue = output.Contains("0x1") ? "On" : "Off",
                         Note = "Hızlı Açılış durumu"
                     });
                 }
@@ -105,7 +115,9 @@ public sealed class BootOptimizerModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Önyükleme ayarı değiştirilmedi (yalnızca rapor)."
         });
 }

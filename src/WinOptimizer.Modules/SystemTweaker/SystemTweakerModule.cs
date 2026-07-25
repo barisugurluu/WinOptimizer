@@ -78,8 +78,11 @@ public sealed class SystemTweakerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / Math.Max(1, total),
-                Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / Math.Max(1, total),
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             var tweak = TweakCatalog.All.FirstOrDefault(t => t.Id == action.Target);
@@ -118,7 +121,10 @@ public sealed class SystemTweakerModule : IOptimizationModule
         await _safety.Journal.WriteRangeAsync(changes, ct);
         return new ExecutionResult
         {
-            ModuleId = Id, Succeeded = succeeded, Failed = failed, Changes = changes
+            ModuleId = Id,
+            Succeeded = succeeded,
+            Failed = failed,
+            Changes = changes
         };
     }
 

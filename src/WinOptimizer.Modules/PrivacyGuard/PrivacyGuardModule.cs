@@ -40,7 +40,8 @@ public sealed class PrivacyGuardModule : IOptimizationModule
     {
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = Tweaks.Length,
+            ModuleId = Id,
+            ItemCount = Tweaks.Length,
             Summary = $"{Tweaks.Length} gizlilik ayarı uygulanabilir."
         });
     }
@@ -49,7 +50,9 @@ public sealed class PrivacyGuardModule : IOptimizationModule
     {
         var actions = Tweaks.Select(t => new PreviewAction
         {
-            Description = $"{t.Desc} ({t.Hive}\\{t.Path})", Risk = RiskLevel.Low, Target = t.Id
+            Description = $"{t.Desc} ({t.Hive}\\{t.Path})",
+            Risk = RiskLevel.Low,
+            Target = t.Id
         }).ToList();
         return Task.FromResult(new PreviewResult { ModuleId = Id, Actions = actions, IsDryRun = true });
     }
@@ -67,7 +70,11 @@ public sealed class PrivacyGuardModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = t.Desc, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = t.Desc,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -80,8 +87,11 @@ public sealed class PrivacyGuardModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.RegistrySetValue,
-                        Target = $"{t.Hive}\\{t.Path}\\{t.Value}", NewValue = t.On, Note = t.Desc
+                        Module = Id,
+                        Operation = ChangeOperationType.RegistrySetValue,
+                        Target = $"{t.Hive}\\{t.Path}\\{t.Value}",
+                        NewValue = t.On,
+                        Note = t.Desc
                     });
                 }
                 else failed++;
@@ -97,7 +107,9 @@ public sealed class PrivacyGuardModule : IOptimizationModule
         // Değeri 1'e (varsayılan açık) döndür
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Gizlilik ayarı varsayılana döndürüldü."
         });
     }

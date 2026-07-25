@@ -101,8 +101,11 @@ public sealed class RepairEngineModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total,
-                Message = step.Name + " çalışıyor…", Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = step.Name + " çalışıyor…",
+                Current = idx,
+                Total = total
             });
 
             try
@@ -138,8 +141,11 @@ public sealed class RepairEngineModule : IOptimizationModule
 
         return new ExecutionResult
         {
-            ModuleId = Id, Succeeded = succeeded, Failed = failed,
-            Changes = changes, Errors = errors
+            ModuleId = Id,
+            Succeeded = succeeded,
+            Failed = failed,
+            Changes = changes,
+            Errors = errors
         };
     }
 
@@ -149,7 +155,9 @@ public sealed class RepairEngineModule : IOptimizationModule
     {
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Sistem onarımı geri alınmaz; zaten sistemi düzeltir."
         });
     }

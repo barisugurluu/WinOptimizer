@@ -46,7 +46,9 @@ public sealed class BackupRestoreModule : IOptimizationModule
 
         return new AnalysisResult
         {
-            ModuleId = Id, ItemCount = versionCount, Summary = versions,
+            ModuleId = Id,
+            ItemCount = versionCount,
+            Summary = versions,
             Details = new() { ["wbadminAvailable"] = versionCount >= 0 }
         };
     }
@@ -80,7 +82,11 @@ public sealed class BackupRestoreModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -107,8 +113,11 @@ public sealed class BackupRestoreModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = action.Target ?? string.Empty, NewValue = "ok", Note = note
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = action.Target ?? string.Empty,
+                        NewValue = "ok",
+                        Note = note
                     });
                 }
                 else failed++;
@@ -124,7 +133,9 @@ public sealed class BackupRestoreModule : IOptimizationModule
         // Yedek oluşturma geri alınmaz (wbadmin delete catalog son çare, tehlikeli).
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Yedek oluşturma geri alınmaz; gereksiz yedek elle silinebilir."
         });
     }

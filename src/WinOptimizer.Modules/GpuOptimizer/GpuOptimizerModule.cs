@@ -50,7 +50,8 @@ public sealed class GpuOptimizerModule : IOptimizationModule
 
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = gpus.Count,
+            ModuleId = Id,
+            ItemCount = gpus.Count,
             Summary = $"{gpus.Count} GPU bulundu. HAGS: {(hags ? "Açık" : "Kapalı")}.",
             Details = new() { ["Gpus"] = gpus, ["HagsEnabled"] = hags }
         });
@@ -97,7 +98,11 @@ public sealed class GpuOptimizerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -113,9 +118,12 @@ public sealed class GpuOptimizerModule : IOptimizationModule
                     {
                         changes.Add(new ChangeRecord
                         {
-                            Module = Id, Operation = ChangeOperationType.RegistrySetValue,
+                            Module = Id,
+                            Operation = ChangeOperationType.RegistrySetValue,
                             Target = @"HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\HwSchMode",
-                            PreviousValue = "1", NewValue = "2", Note = "HAGS açıldı (reboot gerekir)"
+                            PreviousValue = "1",
+                            NewValue = "2",
+                            Note = "HAGS açıldı (reboot gerekir)"
                         });
                     }
                 }
@@ -125,8 +133,11 @@ public sealed class GpuOptimizerModule : IOptimizationModule
                     ok = true;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "VRR", NewValue = "reported", Note = "VRR durumu raporlandı"
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "VRR",
+                        NewValue = "reported",
+                        Note = "VRR durumu raporlandı"
                     });
                 }
 
@@ -149,7 +160,10 @@ public sealed class GpuOptimizerModule : IOptimizationModule
         }
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true, Error = "Geri alınacak kayıt yok."
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
+            Error = "Geri alınacak kayıt yok."
         });
     }
 

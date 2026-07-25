@@ -33,7 +33,8 @@ public sealed class DevEnvironmentModule : IOptimizationModule
 
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = 4,
+            ModuleId = Id,
+            ItemCount = 4,
             Summary = $"Uzun yol: {(longPaths ? "Açık" : "Kapalı")} • Geliştirici Modu: {(devMode ? "Açık" : "Kapalı")}",
             Details = new() { ["LongPaths"] = longPaths, ["DeveloperMode"] = devMode }
         });
@@ -82,7 +83,11 @@ public sealed class DevEnvironmentModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total, Message = action.Description, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = action.Description,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -109,8 +114,11 @@ public sealed class DevEnvironmentModule : IOptimizationModule
                     ok = code == 0;
                     if (ok) changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "Hyper-V", NewValue = "enabled", Note = "Hyper-V etkinleştirildi (reboot gerekir)"
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "Hyper-V",
+                        NewValue = "enabled",
+                        Note = "Hyper-V etkinleştirildi (reboot gerekir)"
                     });
                 }
                 else if (action.Target == "WSL2")
@@ -119,8 +127,11 @@ public sealed class DevEnvironmentModule : IOptimizationModule
                     ok = true; // raporlama
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = "WSL2", NewValue = code == 0 ? "installed" : "not-installed", Note = output.Trim()
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = "WSL2",
+                        NewValue = code == 0 ? "installed" : "not-installed",
+                        Note = output.Trim()
                     });
                 }
 
@@ -138,7 +149,9 @@ public sealed class DevEnvironmentModule : IOptimizationModule
         // Uzun yol / DevMode kapatma; Hyper-V disable dism ile.
         return Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Geliştirici ortamı tweak'leri tek tek geri alınabilir (registry)."
         });
     }

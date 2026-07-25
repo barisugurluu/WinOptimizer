@@ -64,8 +64,11 @@ public sealed class NetworkOptimizerModule : IOptimizationModule
             idx++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = idx * 100 / total,
-                Message = step.Desc, Current = idx, Total = total
+                ModuleId = Id,
+                Percent = idx * 100 / total,
+                Message = step.Desc,
+                Current = idx,
+                Total = total
             });
 
             try
@@ -85,8 +88,11 @@ public sealed class NetworkOptimizerModule : IOptimizationModule
                     succeeded++;
                     changes.Add(new ChangeRecord
                     {
-                        Module = Id, Operation = ChangeOperationType.CommandRun,
-                        Target = $"{step.File} {step.Args}", NewValue = "ok", Note = step.Desc
+                        Module = Id,
+                        Operation = ChangeOperationType.CommandRun,
+                        Target = $"{step.File} {step.Args}",
+                        NewValue = "ok",
+                        Note = step.Desc
                     });
                 }
                 else failed++;
@@ -104,7 +110,9 @@ public sealed class NetworkOptimizerModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "DNS/DHCP sıfırlama geçicidir; sistem yeniden doldurur."
         });
 }

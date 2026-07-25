@@ -65,7 +65,10 @@ public sealed class HardwareMonitorModule : IOptimizationModule
         string summary = warnings.Count > 0 ? "⚠ " + string.Join(" | ", warnings) : "Donanım sağlığı iyi görünüyor.";
         return Task.FromResult(new AnalysisResult
         {
-            ModuleId = Id, ItemCount = details.Count, Summary = summary, Details = details
+            ModuleId = Id,
+            ItemCount = details.Count,
+            Summary = summary,
+            Details = details
         });
     }
 
@@ -82,7 +85,9 @@ public sealed class HardwareMonitorModule : IOptimizationModule
     public Task<RollbackResult> RollbackAsync(ChangeRecord change, CancellationToken ct = default) =>
         Task.FromResult(new RollbackResult
         {
-            ModuleId = Id, ChangeId = change.Id, IsSuccess = true,
+            ModuleId = Id,
+            ChangeId = change.Id,
+            IsSuccess = true,
             Error = "Salt okunur modül — geri alınacak işlem yok."
         });
 
