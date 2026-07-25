@@ -69,6 +69,13 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 
 ---
 
+## Belgeler
+
+| Belge | İçerik |
+|-------|--------|
+| [`docs/EULA.md`](docs/EULA.md) | Son kullanıcı lisans sözleşmesi (taslak — dağıtım öncesi hukukçu incelemesi gerekir) |
+| [`docs/GIZLILIK.md`](docs/GIZLILIK.md) | Gizlilik politikası — sıfır telemetri; tek ağ isteği güncelleme denetimidir |
+
 ## Ön Koşullar
 
 - **.NET 8 SDK** (`dotnet --version` çalışmalı). İndir: <https://dotnet.microsoft.com/download>
