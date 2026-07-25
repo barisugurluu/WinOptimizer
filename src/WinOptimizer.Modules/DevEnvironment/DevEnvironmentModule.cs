@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using WinOptimizer.Core;
+using WinOptimizer.Core.Compatibility;
 using WinOptimizer.Safety;
 
 namespace WinOptimizer.Modules.DevEnvironment;
@@ -47,10 +48,24 @@ public sealed class DevEnvironmentModule : IOptimizationModule
             new() { Description = "Geliştirici Modu aç (geliştirme/sideload)",
                 Risk = RiskLevel.Medium, Target = "DeveloperMode", RequiresExtraConfirmation = true },
             new() { Description = "Hyper-V özelliğini etkinleştir (reboot gerekir)",
-                Risk = RiskLevel.High, Target = "HyperV", RequiresExtraConfirmation = true },
-            new() { Description = "WSL2 (Linux Alt Sistemi) kurulum kontrolü",
-                Risk = RiskLevel.None, Target = "WSL2" }
+                Risk = RiskLevel.High, Target = "HyperV", RequiresExtraConfirmation = true }
         };
+
+        var wsl2Support = CompatibilityChecker.IsSupported("Wsl2");
+        if (wsl2Support.IsSupported)
+        {
+            actions.Add(new PreviewAction
+            {
+                Description = "WSL2 (Linux Alt Sistemi) kurulum kontrolü",
+                Risk = RiskLevel.None,
+                Target = "WSL2"
+            });
+        }
+        else
+        {
+            _logger.LogInformation("WSL2 bu Windows sürümünde sunulmuyor: {Reason}", wsl2Support.Reason);
+        }
+
         return Task.FromResult(new PreviewResult { ModuleId = Id, Actions = actions, IsDryRun = true });
     }
 

@@ -2,6 +2,7 @@ using System.Management;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using WinOptimizer.Core;
+using WinOptimizer.Core.Compatibility;
 using WinOptimizer.Safety;
 
 namespace WinOptimizer.Modules.GpuOptimizer;
@@ -59,15 +60,20 @@ public sealed class GpuOptimizerModule : IOptimizationModule
     {
         var actions = new List<PreviewAction>();
         bool hags = analysis.Details.TryGetValue("HagsEnabled", out var h) && h is true;
-        if (!hags)
+        var hagsSupport = CompatibilityChecker.IsSupported("Hags");
+        if (!hags && hagsSupport.IsSupported)
         {
             actions.Add(new PreviewAction
             {
-                Description = "HAGS (Donanım Hızlandırmalı GPU Zamanlaması) aç — Win10 2004+ gerekir",
+                Description = "HAGS (Donanım Hızlandırmalı GPU Zamanlaması) aç",
                 Risk = RiskLevel.Medium,
                 Target = "Hags",
                 RequiresExtraConfirmation = true
             });
+        }
+        else if (!hags)
+        {
+            _logger.LogInformation("HAGS bu Windows sürümünde sunulmuyor: {Reason}", hagsSupport.Reason);
         }
         actions.Add(new PreviewAction
         {
