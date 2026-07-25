@@ -35,15 +35,16 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 | `WinOptimizer.Modules.DevEnvironment` — Hyper-V, WSL2, Geliştirici Modu, uzun yol | ✅ Derlendi |
 | `WinOptimizer.Modules.DeepCleanEngine` — Windows.old, hibernation, büyük dosyalar | ✅ Derlendi |
 | `WinOptimizer.Modules.BenchmarkEngine` — önce/sonra performans ölçümü + rapor | ✅ Derlendi |
+| `WinOptimizer.Updater` — Uygulama oto-güncelleme (GitHub Release + SHA256/WinTrust + msiexec) | ✅ Derlendi |
 | `WinOptimizer.Service` — RealtimeGuard Windows servisi (MetricsCollector, ThresholdEngine, Named Pipe IPC) | ✅ Derlendi |
 | `WinOptimizer.Cli` — Komut satırı (analyze/optimize/clean/status, --json, --yes) | ✅ Çalıştı |
 | `WinOptimizer.Orchestration` — ModuleRegistry + JobOrchestrationEngine + SettingsService + SchedulerService | ✅ Derlendi |
 | `WinOptimizer.App` — WPF Fluent Dark Dashboard, 11 modül sayfası, Geri Al çizelgesi, i18n (`.resx` TR/EN, `x:Static` bağlı) | ✅ Derlendi |
 | Birim testleri (SafetyGuard, ChangeJournal, RegistryTweak, BenchmarkEngine) — 22 test | ✅ 22/22 geçti |
 | **E2E testleri** (`WinOptimizer.E2E.Tests` — gerçek sistem senaryoları) — 6 test | ✅ 6/6 geçti |
-| JSON şemaları (settings + example + tweaks catalog) | ✅ |
+| JSON şemaları (settings + example + tweaks catalog) | ⚠ Dosyalar var, koda bağlı değil |
 | **i18n** — `.resx` kaynak dosyaları (TR varsayılan + EN), `x:Static` + ViewModel bağlama (Bölüm 12.5) | ✅ Bağlı |
-| **JSON tweak kataloğu** — `tweaks.catalog.json` tek kaynak (Bölüm 16.5) | ✅ |
+| **JSON tweak kataloğu** — `tweaks.catalog.json` (Bölüm 16.5) | ⚠ Henüz `TweakCatalog.cs` tarafından okunmuyor |
 | **CI/CD** — GitHub Actions (build + test Windows runner) (Bölüm 8.6) | ✅ |
 | **Canlı doğrulama** — CLI `analyze` 37.774 öğe / 21,67 GB tespit etti | ✅ |
 | `SettingsService` + `SchedulerService` — JSON ayar kalıcılığı + Task Scheduler (Faz 8) | ✅ Derlendi |
@@ -57,7 +58,7 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 - ✅ **Geri Alma zaman çizelgesi** — change journal'dan 7 günlük kart listesi (Bölüm 12.3 Akış C)
 - ✅ **i18n gerçek bağlama** — `.resx` → `x:Static` (XAML) + `Strings.cs` (ViewModel), TR/EN tam yerelleştirme
 - ✅ **E2E testleri** — `WinOptimizer.E2E.Tests`: gerçek TEMP analizi, donanım okuma, süreç tarama (Bölüm 8.2)
-- ✅ **JSON tweak kataloğu** — `schemas/tweaks.catalog.json` tek kaynak (Bölüm 16.5)
+- ⚠ **JSON tweak kataloğu** — `schemas/tweaks.catalog.json` dosyası mevcut, ancak `SystemTweaker/TweakCatalog.cs` şu an kataloğu koda gömülü tutuyor; "tek kaynak" bağlantısı henüz kurulmadı (bkz. geliştirme planı Faz C)
 
 ### Kapatılan Fonksiyonel Boşluklar (şartname uygunluğu)
 - ✅ **Geri Dönüşüm kutusu** — `Shell32.EmptyRecycleBin` artık CleanEngine'de gerçekten çağrılıyor (Bölüm 11.5)
@@ -89,7 +90,11 @@ dotnet run --project src\WinOptimizer.App\WinOptimizer.App.csproj
 dotnet test WinOptimizer.sln
 ```
 
-> ✅ **Doğrulandı:** 19 proje sıfır uyarı/hata ile derleniyor; 18 birim testi geçiyor (SafetyGuard, ChangeJournal, RegistryTweak).
+> ✅ **Doğrulandı:** Çözüm sıfır uyarı/hata ile derleniyor (30 proje). Test kapsamı: 22 birim testi
+> (SafetyGuard, ChangeJournal, RegistryTweak, BenchmarkEngine) + 6 E2E + 14 Updater testi.
+> ⚠ **Kapsam boşluğu:** `src/WinOptimizer.Modules/` altındaki 19 modülün hiçbirinin kendi birim testi
+> yok; E2E testleri yalnızca CleanEngine/MemoryEngine/HardwareMonitor'a yüzeysel dokunuyor ve
+> `WinOptimizer.Service` (RealtimeGuard) test edilmiyor. Bkz. geliştirme planı Faz B.
 
 ---
 
@@ -142,9 +147,14 @@ WinOptimizer/
 - ✅ **CI/CD** — `.github/workflows/build.yml` (publish + Payload + MSI + imza + Release + Winget PR)
 
 Kalan adımlar (üretim sertleştirme):
-- **Performans benchmark** — boot/RAM/disk önce/sonra ölçümü (Bölüm 13)
-- **a11y** — ekran okuyucu desteği, klavye akışı (WCAG 2.1 AA)
-- **Otomatik güncelleme** — kademeli staged sürüm + geri alma (Bölüm 20.6)
+- ✅ **a11y** — AutomationProperties/HelpText, HeadingLevel, FocusVisualStyle, HighContrast→Mica, i18n tam (Bölüm 21.2)
+- ✅ **Otomatik güncelleme** — `WinOptimizer.Updater` + CLI `update` komutu (Bölüm 20.6)
+- ✅ **Performans benchmark** — CLI `benchmark` komutu: before→optimize→after + diff raporu (Bölüm 13)
+- ~ **Serilog** — App katmanında kurulu (`Infrastructure/LoggingBootstrap.cs`, günlük döngülü dosya
+  sink'i, `AddSerilog()` ile `ILogger<T>`'a köprülenmiş). ⚠ Modüllerin içinde henüz kullanılmıyor
+  (DoD'nin "yapılandırılmış günlük olayları" maddesi modüller için karşılanmadı) — bkz. plan Faz C
+- **Ertelendi** — arm64 MSI üretimi (test edilecek arm64 donanım yok; winget manifestinden sahte
+  SHA256'lı arm64 girişi kaldırıldı), EV kod imzalama sertifikası (imzalama hattı kod olarak hazır)
 
 ### Paketleme Hattı
 ```powershell

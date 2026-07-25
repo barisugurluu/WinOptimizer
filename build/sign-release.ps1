@@ -53,17 +53,18 @@ function Resolve-SignTool {
 # İmza argümanlarını oluştur — PFX dosyası veya certificate store.
 function Build-SignArgs {
     param([string]$File)
-    $args = @('sign', '/fd', 'sha256', '/tr', $TimestampServer, '/td', 'sha256')
+    # $args otomatik değişkeninin üzerine yazma — kendi adlandırılmış değişkenimizi kullan.
+    $signArgs = @('sign', '/fd', 'sha256', '/tr', $TimestampServer, '/td', 'sha256')
     if ($PfxPath -and (Test-Path $PfxPath)) {
         if (-not $PfxPassword) { throw "PFX parolasi gerekli: -PfxPassword veya env SIGN_PFX_PASSWORD" }
-        $args += @('/f', $PfxPath, '/p', $PfxPassword)
+        $signArgs += @('/f', $PfxPath, '/p', $PfxPassword)
     } elseif ($Thumbprint) {
-        $args += @('/sha1', $Thumbprint)
+        $signArgs += @('/sha1', $Thumbprint)
     } else {
-        $args += '/a'  # Otomatik en uygun sertifika.
+        $signArgs += '/a'  # Otomatik en uygun sertifika.
     }
-    $args += $File
-    return $args
+    $signArgs += $File
+    return $signArgs
 }
 
 Write-Host "==> WinOptimizer imzalama (master plan Bölüm 20.4)" -ForegroundColor Cyan
@@ -78,7 +79,7 @@ Write-Host "    signtool:   $signtool"
 
 # İmzalanacak ikililer (DLL dahil — WIx MSI içindekilerin tamamı).
 $binaries = Get-ChildItem -Path $PublishDir -Recurse -Include *.exe, *.dll, *.msi |
-    Where-Object { $_.FullName -notmatch '\\(runtimes\\)\\(linux|osx|unix)' }
+    Where-Object { $_.FullName -notmatch '\\runtimes\\(linux|osx|unix)' }
 
 if ($binaries.Count -eq 0) {
     throw "Imzalanacak exe/dll/msi bulunamadi."

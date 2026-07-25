@@ -37,10 +37,7 @@ Installers:
         Publisher: WinOptimizer Team
         ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
         UpgradeCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
-  - Architecture: arm64
-    InstallerType: wix
-    InstallerUrl: https://github.com/WinOptimizer/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup-arm64.msi
-    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
-    ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
+# arm64: henüz üretilmiyor. arm64 MSI derlenip gerçek donanımda doğrulanana kadar
+# giriş eklenmez — sahte SHA256 ile yayınlanan manifest kurulumu bozar.
 ManifestType: installer
 ManifestVersion: 1.4.0

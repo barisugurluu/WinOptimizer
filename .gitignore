@@ -8,6 +8,7 @@
 .idea/
 *.user
 *.suo
+*_wpftmp.csproj
 
 # Kurulum derlemesi
 installer/build/

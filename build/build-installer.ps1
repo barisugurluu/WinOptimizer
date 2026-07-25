@@ -15,14 +15,27 @@
 .PARAMETER Configuration
     Derleme yapılandırması (varsayılan: Release).
 
+.PARAMETER PfxPath
+    Kod imzalama PFX dosyasının yolu (sign-release.ps1'e iletilir). Yoksa certificate store kullanılır.
+
+.PARAMETER PfxPassword
+    PFX parolası (CI'da gizli değişken: $env:SIGN_PFX_PASSWORD).
+
+.PARAMETER Thumbprint
+    Certificate store'daki sertifikanın SHA-1 parmak izi.
+
 .EXAMPLE
     .\build-installer.ps1                 # tam hat
     .\build-installer.ps1 -SkipSign       # geliştirme: imzasız MSI
+    .\build-installer.ps1 -PfxPath codesign.pfx -PfxPassword $env:SIGN_PFX_PASSWORD
 #>
 [CmdletBinding()]
 param(
     [switch]$SkipSign,
-    [ValidateSet('Debug','Release')][string]$Configuration = 'Release'
+    [ValidateSet('Debug','Release')][string]$Configuration = 'Release',
+    [string]$PfxPath,
+    [string]$PfxPassword = $env:SIGN_PFX_PASSWORD,
+    [string]$Thumbprint
 )
 
 $ErrorActionPreference = 'Stop'
@@ -31,6 +44,13 @@ Set-Location $root
 
 $solution = Join-Path $root 'WinOptimizer.sln'
 $publishBase = Join-Path $root 'src\WinOptimizer.App\bin\Release\net8.0-windows\publish'
+$signScript = Join-Path $PSScriptRoot 'sign-release.ps1'
+
+# İmzalama kimlik bilgileri — yalnızca verilenler sign-release.ps1'e iletilir.
+$signCredentials = @{}
+if ($PfxPath)     { $signCredentials['PfxPath'] = $PfxPath }
+if ($PfxPassword) { $signCredentials['PfxPassword'] = $PfxPassword }
+if ($Thumbprint)  { $signCredentials['Thumbprint'] = $Thumbprint }
 
 Write-Host "==> WinOptimizer paketleme hatti (Bölüm 20)" -ForegroundColor Cyan
 
@@ -49,7 +69,7 @@ if ($LASTEXITCODE -ne 0) { throw "Publish basarisiz." }
 # --- 3) İmzala (opsiyonel) ---
 if (-not $SkipSign) {
     Write-Host "[3/4] Authenticode imzalama..." -ForegroundColor Yellow
-    & (Join-Path $PSScriptRoot 'sign-release.ps1') -PublishDir $publishBase
+    & $signScript -PublishDir $publishBase @signCredentials
     if ($LASTEXITCODE -ne 0) { throw "Imzalama basarisiz." }
 } else {
     Write-Host "[3/4] Imzalama ATLANDI (-SkipSign)" -ForegroundColor DarkYellow
@@ -71,7 +91,8 @@ if ($msi) {
     Write-Host ""
     Write-Host "==> MSI uretildi: $($msi.FullName)" -ForegroundColor Green
     if (-not $SkipSign) {
-        & (Join-Path $PSScriptRoot 'sign-release.ps1') -PublishDir $msi.DirectoryName -PfxPath $args
+        & $signScript -PublishDir $msi.DirectoryName @signCredentials
+        if ($LASTEXITCODE -ne 0) { throw "MSI imzalama basarisiz." }
     }
 } else {
     throw "MSI bulunamadi (installer/wix/bin altinda degil)."

@@ -97,7 +97,7 @@ jobs:
         working-directory: installer/winget
         run: |
           (Get-Content WinOptimizer.WinOptimizer.installer.yaml) `
-            -replace '0000000000000000000000000000000000000000000000000000000000000000', '${{ steps.sha.outputs.sha256 }}' `
+            -replace '(?<=InstallerSha256:\s)[0-9A-Fa-f]{64}', '${{ steps.sha.outputs.sha256 }}' `
             | Set-Content WinOptimizer.WinOptimizer.installer.yaml
           Get-Content WinOptimizer.WinOptimizer.installer.yaml
 
