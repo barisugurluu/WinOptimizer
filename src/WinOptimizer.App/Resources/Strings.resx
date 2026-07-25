@@ -57,4 +57,75 @@
   <data name="CancelRequested" xml:space="preserve"><value>İptal istendi.</value></data>
   <data name="Analyze" xml:space="preserve"><value>Analiz</value></data>
   <data name="Optimize" xml:space="preserve"><value>Optimizasyon</value></data>
+  <!-- Erişilebilirlik (a11y) kaynakları — master plan Bölüm 21.2 (WCAG 2.1 AA) -->
+  <data name="AnalyzeAction" xml:space="preserve"><value>🔍 Analiz Et</value></data>
+  <data name="CancelAction" xml:space="preserve"><value>İptal</value></data>
+  <data name="ActionsHeader" xml:space="preserve"><value>Uygulanacak Eylemler</value></data>
+  <data name="RollbackTimelineTitle" xml:space="preserve"><value>↩ Geri Alma Zaman Çizelgesi</value></data>
+  <data name="ProgressText" xml:space="preserve"><value>İlerleme</value></data>
+  <data name="PreviewHelpText" xml:space="preserve"><value>Sistemi analiz eder, değişiklik yapmaz.</value></data>
+  <data name="ApplyHelpText" xml:space="preserve"><value>Önizlenen değişiklikleri uygular. Önce geri yükleme noktası alınır.</value></data>
+  <data name="AnalyzeHelpText" xml:space="preserve"><value>Bu modülü analiz eder, değişiklik yapmaz.</value></data>
+  <data name="CancelHelpText" xml:space="preserve"><value>Çalışan işlemi iptal eder.</value></data>
+  <data name="ProgressHelpText" xml:space="preserve"><value>İşlem ilerleme yüzdesi.</value></data>
+  <data name="RollbackListHelpText" xml:space="preserve"><value>Son yapılan değişiklikler.</value></data>
+  <data name="ActionsListHelpText" xml:space="preserve"><value>Uygulanacak eylemlerin listesi.</value></data>
+  <data name="RiskBadgeHelpText" xml:space="preserve"><value>Modül risk seviyesi.</value></data>
+  <data name="NavPaneHelpText" xml:space="preserve"><value>Modül navigasyon menüsü.</value></data>
+  <!-- Yönetim Merkezi (Control Center) -->
+  <data name="Management" xml:space="preserve"><value>Yönetim</value></data>
+  <data name="ManagementTitle" xml:space="preserve"><value>Yönetim Merkezi</value></data>
+  <data name="ManagementHelpText" xml:space="preserve"><value>Yönetim merkezi — ayarlar, zamanlayıcı, modüller, guard ve daha fazlası.</value></data>
+  <data name="TabOverview" xml:space="preserve"><value>Genel Bakış</value></data>
+  <data name="TabSettings" xml:space="preserve"><value>Ayarlar</value></data>
+  <data name="TabScheduler" xml:space="preserve"><value>Zamanlayıcı</value></data>
+  <data name="TabModules" xml:space="preserve"><value>Modüller</value></data>
+  <data name="TabProfiles" xml:space="preserve"><value>Profiller</value></data>
+  <data name="TabGuard" xml:space="preserve"><value>Guard &amp; Uyarılar</value></data>
+  <data name="TabReports" xml:space="preserve"><value>Raporlar</value></data>
+  <data name="TabUpdate" xml:space="preserve"><value>Güncelleme</value></data>
+  <data name="TabData" xml:space="preserve"><value>Veri &amp; Geri Yükleme</value></data>
+  <data name="TabComingSoon" xml:space="preserve"><value>Bu sekme yakında gelecek.</value></data>
+  <data name="OverviewServiceStatus" xml:space="preserve"><value>Servis Durumu</value></data>
+  <data name="OverviewLiveMetrics" xml:space="preserve"><value>Canlı Metrikler</value></data>
+  <data name="OverviewCpu" xml:space="preserve"><value>İşlemci (CPU)</value></data>
+  <data name="OverviewRam" xml:space="preserve"><value>Bellek (RAM)</value></data>
+  <data name="OverviewDisk" xml:space="preserve"><value>Disk (C:)</value></data>
+  <data name="OverviewRecentActivity" xml:space="preserve"><value>Son Etkinlik</value></data>
+  <data name="OverviewNoActivity" xml:space="preserve"><value>Henüz etkinlik yok.</value></data>
+  <data name="OverviewRefresh" xml:space="preserve"><value>Yenile</value></data>
+  <data name="SettingsGeneral" xml:space="preserve"><value>Genel</value></data>
+  <data name="SettingsLanguage" xml:space="preserve"><value>Dil</value></data>
+  <data name="SettingsTheme" xml:space="preserve"><value>Tema</value></data>
+  <data name="SettingsSafetyNet" xml:space="preserve"><value>Güvenlik Ağı</value></data>
+  <data name="SettingsAutoRestorePoint" xml:space="preserve"><value>İşlem öncesi otomatik geri yükleme noktası al</value></data>
+  <data name="SettingsAutoRegistryBackup" xml:space="preserve"><value>Kayıt defteri değişikliğinde otomatik yedek al</value></data>
+  <data name="SettingsRequireConfirm" xml:space="preserve"><value>Yüksek riskli işlemler için ek onay iste</value></data>
+  <data name="SettingsGuardSection" xml:space="preserve"><value>RealtimeGuard (Gerçek Zamanlı Koruma)</value></data>
+  <data name="SettingsGuardEnabled" xml:space="preserve"><value>Gerçek zamanlı koruma açık</value></data>
+  <data name="SettingsThresholds" xml:space="preserve"><value>Müdahale Eşikleri</value></data>
+  <data name="SettingsRamThreshold" xml:space="preserve"><value>RAM kullanım eşiği (%)</value></data>
+  <data name="SettingsDiskThreshold" xml:space="preserve"><value>Disk boş alan uyarı eşiği (%)</value></data>
+  <data name="SettingsDiskCritical" xml:space="preserve"><value>Disk boş alan kritik eşiği (%)</value></data>
+  <data name="SettingsCpuThreshold" xml:space="preserve"><value>Süreç başına CPU eşiği (%)</value></data>
+  <data name="SettingsTempThreshold" xml:space="preserve"><value>CPU sıcaklık eşiği (°C)</value></data>
+  <data name="SettingsSave" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="SettingsResetAction" xml:space="preserve"><value>Sıfırla</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>✓ Ayarlar kaydedildi.</value></data>
+  <data name="SettingsReverted" xml:space="preserve"><value>Ayarlar kayıtlı değerlere geri alındı.</value></data>
+  <data name="SchedulerWeekly" xml:space="preserve"><value>Haftalık Otomatik Bakım</value></data>
+  <data name="SchedulerWeeklyDesc" xml:space="preserve"><value>Her hafta belirlenen günde/saatte otomatik optimizasyon çalıştırılır (arka planda, en yüksek ayrıcalıkla).</value></data>
+  <data name="SchedulerEnable" xml:space="preserve"><value>Etkin</value></data>
+  <data name="SchedulerDay" xml:space="preserve"><value>Gün</value></data>
+  <data name="SchedulerTime" xml:space="preserve"><value>Saat</value></data>
+  <data name="SchedulerCliPath" xml:space="preserve"><value>CLI yolu</value></data>
+  <data name="SchedulerTaskStatus" xml:space="preserve"><value>Görev durumu</value></data>
+  <data name="SchedulerTaskExists" xml:space="preserve"><value>✓ Zamanlanmış görev kurulu</value></data>
+  <data name="SchedulerTaskMissing" xml:space="preserve"><value>Zamanlanmış görev kurulu değil</value></data>
+  <data name="SchedulerCreate" xml:space="preserve"><value>Görevi Oluştur</value></data>
+  <data name="SchedulerDelete" xml:space="preserve"><value>Görevi Sil</value></data>
+  <data name="TaskCreated" xml:space="preserve"><value>✓ Haftalık görev oluşturuldu.</value></data>
+  <data name="TaskCreateFailed" xml:space="preserve"><value>⚠ Görev oluşturulamadı (yönetici ayrıcalığı gerekli olabilir).</value></data>
+  <data name="TaskDeleted" xml:space="preserve"><value>✓ Görev silindi.</value></data>
+  <data name="TaskDeleteFailed" xml:space="preserve"><value>⚠ Görev silinemedi.</value></data>
 </root>

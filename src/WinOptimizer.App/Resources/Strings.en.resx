@@ -57,4 +57,75 @@
   <data name="CancelRequested" xml:space="preserve"><value>Cancel requested.</value></data>
   <data name="Analyze" xml:space="preserve"><value>Analysis</value></data>
   <data name="Optimize" xml:space="preserve"><value>Optimization</value></data>
+  <!-- Accessibility (a11y) resources — master plan Section 21.2 (WCAG 2.1 AA) -->
+  <data name="AnalyzeAction" xml:space="preserve"><value>🔍 Analyze</value></data>
+  <data name="CancelAction" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ActionsHeader" xml:space="preserve"><value>Actions to Apply</value></data>
+  <data name="RollbackTimelineTitle" xml:space="preserve"><value>↩ Rollback Timeline</value></data>
+  <data name="ProgressText" xml:space="preserve"><value>Progress</value></data>
+  <data name="PreviewHelpText" xml:space="preserve"><value>Analyzes the system without making changes.</value></data>
+  <data name="ApplyHelpText" xml:space="preserve"><value>Applies the previewed changes. A restore point is created first.</value></data>
+  <data name="AnalyzeHelpText" xml:space="preserve"><value>Analyzes this module without making changes.</value></data>
+  <data name="CancelHelpText" xml:space="preserve"><value>Cancels the running operation.</value></data>
+  <data name="ProgressHelpText" xml:space="preserve"><value>Operation progress percentage.</value></data>
+  <data name="RollbackListHelpText" xml:space="preserve"><value>Recent changes.</value></data>
+  <data name="ActionsListHelpText" xml:space="preserve"><value>List of actions to be applied.</value></data>
+  <data name="RiskBadgeHelpText" xml:space="preserve"><value>Module risk level.</value></data>
+  <data name="NavPaneHelpText" xml:space="preserve"><value>Module navigation menu.</value></data>
+  <!-- Control Center -->
+  <data name="Management" xml:space="preserve"><value>Management</value></data>
+  <data name="ManagementTitle" xml:space="preserve"><value>Control Center</value></data>
+  <data name="ManagementHelpText" xml:space="preserve"><value>Control center — settings, scheduler, modules, guard and more.</value></data>
+  <data name="TabOverview" xml:space="preserve"><value>Overview</value></data>
+  <data name="TabSettings" xml:space="preserve"><value>Settings</value></data>
+  <data name="TabScheduler" xml:space="preserve"><value>Scheduler</value></data>
+  <data name="TabModules" xml:space="preserve"><value>Modules</value></data>
+  <data name="TabProfiles" xml:space="preserve"><value>Profiles</value></data>
+  <data name="TabGuard" xml:space="preserve"><value>Guard &amp; Alerts</value></data>
+  <data name="TabReports" xml:space="preserve"><value>Reports</value></data>
+  <data name="TabUpdate" xml:space="preserve"><value>Update</value></data>
+  <data name="TabData" xml:space="preserve"><value>Data &amp; Restore</value></data>
+  <data name="TabComingSoon" xml:space="preserve"><value>This tab is coming soon.</value></data>
+  <data name="OverviewServiceStatus" xml:space="preserve"><value>Service Status</value></data>
+  <data name="OverviewLiveMetrics" xml:space="preserve"><value>Live Metrics</value></data>
+  <data name="OverviewCpu" xml:space="preserve"><value>Processor (CPU)</value></data>
+  <data name="OverviewRam" xml:space="preserve"><value>Memory (RAM)</value></data>
+  <data name="OverviewDisk" xml:space="preserve"><value>Disk (C:)</value></data>
+  <data name="OverviewRecentActivity" xml:space="preserve"><value>Recent Activity</value></data>
+  <data name="OverviewNoActivity" xml:space="preserve"><value>No activity yet.</value></data>
+  <data name="OverviewRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="SettingsGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="SettingsLanguage" xml:space="preserve"><value>Language</value></data>
+  <data name="SettingsTheme" xml:space="preserve"><value>Theme</value></data>
+  <data name="SettingsSafetyNet" xml:space="preserve"><value>Safety Net</value></data>
+  <data name="SettingsAutoRestorePoint" xml:space="preserve"><value>Automatically create a restore point before operations</value></data>
+  <data name="SettingsAutoRegistryBackup" xml:space="preserve"><value>Back up registry before changes</value></data>
+  <data name="SettingsRequireConfirm" xml:space="preserve"><value>Require extra confirmation for high-risk operations</value></data>
+  <data name="SettingsGuardSection" xml:space="preserve"><value>RealtimeGuard (Real-Time Protection)</value></data>
+  <data name="SettingsGuardEnabled" xml:space="preserve"><value>Real-time protection enabled</value></data>
+  <data name="SettingsThresholds" xml:space="preserve"><value>Intervention Thresholds</value></data>
+  <data name="SettingsRamThreshold" xml:space="preserve"><value>RAM usage threshold (%)</value></data>
+  <data name="SettingsDiskThreshold" xml:space="preserve"><value>Disk free space warning threshold (%)</value></data>
+  <data name="SettingsDiskCritical" xml:space="preserve"><value>Disk free space critical threshold (%)</value></data>
+  <data name="SettingsCpuThreshold" xml:space="preserve"><value>Per-process CPU threshold (%)</value></data>
+  <data name="SettingsTempThreshold" xml:space="preserve"><value>CPU temperature threshold (°C)</value></data>
+  <data name="SettingsSave" xml:space="preserve"><value>Save</value></data>
+  <data name="SettingsResetAction" xml:space="preserve"><value>Reset</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>✓ Settings saved.</value></data>
+  <data name="SettingsReverted" xml:space="preserve"><value>Settings reverted to saved values.</value></data>
+  <data name="SchedulerWeekly" xml:space="preserve"><value>Weekly Automatic Maintenance</value></data>
+  <data name="SchedulerWeeklyDesc" xml:space="preserve"><value>Runs an automatic optimization on the chosen day/time each week (in the background, with highest privileges).</value></data>
+  <data name="SchedulerEnable" xml:space="preserve"><value>Enabled</value></data>
+  <data name="SchedulerDay" xml:space="preserve"><value>Day</value></data>
+  <data name="SchedulerTime" xml:space="preserve"><value>Time</value></data>
+  <data name="SchedulerCliPath" xml:space="preserve"><value>CLI path</value></data>
+  <data name="SchedulerTaskStatus" xml:space="preserve"><value>Task status</value></data>
+  <data name="SchedulerTaskExists" xml:space="preserve"><value>✓ Scheduled task installed</value></data>
+  <data name="SchedulerTaskMissing" xml:space="preserve"><value>No scheduled task installed</value></data>
+  <data name="SchedulerCreate" xml:space="preserve"><value>Create Task</value></data>
+  <data name="SchedulerDelete" xml:space="preserve"><value>Delete Task</value></data>
+  <data name="TaskCreated" xml:space="preserve"><value>✓ Weekly task created.</value></data>
+  <data name="TaskCreateFailed" xml:space="preserve"><value>⚠ Task could not be created (administrator privileges may be required).</value></data>
+  <data name="TaskDeleted" xml:space="preserve"><value>✓ Task deleted.</value></data>
+  <data name="TaskDeleteFailed" xml:space="preserve"><value>⚠ Task could not be deleted.</value></data>
 </root>

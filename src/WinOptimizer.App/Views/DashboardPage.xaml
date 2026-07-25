@@ -9,12 +9,14 @@
 
             <!-- Başlık (i18n: x:Static ile kaynak bağlama — Bölüm 12.5) -->
             <TextBlock Text="{x:Static p:Strings.AppTitle}"
-                       FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16" />
+                       FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"
+                       AutomationProperties.HeadingLevel="Level1" />
 
             <!-- Sistem Durumu kartı -->
             <ui:Card Margin="0,0,0,16">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="{x:Static p:Strings.SystemStatus}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{x:Static p:Strings.SystemStatus}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"
+                               AutomationProperties.HeadingLevel="Level2" />
                     <TextBlock Text="{Binding StatusSummary}" FontSize="14" Opacity="0.8"
                                TextWrapping="Wrap" />
                 </StackPanel>
@@ -23,16 +25,23 @@
             <!-- Tek Tıkla En İyi Hale Getir -->
             <ui:Card Margin="0,0,0,16">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="{x:Static p:Strings.OneClickOptimize}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12" />
+                    <TextBlock Text="{x:Static p:Strings.OneClickOptimize}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12"
+                               AutomationProperties.HeadingLevel="Level2" />
                     <TextBlock Text="{Binding AnalysisSummary}" TextWrapping="Wrap" Opacity="0.85" Margin="0,0,0,8" />
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                         <ui:Button Content="{x:Static p:Strings.Preview}" Command="{Binding AnalyzeCommand}"
-                                   Appearance="Secondary" Margin="0,0,8,0" />
+                                   Appearance="Secondary" Margin="0,0,8,0"
+                                   TabIndex="0"
+                                   AutomationProperties.HelpText="{x:Static p:Strings.PreviewHelpText}" />
                         <ui:Button Content="{x:Static p:Strings.Apply}" Command="{Binding OptimizeCommand}"
-                                   Appearance="Primary" />
+                                   Appearance="Primary"
+                                   TabIndex="1"
+                                   AutomationProperties.HelpText="{x:Static p:Strings.ApplyHelpText}" />
                     </StackPanel>
                     <ProgressBar Value="{Binding Progress}" Maximum="100"
-                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,0,0,8" />
+                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,0,0,8"
+                                 AutomationProperties.Name="{x:Static p:Strings.ProgressText}"
+                                 AutomationProperties.HelpText="{x:Static p:Strings.ProgressHelpText}" />
                     <ui:InfoBar Title="{x:Static p:Strings.Result}" Message="{Binding ResultSummary}"
                                 IsOpen="{Binding HasResult}" Severity="Success" />
                 </StackPanel>
@@ -41,7 +50,8 @@
             <!-- Hızlı İşlemler -->
             <ui:Card Margin="0,0,0,16">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="{x:Static p:Strings.QuickActions}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{x:Static p:Strings.QuickActions}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"
+                               AutomationProperties.HeadingLevel="Level2" />
                     <TextBlock Text="{Binding AvailableModules}" TextWrapping="Wrap" Opacity="0.75" />
                 </StackPanel>
             </ui:Card>

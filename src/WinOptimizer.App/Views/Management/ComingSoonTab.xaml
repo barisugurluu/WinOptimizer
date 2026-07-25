@@ -1,0 +1,11 @@
+<UserControl x:Class="WinOptimizer.App.Views.Management.ComingSoonTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:p="clr-namespace:WinOptimizer.App.Resources">
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
+        <ui:SymbolIcon Symbol="Settings24" FontSize="48" Opacity="0.3" HorizontalAlignment="Center" Margin="0,0,0,12" />
+        <TextBlock Text="{Binding}" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,4" />
+        <TextBlock Text="{x:Static p:Strings.TabComingSoon}" Opacity="0.6" HorizontalAlignment="Center" />
+    </StackPanel>
+</UserControl>

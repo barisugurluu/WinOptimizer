@@ -11,6 +11,27 @@
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Erişilebilirlik (a11y) — master plan Bölüm 21.2 (WCAG 2.1 AA) -->
+            <!-- BooleanToVisibilityConverter (ModulePage'de kullanılır) -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <!-- Görünür odak göstergesi (WCAG 2.4.7 Focus Visible).
+                 SystemParameters.FocusVisualStyleKey global varsayılanı geçersiz kılar;
+                 ControlTextBrush HC tema değişiminde otomatik güncellenir (DynamicResource). -->
+            <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" TargetType="Control">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Control">
+                            <Rectangle Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                       StrokeThickness="2"
+                                       RadiusX="3" RadiusY="3"
+                                       Margin="-2"
+                                       SnapsToDevicePixels="True" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

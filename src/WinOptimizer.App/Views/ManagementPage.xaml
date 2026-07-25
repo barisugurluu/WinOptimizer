@@ -1,0 +1,51 @@
+<Page x:Class="WinOptimizer.App.Views.ManagementPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:p="clr-namespace:WinOptimizer.App.Resources"
+      Title="{x:Static p:Strings.ManagementTitle}">
+    <Grid Margin="24,16,24,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="{x:Static p:Strings.ManagementTitle}" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"
+                   AutomationProperties.HeadingLevel="Level1"
+                   AutomationProperties.HelpText="{x:Static p:Strings.ManagementHelpText}" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- İkincil navigasyon (sekmeler) -->
+            <ListBox Grid.Column="0" x:Name="TabList"
+                     ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
+                     Background="Transparent" BorderThickness="0"
+                     AutomationProperties.Name="{x:Static p:Strings.ManagementTitle}"
+                     AutomationProperties.HelpText="{x:Static p:Strings.ManagementHelpText}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="12,10" />
+                        <Setter Property="Margin" Value="0,2" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="{Binding Icon}" FontSize="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Seçili sekmenin içeriği -->
+            <ContentControl Grid.Column="2" Content="{Binding SelectedTab.View}" Focusable="False" />
+        </Grid>
+    </Grid>
+</Page>

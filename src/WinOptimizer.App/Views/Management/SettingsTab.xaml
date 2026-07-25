@@ -1,0 +1,99 @@
+<UserControl x:Class="WinOptimizer.App.Views.Management.SettingsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:p="clr-namespace:WinOptimizer.App.Resources">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical" MaxWidth="720">
+
+            <!-- Genel -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.SettingsGeneral}" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,12"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="{x:Static p:Strings.SettingsLanguage}" Width="120" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding Languages}" DisplayMemberPath="Value" SelectedValuePath="Key"
+                                  SelectedItem="{Binding SelectedLanguage}" MinWidth="180" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Static p:Strings.SettingsTheme}" Width="120" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding Themes}" DisplayMemberPath="Value" SelectedValuePath="Key"
+                                  SelectedItem="{Binding SelectedTheme}" MinWidth="180" />
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Güvenlik Ağı -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.SettingsSafetyNet}" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,12"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <ui:ToggleSwitch Content="{x:Static p:Strings.SettingsAutoRestorePoint}" IsChecked="{Binding AutoRestorePoint}" Margin="0,0,0,8" />
+                    <ui:ToggleSwitch Content="{x:Static p:Strings.SettingsAutoRegistryBackup}" IsChecked="{Binding AutoRegistryBackup}" Margin="0,0,0,8" />
+                    <ui:ToggleSwitch Content="{x:Static p:Strings.SettingsRequireConfirm}" IsChecked="{Binding RequireConfirmationForHighRisk}" />
+                </StackPanel>
+            </ui:Card>
+
+            <!-- RealtimeGuard -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.SettingsGuardSection}" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,8"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <ui:ToggleSwitch Content="{x:Static p:Strings.SettingsGuardEnabled}" IsChecked="{Binding GuardEnabled}" Margin="0,0,0,12" />
+
+                    <TextBlock Text="{x:Static p:Strings.SettingsThresholds}" FontWeight="SemiBold" Margin="0,0,0,8" />
+
+                    <DockPanel Margin="0,6,0,2">
+                        <TextBlock Text="{x:Static p:Strings.SettingsRamThreshold}" />
+                        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontWeight="SemiBold"
+                                   Text="{Binding RamUsageThreshold, StringFormat={}{0} %}" />
+                    </DockPanel>
+                    <Slider Minimum="50" Maximum="100" Value="{Binding RamUsageThreshold}" TickFrequency="5" IsSnapToTickEnabled="True"
+                            AutomationProperties.Name="{x:Static p:Strings.SettingsRamThreshold}" />
+
+                    <DockPanel Margin="0,8,0,2">
+                        <TextBlock Text="{x:Static p:Strings.SettingsDiskThreshold}" />
+                        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontWeight="SemiBold"
+                                   Text="{Binding DiskFreeThreshold, StringFormat={}{0} %}" />
+                    </DockPanel>
+                    <Slider Minimum="5" Maximum="50" Value="{Binding DiskFreeThreshold}" TickFrequency="5" IsSnapToTickEnabled="True"
+                            AutomationProperties.Name="{x:Static p:Strings.SettingsDiskThreshold}" />
+
+                    <DockPanel Margin="0,8,0,2">
+                        <TextBlock Text="{x:Static p:Strings.SettingsDiskCritical}" />
+                        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontWeight="SemiBold"
+                                   Text="{Binding DiskFreeCriticalThreshold, StringFormat={}{0} %}" />
+                    </DockPanel>
+                    <Slider Minimum="1" Maximum="15" Value="{Binding DiskFreeCriticalThreshold}" TickFrequency="1" IsSnapToTickEnabled="True"
+                            AutomationProperties.Name="{x:Static p:Strings.SettingsDiskCritical}" />
+
+                    <DockPanel Margin="0,8,0,2">
+                        <TextBlock Text="{x:Static p:Strings.SettingsCpuThreshold}" />
+                        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontWeight="SemiBold"
+                                   Text="{Binding CpuPerProcessThreshold, StringFormat={}{0} %}" />
+                    </DockPanel>
+                    <Slider Minimum="20" Maximum="100" Value="{Binding CpuPerProcessThreshold}" TickFrequency="5" IsSnapToTickEnabled="True"
+                            AutomationProperties.Name="{x:Static p:Strings.SettingsCpuThreshold}" />
+
+                    <DockPanel Margin="0,8,0,2">
+                        <TextBlock Text="{x:Static p:Strings.SettingsTempThreshold}" />
+                        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" FontWeight="SemiBold"
+                                   Text="{Binding TempThreshold, StringFormat={}{0} °C}" />
+                    </DockPanel>
+                    <Slider Minimum="60" Maximum="100" Value="{Binding TempThreshold}" TickFrequency="5" IsSnapToTickEnabled="True"
+                            AutomationProperties.Name="{x:Static p:Strings.SettingsTempThreshold}" />
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Aksiyonlar -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <ui:Button Content="{x:Static p:Strings.SettingsSave}" Command="{Binding SaveCommand}" Appearance="Primary" Margin="0,0,8,0" />
+                <ui:Button Content="{x:Static p:Strings.SettingsResetAction}" Command="{Binding ResetCommand}" Appearance="Secondary" />
+            </StackPanel>
+            <ui:InfoBar Title="{x:Static p:Strings.Result}" Message="{Binding StatusMessage}"
+                        IsOpen="{Binding HasStatus}" Severity="Success" />
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

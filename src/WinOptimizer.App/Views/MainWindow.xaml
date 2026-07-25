@@ -3,6 +3,7 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:local="clr-namespace:WinOptimizer.App.Views"
+                 xmlns:p="clr-namespace:WinOptimizer.App.Resources"
                  Title="WinOptimizer"
                  Width="1100" Height="720" MinWidth="1024" MinHeight="640"
                  ExtendsContentIntoTitleBar="True"
@@ -15,7 +16,9 @@
         </Grid.RowDefinitions>
 
         <!-- Özel başlık çubuğu -->
-        <ui:TitleBar Grid.Row="0" Title="WinOptimizer">
+        <ui:TitleBar Grid.Row="0" Title="WinOptimizer"
+                     AutomationProperties.Name="WinOptimizer"
+                     AutomationProperties.HelpText="{x:Static p:Strings.AppTitle}">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon />
             </ui:TitleBar.Icon>
@@ -25,9 +28,11 @@
                            x:Name="RootNavigation"
                            PaneDisplayMode="Left"
                            IsBackButtonVisible="Collapsed"
-                           SelectionChanged="OnNavigationSelectionChanged">
+                           SelectionChanged="OnNavigationSelectionChanged"
+                           AutomationProperties.Name="{x:Static p:Strings.Dashboard}"
+                           AutomationProperties.HelpText="{x:Static p:Strings.NavPaneHelpText}">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Panosu"
+                <ui:NavigationViewItem Content="{x:Static p:Strings.Dashboard}"
                                        TargetPageType="{x:Type local:DashboardPage}"
                                        Icon="{ui:SymbolIcon Home24}" />
                 <ui:NavigationViewItem Content="Temizlik"
@@ -72,7 +77,11 @@
                                        Icon="{ui:SymbolIcon ArrowSync24}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem Content="↩ Geri Al"
+                <ui:NavigationViewItem Content="{x:Static p:Strings.Management}"
+                                       TargetPageType="{x:Type local:ManagementPage}"
+                                       Icon="{ui:SymbolIcon Settings24}"
+                                       AutomationProperties.HelpText="{x:Static p:Strings.ManagementHelpText}" />
+                <ui:NavigationViewItem Content="{x:Static p:Strings.Rollback}"
                                        TargetPageType="{x:Type local:RollbackPage}"
                                        Icon="{ui:SymbolIcon History24}" />
             </ui:NavigationView.FooterMenuItems>

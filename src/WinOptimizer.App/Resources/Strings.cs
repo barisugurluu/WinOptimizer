@@ -35,9 +35,89 @@ public static class Strings
     public static string PreparingRestorePoint => _rm.GetString("PreparingRestorePoint") ?? "Geri yükleme noktası alınıyor…";
     public static string CancelRequested => _rm.GetString("CancelRequested") ?? "İptal istendi.";
 
+    // --- Erişilebilirlik (a11y) kaynakları — master plan Bölüm 21.2 (WCAG 2.1 AA) ---
+    // Duyuru metinleri (ekran okuyucu + UI etiketleri) ve AutomationProperties.HelpText değerleri.
+    public static string AnalyzeAction => _rm.GetString("AnalyzeAction") ?? "🔍 Analiz Et";
+    public static string CancelAction => _rm.GetString("CancelAction") ?? "İptal";
+    public static string ActionsHeader => _rm.GetString("ActionsHeader") ?? "Uygulanacak Eylemler";
+    public static string RollbackTimelineTitle => _rm.GetString("RollbackTimelineTitle") ?? "↩ Geri Alma Zaman Çizelgesi";
+    public static string ProgressText => _rm.GetString("ProgressText") ?? "İlerleme";
+
+    // Ekran okuyucu yardım metinleri (AutomationProperties.HelpText)
+    public static string PreviewHelpText => _rm.GetString("PreviewHelpText") ?? "Sistemi analiz eder, değişiklik yapmaz.";
+    public static string ApplyHelpText => _rm.GetString("ApplyHelpText") ?? "Önizlenen değişiklikleri uygular. Önce geri yükleme noktası alınır.";
+    public static string AnalyzeHelpText => _rm.GetString("AnalyzeHelpText") ?? "Bu modülü analiz eder, değişiklik yapmaz.";
+    public static string CancelHelpText => _rm.GetString("CancelHelpText") ?? "Çalışan işlemi iptal eder.";
+    public static string ProgressHelpText => _rm.GetString("ProgressHelpText") ?? "İşlem ilerleme yüzdesi.";
+    public static string RollbackListHelpText => _rm.GetString("RollbackListHelpText") ?? "Son yapılan değişiklikler.";
+    public static string ActionsListHelpText => _rm.GetString("ActionsListHelpText") ?? "Uygulanacak eylemlerin listesi.";
+    public static string RiskBadgeHelpText => _rm.GetString("RiskBadgeHelpText") ?? "Modül risk seviyesi.";
+    public static string NavPaneHelpText => _rm.GetString("NavPaneHelpText") ?? "Modül navigasyon menüsü.";
+
     /// <summary>Biçimlendirilebilir kaynak — {0}, {1} yer tutucularını değiştirir.</summary>
     public static string OptimizeComplete(long items, string gained) =>
         string.Format(_rm.GetString("OptimizeComplete") ?? "Tamamlandı: {0} öğe temizlendi, {1} kazanıldı.", items, gained);
     public static string Error(string message) =>
         string.Format(_rm.GetString("Error") ?? "Hata: {0}", message);
+
+    // --- Yönetim Merkezi (Control Center) kaynakları — Bölüm 12 genişletmesi ---
+    public static string Management => _rm.GetString("Management") ?? "Yönetim";
+    public static string ManagementTitle => _rm.GetString("ManagementTitle") ?? "Yönetim Merkezi";
+    public static string ManagementHelpText => _rm.GetString("ManagementHelpText") ?? "Yönetim merkezi — ayarlar, zamanlayıcı, modüller, guard ve daha fazlası.";
+
+    public static string TabOverview => _rm.GetString("TabOverview") ?? "Genel Bakış";
+    public static string TabSettings => _rm.GetString("TabSettings") ?? "Ayarlar";
+    public static string TabScheduler => _rm.GetString("TabScheduler") ?? "Zamanlayıcı";
+    public static string TabModules => _rm.GetString("TabModules") ?? "Modüller";
+    public static string TabProfiles => _rm.GetString("TabProfiles") ?? "Profiller";
+    public static string TabGuard => _rm.GetString("TabGuard") ?? "Guard & Uyarılar";
+    public static string TabReports => _rm.GetString("TabReports") ?? "Raporlar";
+    public static string TabUpdate => _rm.GetString("TabUpdate") ?? "Güncelleme";
+    public static string TabData => _rm.GetString("TabData") ?? "Veri & Geri Yükleme";
+    public static string TabComingSoon => _rm.GetString("TabComingSoon") ?? "Bu sekme yakında gelecek.";
+
+    public static string OverviewServiceStatus => _rm.GetString("OverviewServiceStatus") ?? "Servis Durumu";
+    public static string OverviewLiveMetrics => _rm.GetString("OverviewLiveMetrics") ?? "Canlı Metrikler";
+    public static string OverviewCpu => _rm.GetString("OverviewCpu") ?? "İşlemci (CPU)";
+    public static string OverviewRam => _rm.GetString("OverviewRam") ?? "Bellek (RAM)";
+    public static string OverviewDisk => _rm.GetString("OverviewDisk") ?? "Disk (C:)";
+    public static string OverviewRecentActivity => _rm.GetString("OverviewRecentActivity") ?? "Son Etkinlik";
+    public static string OverviewNoActivity => _rm.GetString("OverviewNoActivity") ?? "Henüz etkinlik yok.";
+    public static string OverviewRefresh => _rm.GetString("OverviewRefresh") ?? "Yenile";
+
+    public static string SettingsGeneral => _rm.GetString("SettingsGeneral") ?? "Genel";
+    public static string SettingsLanguage => _rm.GetString("SettingsLanguage") ?? "Dil";
+    public static string SettingsTheme => _rm.GetString("SettingsTheme") ?? "Tema";
+    public static string SettingsSafetyNet => _rm.GetString("SettingsSafetyNet") ?? "Güvenlik Ağı";
+    public static string SettingsAutoRestorePoint => _rm.GetString("SettingsAutoRestorePoint") ?? "İşlem öncesi otomatik geri yükleme noktası al";
+    public static string SettingsAutoRegistryBackup => _rm.GetString("SettingsAutoRegistryBackup") ?? "Kayıt defteri değişikliğinde otomatik yedek al";
+    public static string SettingsRequireConfirm => _rm.GetString("SettingsRequireConfirm") ?? "Yüksek riskli işlemler için ek onay iste";
+    public static string SettingsGuardSection => _rm.GetString("SettingsGuardSection") ?? "RealtimeGuard (Gerçek Zamanlı Koruma)";
+    public static string SettingsGuardEnabled => _rm.GetString("SettingsGuardEnabled") ?? "Gerçek zamanlı koruma açık";
+    public static string SettingsThresholds => _rm.GetString("SettingsThresholds") ?? "Müdahale Eşikleri";
+    public static string SettingsRamThreshold => _rm.GetString("SettingsRamThreshold") ?? "RAM kullanım eşiği (%)";
+    public static string SettingsDiskThreshold => _rm.GetString("SettingsDiskThreshold") ?? "Disk boş alan uyarı eşiği (%)";
+    public static string SettingsDiskCritical => _rm.GetString("SettingsDiskCritical") ?? "Disk boş alan kritik eşiği (%)";
+    public static string SettingsCpuThreshold => _rm.GetString("SettingsCpuThreshold") ?? "Süreç başına CPU eşiği (%)";
+    public static string SettingsTempThreshold => _rm.GetString("SettingsTempThreshold") ?? "CPU sıcaklık eşiği (°C)";
+    public static string SettingsSave => _rm.GetString("SettingsSave") ?? "Kaydet";
+    public static string SettingsResetAction => _rm.GetString("SettingsResetAction") ?? "Sıfırla";
+    public static string SettingsSaved => _rm.GetString("SettingsSaved") ?? "✓ Ayarlar kaydedildi.";
+    public static string SettingsReverted => _rm.GetString("SettingsReverted") ?? "Ayarlar kayıtlı değerlere geri alındı.";
+
+    public static string SchedulerWeekly => _rm.GetString("SchedulerWeekly") ?? "Haftalık Otomatik Bakım";
+    public static string SchedulerWeeklyDesc => _rm.GetString("SchedulerWeeklyDesc") ?? "Her hafta belirlenen günde/saatte otomatik optimizasyon çalıştırılır (arka planda, en yüksek ayrıcalıkla).";
+    public static string SchedulerEnable => _rm.GetString("SchedulerEnable") ?? "Etkin";
+    public static string SchedulerDay => _rm.GetString("SchedulerDay") ?? "Gün";
+    public static string SchedulerTime => _rm.GetString("SchedulerTime") ?? "Saat";
+    public static string SchedulerCliPath => _rm.GetString("SchedulerCliPath") ?? "CLI yolu";
+    public static string SchedulerTaskStatus => _rm.GetString("SchedulerTaskStatus") ?? "Görev durumu";
+    public static string SchedulerTaskExists => _rm.GetString("SchedulerTaskExists") ?? "✓ Zamanlanmış görev kurulu";
+    public static string SchedulerTaskMissing => _rm.GetString("SchedulerTaskMissing") ?? "Zamanlanmış görev kurulu değil";
+    public static string SchedulerCreate => _rm.GetString("SchedulerCreate") ?? "Görevi Oluştur";
+    public static string SchedulerDelete => _rm.GetString("SchedulerDelete") ?? "Görevi Sil";
+    public static string TaskCreated => _rm.GetString("TaskCreated") ?? "✓ Haftalık görev oluşturuldu.";
+    public static string TaskCreateFailed => _rm.GetString("TaskCreateFailed") ?? "⚠ Görev oluşturulamadı (yönetici ayrıcalığı gerekli olabilir).";
+    public static string TaskDeleted => _rm.GetString("TaskDeleted") ?? "✓ Görev silindi.";
+    public static string TaskDeleteFailed => _rm.GetString("TaskDeleteFailed") ?? "⚠ Görev silinemedi.";
 }

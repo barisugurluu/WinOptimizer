@@ -1,0 +1,90 @@
+<UserControl x:Class="WinOptimizer.App.Views.Management.OverviewTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:p="clr-namespace:WinOptimizer.App.Resources"
+             Loaded="OnLoaded" Unloaded="OnUnloaded">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical" MaxWidth="960">
+
+            <!-- Servis durumu -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="24" Margin="0,0,12,0" />
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Static p:Strings.OverviewServiceStatus}" FontWeight="SemiBold" FontSize="15"
+                                   AutomationProperties.HeadingLevel="Level2" />
+                        <TextBlock Text="{Binding ServiceStatusText}" Opacity="0.8" TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </ui:Card>
+
+            <!-- Canlı metrikler başlığı + yenile -->
+            <DockPanel Margin="0,0,0,8">
+                <TextBlock Text="{x:Static p:Strings.OverviewLiveMetrics}" FontWeight="SemiBold" FontSize="15"
+                           AutomationProperties.HeadingLevel="Level2" />
+                <ui:Button DockPanel.Dock="Right" Content="{x:Static p:Strings.OverviewRefresh}"
+                           Command="{Binding RefreshCommand}" Appearance="Secondary" HorizontalAlignment="Right" />
+            </DockPanel>
+
+            <!-- 3 metrik kartı -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ui:Card Grid.Column="0" Margin="0,0,6,0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Static p:Strings.OverviewCpu}" Opacity="0.7" FontSize="12" />
+                        <TextBlock Text="{Binding CpuText}" FontSize="22" FontWeight="Bold" Margin="0,2,0,6" />
+                        <ProgressBar Value="{Binding CpuPercent}" Maximum="100" Height="6" />
+                    </StackPanel>
+                </ui:Card>
+
+                <ui:Card Grid.Column="1" Margin="6,0,6,0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Static p:Strings.OverviewRam}" Opacity="0.7" FontSize="12" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding RamPercent, StringFormat='%{0}'}" FontSize="22" FontWeight="Bold" Margin="0,2,6,6" />
+                            <TextBlock Text="{Binding RamFreeText}" Opacity="0.6" FontSize="12" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+                        </StackPanel>
+                        <ProgressBar Value="{Binding RamPercent}" Maximum="100" Height="6" />
+                    </StackPanel>
+                </ui:Card>
+
+                <ui:Card Grid.Column="2" Margin="6,0,0,0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Static p:Strings.OverviewDisk}" Opacity="0.7" FontSize="12" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding DiskFreePercent, StringFormat='%{0} boş'}" FontSize="22" FontWeight="Bold" Margin="0,2,6,6" />
+                            <TextBlock Text="{Binding DiskFreeText}" Opacity="0.6" FontSize="12" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+                        </StackPanel>
+                        <ProgressBar Value="{Binding DiskFreePercent}" Maximum="100" Height="6" />
+                    </StackPanel>
+                </ui:Card>
+            </Grid>
+
+            <TextBlock Text="{Binding MetricSourceText}" Opacity="0.5" FontSize="11" Margin="0,0,0,12" />
+
+            <!-- Son etkinlik -->
+            <ui:Card Margin="0,0,0,12">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static p:Strings.OverviewRecentActivity}" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,6"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <TextBlock Text="{Binding ActivitySummary}" Opacity="0.7" Margin="0,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding RecentActivity}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2" Opacity="0.8" FontSize="12"
+                                           FontFamily="Consolas" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ui:Card>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

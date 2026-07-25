@@ -2,14 +2,18 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:p="clr-namespace:WinOptimizer.App.Resources"
       Title="{Binding PageTitle}">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
         <StackPanel Orientation="Vertical" MaxWidth="900">
 
             <!-- Başlık + risk rozeti -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                <TextBlock Text="{Binding PageTitle}" FontSize="28" FontWeight="SemiBold" />
-                <Border Background="#5B5FC7" CornerRadius="8" Padding="10,2" Margin="12,4,0,8">
+                <TextBlock Text="{Binding PageTitle}" FontSize="28" FontWeight="SemiBold"
+                           AutomationProperties.HeadingLevel="Level1" />
+                <Border Background="#5B5FC7" CornerRadius="8" Padding="10,2" Margin="12,4,0,8"
+                        AutomationProperties.Name="{Binding RiskBadge}"
+                        AutomationProperties.HelpText="{x:Static p:Strings.RiskBadgeHelpText}">
                     <TextBlock Text="{Binding RiskBadge}" FontSize="12" Foreground="White" />
                 </Border>
             </StackPanel>
@@ -17,27 +21,38 @@
             <!-- Analiz özeti -->
             <ui:Card Margin="0,0,0,16">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="Analiz" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock Text="{x:Static p:Strings.Analyze}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"
+                               AutomationProperties.HeadingLevel="Level2" />
                     <TextBlock Text="{Binding AnalysisText}" TextWrapping="Wrap" Opacity="0.85" />
                     <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                        <ui:Button Content="🔍 Analiz Et" Command="{Binding AnalyzeCommand}"
-                                   Appearance="Secondary" Margin="0,0,8,0" />
-                        <ui:Button Content="🔁 Uygula" Command="{Binding ApplyCommand}"
+                        <ui:Button Content="{x:Static p:Strings.AnalyzeAction}" Command="{Binding AnalyzeCommand}"
+                                   Appearance="Secondary" Margin="0,0,8,0"
+                                   TabIndex="0"
+                                   AutomationProperties.HelpText="{x:Static p:Strings.AnalyzeHelpText}" />
+                        <ui:Button Content="{x:Static p:Strings.Apply}" Command="{Binding ApplyCommand}"
                                    Appearance="Primary" Margin="0,0,8,0"
-                                   IsEnabled="{Binding HasActions}" />
-                        <ui:Button Content="İptal" Command="{Binding CancelCommand}"
-                                   Appearance="Caution" />
+                                   IsEnabled="{Binding HasActions}"
+                                   TabIndex="1"
+                                   AutomationProperties.HelpText="{x:Static p:Strings.ApplyHelpText}" />
+                        <ui:Button Content="{x:Static p:Strings.CancelAction}" Command="{Binding CancelCommand}"
+                                   Appearance="Caution"
+                                   TabIndex="2"
+                                   AutomationProperties.HelpText="{x:Static p:Strings.CancelHelpText}" />
                     </StackPanel>
                     <ProgressBar Value="{Binding Progress}" Maximum="100"
-                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,12,0,0" />
+                                 IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,12,0,0"
+                                 AutomationProperties.Name="{x:Static p:Strings.ProgressText}"
+                                 AutomationProperties.HelpText="{x:Static p:Strings.ProgressHelpText}" />
                 </StackPanel>
             </ui:Card>
 
             <!-- Eylem listesi -->
             <ui:Card Margin="0,0,0,16" Visibility="{Binding HasActions, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Text="Uygulanacak Eylemler" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
-                    <ItemsControl ItemsSource="{Binding Actions}">
+                    <TextBlock Text="{x:Static p:Strings.ActionsHeader}" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <ItemsControl ItemsSource="{Binding Actions}"
+                                  AutomationProperties.HelpText="{x:Static p:Strings.ActionsListHelpText}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2" Opacity="0.8" />
@@ -49,7 +64,7 @@
 
             <!-- Sonuç -->
             <ui:Card Margin="0,0,0,16">
-                <ui:InfoBar Title="Sonuç" Message="{Binding ResultText}"
+                <ui:InfoBar Title="{x:Static p:Strings.Result}" Message="{Binding ResultText}"
                             IsOpen="{Binding HasResult}" Severity="Success" />
             </ui:Card>
 
