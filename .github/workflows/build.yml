@@ -23,6 +23,12 @@ jobs:
       - name: Restore
         run: dotnet restore WinOptimizer.sln
 
+      # Biçim kapısı — .editorconfig kurallarına uymayan kod derlemeden önce yakalanır
+      # (master plan Bölüm 18.3). Roslyn analiz kapısı Directory.Build.props'ta
+      # (AnalysisLevel=latest-recommended + TreatWarningsAsErrors) zorlanır.
+      - name: Verify formatting
+        run: dotnet format WinOptimizer.sln --verify-no-changes --verbosity minimal
+
       - name: Build
         # TreatWarningsAsErrors açık; sıfır uyarı hedefi (master plan Bölüm 8.6)
         run: dotnet build WinOptimizer.sln -c Release --no-restore

@@ -1,0 +1,65 @@
+# WinOptimizer — kod stili ve statik analiz yapılandırması (master plan Bölüm 18.3).
+#
+# Directory.Build.props'ta AnalysisLevel=latest-recommended ve TreatWarningsAsErrors=true açık.
+# Bu dosya, projeye uymayan kuralları GEREKÇESİYLE indirger; geri kalan her bulgu derlemeyi kırar.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.{csproj,props,targets,wxs,wixproj}]
+indent_size = 2
+
+[*.cs]
+# --- Analiz kuralı ayarları -------------------------------------------------
+
+# CA1848: "LoggerMessage temsilcileri kullanın." Sıcak yolda olmayan, kullanıcı tetikli
+# bakım işlemleri için mikro-optimizasyon; okunabilirliği düşürür. Bu projede uygulanmıyor.
+dotnet_diagnostic.CA1848.severity = none
+
+# CA1305: "IFormatProvider belirtin." Gerçek bir konu (TR yerelinde ondalık ayırıcı farklıdır)
+# ancak mevcut kod tabanında ~36 çağrı noktası var. Derlemeyi kırmadan görünür kalsın ki
+# dokunulan yerlerde kademeli düzeltilebilsin.
+dotnet_diagnostic.CA1305.severity = suggestion
+
+# CA1401: "P/Invoke'lar görünür olmamalı." WinOptimizer.Native bilinçli olarak, çözüm içindeki
+# diğer projelerin kullanması için ince bir genel P/Invoke cephesi sunar (Bölüm 11).
+dotnet_diagnostic.CA1401.severity = none
+
+# CA1711: Tür adı 'Flags' ile bitmemeli. RecycleFlags gerçekten bir [Flags] enum'u ve adı
+# Win32 SHERB_* sabitlerini yansıtıyor; interop kodunda yeniden adlandırma netliği düşürür.
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1822: "Üyeyi static yapın." Arayüz/desen tutarlılığı için örnek üye kalması yeğlenen
+# yerler var; bilgi düzeyinde kalsın.
+dotnet_diagnostic.CA1822.severity = suggestion
+
+[src/WinOptimizer.App/Resources/**.cs]
+# CA1304/CA1305: yerelleştirilmiş dize erişimcileri kasten CurrentUICulture kullanır —
+# i18n'in amacı zaten kullanıcının yereline göre metin döndürmektir (Bölüm 21.1).
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+
+[src/WinOptimizer.Native/**.cs]
+# Win32 sabitleri özgün adlarıyla (SHERB_NOCONFIRMATION vb.) yazılır; yeniden adlandırmak
+# bildirimi belgelerdeki karşılığından koparır.
+dotnet_diagnostic.CA1707.severity = none
+
+[tests/**/*.cs]
+# Test adları kasıtlı olarak alt çizgili okunur cümlelerdir
+# (ör. SetValue_then_RevertValue_restores_previous) — CA1707 burada geçerli değil.
+dotnet_diagnostic.CA1707.severity = none
+
+# xUnit test sınıflarında Dispose, sınıf başına kurulum temizliği içindir; sonlandırıcı yoktur.
+dotnet_diagnostic.CA1816.severity = none
+
+# Test verisi olarak satır içi dizi okunaklıdır; sıcak yol değil.
+dotnet_diagnostic.CA1861.severity = none

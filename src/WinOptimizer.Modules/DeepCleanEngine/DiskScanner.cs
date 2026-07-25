@@ -47,7 +47,7 @@ internal sealed class DiskScanner
 
     /// <summary>
     /// Yinelenen dosyaları bulur (hash-tabanlı — Bölüm 3.2).
-    /// Önce boyuta göre gruplar, sonra aynı boyuttakileri MD5 hash ile karşılaştırır.
+    /// Önce boyuta göre gruplar, sonra aynı boyuttakileri içerik hash'i ile karşılaştırır.
     /// Silmez — yalnızca raporlar. Döndürür: her grup bir yinelenen kümesi (≥2 dosya).
     /// </summary>
     public IReadOnlyList<IReadOnlyList<FileInfo>> FindDuplicateFiles(
@@ -99,8 +99,8 @@ internal sealed class DiskScanner
     private static string ComputeHash(FileInfo fi)
     {
         using var stream = fi.OpenRead();
-        using var md5 = System.Security.Cryptography.MD5.Create();
-        return System.BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "", StringComparison.Ordinal);
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        return Convert.ToHexString(sha.ComputeHash(stream));
     }
 
     public static string FormatBytes(long bytes) => bytes switch

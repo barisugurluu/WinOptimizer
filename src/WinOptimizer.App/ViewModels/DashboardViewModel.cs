@@ -12,11 +12,22 @@ namespace WinOptimizer.App.ViewModels;
 /// Panosu görünüm modeli — "Tek Tıkla En İyi Hale Getir" akışını yönetir
 /// (master plan Bölüm 12.3 Akış A: Önizle → Onayla → Uygula).
 /// </summary>
-public partial class DashboardViewModel : ObservableObject
+public partial class DashboardViewModel : ObservableObject, IDisposable
 {
     private readonly JobOrchestrationEngine _engine;
     private readonly ModuleRegistry _registry;
     private CancellationTokenSource? _cts;
+
+    /// <summary>
+    /// Yeni bir iptal kaynağı açar; bir öncekini serbest bırakır.
+    /// (Doğrudan yeniden atama, her işlemde bir CancellationTokenSource sızdırıyordu.)
+    /// </summary>
+    private CancellationTokenSource StartNewOperation()
+    {
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts;
+    }
 
     public DashboardViewModel(JobOrchestrationEngine engine, ModuleRegistry registry)
     {
@@ -54,8 +65,7 @@ public partial class DashboardViewModel : ObservableObject
 
         try
         {
-            _cts = new CancellationTokenSource();
-            var analyses = await _engine.AnalyzeAllAsync(_cts.Token);
+            var analyses = await _engine.AnalyzeAllAsync(StartNewOperation().Token);
 
             long totalBytes = analyses.Values.Sum(a => a.TotalBytes);
             int totalItems = analyses.Values.Sum(a => a.ItemCount);
@@ -90,7 +100,7 @@ public partial class DashboardViewModel : ObservableObject
 
         try
         {
-            _cts = new CancellationTokenSource();
+            var ct = StartNewOperation().Token;
 
             await _engine.PrepareSafetyAsync("WinOptimizer öncesi");
             var progress = new Progress<ProgressInfo>(info =>
@@ -99,7 +109,7 @@ public partial class DashboardViewModel : ObservableObject
                 StatusSummary = $"{info.ModuleId}: {info.Message} ({info.Percent}%)";
             });
 
-            var results = await _engine.ExecuteAsync(null, progress, _cts.Token);
+            var results = await _engine.ExecuteAsync(null, progress, ct);
 
             long gained = results.Sum(r => r.GainBytes);
             int succeeded = results.Sum(r => r.Succeeded);
@@ -143,5 +153,12 @@ public partial class DashboardViewModel : ObservableObject
     {
         IsBusy = false;
         Progress = 100;
+    }
+
+    public void Dispose()
+    {
+        _cts?.Dispose();
+        _cts = null;
+        GC.SuppressFinalize(this);
     }
 }

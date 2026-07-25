@@ -19,6 +19,9 @@ public static class Program
     private const int ExitPartial = 1;
     private const int ExitError = 2;
 
+    /// <summary>--json çıktısı için paylaşılan ayarlar (her çağrıda yeniden kurmak pahalıdır).</summary>
+    private static readonly JsonSerializerOptions JsonOutputOptions = new() { WriteIndented = true };
+
     public static async Task<int> Main(string[] args)
     {
         if (args.Length == 0 || args[0] is "--help" or "-h" or "help")
@@ -62,8 +65,8 @@ public static class Program
 
         if (opts.Json)
         {
-            Console.WriteLine(JsonSerializer.Serialize(new { items, totalBytes = total, modules = analyses },
-                new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine(JsonSerializer.Serialize(
+                new { items, totalBytes = total, modules = analyses }, JsonOutputOptions));
         }
         else
         {
@@ -207,8 +210,7 @@ public static class Program
 
         if (opts.Json)
             Console.WriteLine(JsonSerializer.Serialize(
-                new { before = before.ToSummary(), after = after.ToSummary(), report },
-                new JsonSerializerOptions { WriteIndented = true }));
+                new { before = before.ToSummary(), after = after.ToSummary(), report }, JsonOutputOptions));
         else
             Console.WriteLine(report);
         return ExitSuccess;

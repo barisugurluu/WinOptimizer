@@ -30,12 +30,16 @@ public static class Shell32
         public long i64NumItems;
     }
 
-    /// <summary>Tüm sürücülerin geri dönüşüm kutusundaki toplam boyutu döndürür (bayt).</summary>
+    /// <summary>
+    /// Tüm sürücülerin geri dönüşüm kutusundaki toplam boyutu döndürür (bayt).
+    /// Sorgu başarısızsa 0 döner — çağrı hata verdiğinde <c>info</c> doldurulmamış olur,
+    /// dolayısıyla değeri okumak çöp boyut raporlanmasına yol açardı.
+    /// </summary>
     public static long GetRecycleBinSize(string? rootPath = null)
     {
         var info = new SHQueryRBInfo { cbSize = Marshal.SizeOf<SHQueryRBInfo>() };
-        SHQueryRecycleBin(rootPath, ref info);
-        return info.i64Size;
+        uint hr = SHQueryRecycleBin(rootPath, ref info);
+        return hr == 0 ? info.i64Size : 0; // S_OK dışında sonuç güvenilir değil
     }
 
     /// <summary>Geri dönüşüm kutusunu boşaltır (onay diyaloğu olmadan, sessizce).</summary>

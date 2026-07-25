@@ -11,7 +11,10 @@ public static class Kernel32
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadLibrary(string lpFileName);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
+    // GetProcAddress yalnızca ANSI ad alır (LPCSTR). Best-fit eşleme kapatılır: aksi halde
+    // eşlenemeyen karakterler sessizce benzerlerine dönüşür (CA2101).
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi,
+        BestFitMapping = false, ThrowOnUnmappableChar = true)]
     public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
     [DllImport("kernel32.dll", SetLastError = true)]

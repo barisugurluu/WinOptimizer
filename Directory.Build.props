@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Statik analiz — master plan Bölüm 18.3 (Roslyn analyzer kapısı). -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>WinOptimizer Team</Authors>
     <Product>WinOptimizer</Product>
     <Version>0.1.0-alpha</Version>

@@ -25,10 +25,10 @@ public sealed class CleanEngineModule : IOptimizationModule
         _cleaner = new DiskCleaner(logger);
     }
 
-    private record CleanStep(string Name, string Folder, Func<FileInfo, bool>? Predicate,
+    private sealed record CleanStep(string Name, string Folder, Func<FileInfo, bool>? Predicate,
         SearchOption Option, RiskLevel Risk, string Description);
 
-    private IEnumerable<CleanStep> BuildSteps() => new[]
+    private CleanStep[] BuildSteps() => new[]
     {
         new CleanStep("Temp", CleanTargets.TempFolders[0],
             fi => DiskCleaner.IsOlderThan(fi, CleanTargets.MinFileAgeHours),
@@ -210,8 +210,11 @@ public sealed class CleanEngineModule : IOptimizationModule
             stepIndex++;
             progress.Report(new ProgressInfo
             {
-                ModuleId = Id, Percent = 100, Message = "Geri Dönüşüm kutusu boşaltılıyor…",
-                Current = stepIndex, Total = totalSteps + 1
+                ModuleId = Id,
+                Percent = 100,
+                Message = "Geri Dönüşüm kutusu boşaltılıyor…",
+                Current = stepIndex,
+                Total = totalSteps + 1
             });
             try
             {

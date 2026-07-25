@@ -10,13 +10,24 @@ namespace WinOptimizer.App.ViewModels;
 /// Modül bazlı sayfa için ViewModel (master plan Bölüm 12.3 Akış B — ileri kullanıcı).
 /// Belirli bir modülü çalıştırır: Analiz et → Önizle → Uygula.
 /// </summary>
-public partial class ModulePageViewModel : ObservableObject
+public partial class ModulePageViewModel : ObservableObject, IDisposable
 {
     private readonly JobOrchestrationEngine _engine;
     private readonly ModuleRegistry _registry;
     private IOptimizationModule? _module;
     private AnalysisResult? _analysis;
     private CancellationTokenSource? _cts;
+
+    /// <summary>
+    /// Yeni bir iptal kaynağı açar; bir öncekini serbest bırakır.
+    /// (Doğrudan yeniden atama, her işlemde bir CancellationTokenSource sızdırıyordu.)
+    /// </summary>
+    private CancellationTokenSource StartNewOperation()
+    {
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts;
+    }
 
     [ObservableProperty] private string _pageTitle = string.Empty;
     [ObservableProperty] private string _analysisText = "Henüz analiz edilmedi.";
@@ -59,10 +70,10 @@ public partial class ModulePageViewModel : ObservableObject
         IsBusy = true; Progress = 0; HasResult = false;
         try
         {
-            _cts = new CancellationTokenSource();
-            _analysis = await _module.AnalyzeAsync(_cts.Token);
+            var ct = StartNewOperation().Token;
+            _analysis = await _module.AnalyzeAsync(ct);
             AnalysisText = _analysis.Summary;
-            var preview = await _module.PreviewAsync(_analysis, _cts.Token);
+            var preview = await _module.PreviewAsync(_analysis, ct);
             Actions.Clear();
             foreach (var a in preview.Actions)
                 Actions.Add($"{a.Description}  [{a.Risk}{(a.RequiresExtraConfirmation ? ", onaylı" : "")}]");
@@ -82,15 +93,15 @@ public partial class ModulePageViewModel : ObservableObject
         IsBusy = true; Progress = 0; HasResult = false;
         try
         {
-            _cts = new CancellationTokenSource();
+            var ct = StartNewOperation().Token;
             await _engine.PrepareSafetyAsync($"WinOptimizer — {_module.DisplayName}");
             var progress = new Progress<ProgressInfo>(p =>
             {
                 Progress = p.Percent;
                 AnalysisText = $"{p.Message} ({p.Percent}%)";
             });
-            var preview = await _module.PreviewAsync(_analysis, _cts.Token);
-            var result = await _module.ExecuteAsync(preview, progress, _cts.Token);
+            var preview = await _module.PreviewAsync(_analysis, ct);
+            var result = await _module.ExecuteAsync(preview, progress, ct);
             ResultText = $"Tamamlandı: {result.Succeeded} başarılı, {result.Skipped} atlanan, " +
                          $"{result.Failed} başarısız" +
                          (result.GainBytes > 0 ? $", +{FormatBytes(result.GainBytes)} kazanç." : ".");
@@ -114,4 +125,11 @@ public partial class ModulePageViewModel : ObservableObject
         >= 1L << 10 => $"{bytes / (double)(1L << 10):F0} KB",
         _ => $"{bytes} B"
     };
+
+    public void Dispose()
+    {
+        _cts?.Dispose();
+        _cts = null;
+        GC.SuppressFinalize(this);
+    }
 }
