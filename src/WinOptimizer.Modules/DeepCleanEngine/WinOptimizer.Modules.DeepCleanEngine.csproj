@@ -12,4 +12,8 @@
     <ProjectReference Include="..\..\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="WinOptimizer.Modules.Tests" />
+  </ItemGroup>
+
 </Project>
