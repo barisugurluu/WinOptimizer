@@ -44,7 +44,7 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 | **E2E testleri** (`WinOptimizer.E2E.Tests` — gerçek sistem senaryoları) — 6 test | ✅ 6/6 geçti |
 | JSON şemaları (settings + example + tweaks catalog) | ⚠ Dosyalar var, koda bağlı değil |
 | **i18n** — `.resx` kaynak dosyaları (TR varsayılan + EN), `x:Static` + ViewModel bağlama (Bölüm 12.5) | ✅ Bağlı |
-| **JSON tweak kataloğu** — `tweaks.catalog.json` (Bölüm 16.5) | ⚠ Henüz `TweakCatalog.cs` tarafından okunmuyor |
+| **Tweak kataloğu** — `SystemTweaker/TweakCatalog.cs` tek kaynak | ✅ |
 | **CI/CD** — GitHub Actions (build + test Windows runner) (Bölüm 8.6) | ✅ |
 | **Canlı doğrulama** — CLI `analyze` 37.774 öğe / 21,67 GB tespit etti | ✅ |
 | `SettingsService` + `SchedulerService` — JSON ayar kalıcılığı + Task Scheduler (Faz 8) | ✅ Derlendi |
@@ -58,7 +58,7 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 - ✅ **Geri Alma zaman çizelgesi** — change journal'dan 7 günlük kart listesi (Bölüm 12.3 Akış C)
 - ✅ **i18n gerçek bağlama** — `.resx` → `x:Static` (XAML) + `Strings.cs` (ViewModel), TR/EN tam yerelleştirme
 - ✅ **E2E testleri** — `WinOptimizer.E2E.Tests`: gerçek TEMP analizi, donanım okuma, süreç tarama (Bölüm 8.2)
-- ⚠ **JSON tweak kataloğu** — `schemas/tweaks.catalog.json` dosyası mevcut, ancak `SystemTweaker/TweakCatalog.cs` şu an kataloğu koda gömülü tutuyor; "tek kaynak" bağlantısı henüz kurulmadı (bkz. geliştirme planı Faz C)
+- ✅ **Tweak kataloğu** — `SystemTweaker/TweakCatalog.cs` tek kaynaktır. (Eski `schemas/tweaks.catalog.json` kaldırıldı: hiçbir kod tarafından okunmuyordu, koddaki katalogdan bir madde eksikti ve şeması geri-alma değerlerini taşımadığı için "tek kaynak" yapılsaydı rollback simetrisi bozulurdu.)
 
 ### Kapatılan Fonksiyonel Boşluklar (şartname uygunluğu)
 - ✅ **Geri Dönüşüm kutusu** — `Shell32.EmptyRecycleBin` artık CleanEngine'de gerçekten çağrılıyor (Bölüm 11.5)
