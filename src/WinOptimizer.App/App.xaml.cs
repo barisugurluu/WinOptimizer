@@ -1,4 +1,5 @@
 using System.IO;
+using WinOptimizer.Native;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,8 @@ public partial class App : Application
     /// <summary>Genel Bakış sekmesi canlı metrik yoklama aralığı (saniye) — ayarlardan okunur.</summary>
     public static int PollingIntervalSeconds { get; private set; } = 3;
 
+    private static string? _dataDir;
+
     private Serilog.ILogger? _serilogLogger;
 
     private void OnStartup(object sender, StartupEventArgs e)
@@ -50,6 +53,7 @@ public partial class App : Application
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
             "WinOptimizer");
         Directory.CreateDirectory(baseDir);
+        _dataDir = baseDir;
 
         // Serilog yapılandırılmış dosya günlüğü (master plan Bölüm 8.3).
         _serilogLogger = LoggingBootstrap.CreateLogger(baseDir);
@@ -70,12 +74,14 @@ public partial class App : Application
         services.AddSingleton<SettingsService>(_ =>
             new SettingsService(baseDir, _.GetRequiredService<ILogger<SettingsService>>()));
 
-        // Safety katmanı (Faz 0)
+        // Safety katmanı (Faz 0) — bütünlük koruyucu önce kurulur (§17.4).
+        services.AddSingleton<IntegrityGuard>(_ => new IntegrityGuard(
+            IntegrityKeyStore.LoadOrCreate(baseDir), _.GetRequiredService<ILogger<IntegrityGuard>>()));
         services.AddSingleton<RestorePointService>();
         services.AddSingleton<ChangeJournal>(_ =>
-            new ChangeJournal(baseDir, _.GetRequiredService<ILogger<ChangeJournal>>()));
+            new ChangeJournal(baseDir, _.GetRequiredService<ILogger<ChangeJournal>>(), _.GetRequiredService<IntegrityGuard>()));
         services.AddSingleton<RegistryBackup>(_ =>
-            new RegistryBackup(baseDir, _.GetRequiredService<ILogger<RegistryBackup>>()));
+            new RegistryBackup(baseDir, _.GetRequiredService<ILogger<RegistryBackup>>(), _.GetRequiredService<IntegrityGuard>()));
         services.AddSingleton<SafetyGuard>();
         services.AddSingleton<SafetyNet>();
         services.AddSingleton<ProcessRunner>();
@@ -169,7 +175,11 @@ public partial class App : Application
     private static void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         if (e.ExceptionObject is Exception ex)
+        {
             Log.Fatal(ex, "İşlenmemiş uygulama etki alanı istisnası.");
+            if (_dataDir is not null)
+                CrashDumper.Write(Path.Combine(_dataDir, "dumps"), ex);
+        }
         else
             Log.Fatal("İşlenmemiş etki alanı istisnası (nesne): {Obj}", e.ExceptionObject);
         Log.CloseAndFlush();

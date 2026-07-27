@@ -73,7 +73,7 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
                 items++; total += fi.Length;
                 details["MemoryDump"] = new { Bytes = fi.Length };
             }
-            catch { }
+            catch (Exception ex) { _logger.LogDebug(ex, "Büyük dosya boyutu okunamadı (memory.dmp)."); }
         }
 
         // Eski sürücü paketleri (pnputil -e ile listelenebilir; burada özet)
@@ -163,7 +163,7 @@ public sealed class DeepCleanEngineModule : IOptimizationModule
                 {
                     long bytes = _scanner.GetFolderSize(GetWindowsOldPath());
                     // takeown + icacls + rd ile güvenli kaldırma (10 gün kuralı sağlanmış)
-                    await _runner.RunAsync("cmd.exe", $"/c rd /s /q \"{GetWindowsOldPath()}\"", null, ct);
+                    await _runner.RunAsync("cmd.exe", new[] { "/c", "rd", "/s", "/q", GetWindowsOldPath() }, null, ct);
                     succeeded++; gain += bytes;
                     changes.Add(new ChangeRecord
                     {

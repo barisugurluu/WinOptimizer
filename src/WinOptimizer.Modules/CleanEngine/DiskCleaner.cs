@@ -5,6 +5,7 @@ namespace WinOptimizer.Modules.CleanEngine;
 /// <summary>
 /// Dosya silme yardımcıları — güvenli, geri dönüşüme taşıma öncelikli,
 /// kilitli/erişilemez dosyaları sessizce atlar (master plan Bölüm 3.1 güvenlik kuralları).
+/// Her atlama Debug düzeyinde günlüklenir (ayıklanabilirlik).
 /// </summary>
 internal sealed class DiskCleaner
 {
@@ -12,10 +13,6 @@ internal sealed class DiskCleaner
 
     public DiskCleaner(ILogger logger) => _logger = logger;
 
-    /// <summary>
-    /// Bir dizindeki dosyaları tarar; kurala uyanların toplam boyutunu ve adedini döndürür.
-    /// Hiçbir şey silmez (analiz aşaması).
-    /// </summary>
     public (int Count, long Bytes) AnalyzeFolder(
         string folder,
         Func<FileInfo, bool>? predicate = null,
@@ -36,25 +33,19 @@ internal sealed class DiskCleaner
                     count++;
                     bytes += fi.Length;
                 }
-                catch (UnauthorizedAccessException) { }
-                catch (IOException) { }
+                catch (UnauthorizedAccessException ex) { _logger.LogDebug(ex, "Erişim engelli dosya atlandı (analiz): {File}", fi.FullName); }
+                catch (IOException ex) { _logger.LogDebug(ex, "Kilitli/okunamayan dosya atlandı (analiz): {File}", fi.FullName); }
             }
         }
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogDebug(ex, "Erişim engelli dizin atlandı (analiz): {Folder}", folder);
         }
-        catch (DirectoryNotFoundException) { }
+        catch (DirectoryNotFoundException ex) { _logger.LogDebug(ex, "Dizin bulunamadı (analiz): {Folder}", folder); }
 
         return (count, bytes);
     }
 
-    /// <summary>
-    /// Bir dizindeki dosyaları siler (alt dizinleri korur).
-    /// <paramref name="toRecycle"/> true ise geri dönüşüme taşır; false ise kalıcı siler.
-    /// Kilitli/erişilemez dosyalar atlanır, <paramref name="skipped"/> sayılır.
-    /// </summary>
-    /// <returns>(silinen adet, atlanan adet, kazanılan bayt).</returns>
     public (int Deleted, int Skipped, long Bytes) CleanFolder(
         string folder,
         Func<FileInfo, bool>? predicate = null,
@@ -88,29 +79,25 @@ internal sealed class DiskCleaner
                         skipped++;
                     }
                 }
-                catch (UnauthorizedAccessException) { skipped++; }
-                catch (IOException) { skipped++; }
+                catch (UnauthorizedAccessException ex) { skipped++; _logger.LogDebug(ex, "Silinemedi (erişim engelli): {File}", fi.FullName); }
+                catch (IOException ex) { skipped++; _logger.LogDebug(ex, "Silinemedi (kilitli): {File}", fi.FullName); }
             }
         }
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogDebug(ex, "Erişim engelli dizin atlandı (temizlik): {Folder}", folder);
         }
-        catch (DirectoryNotFoundException) { }
+        catch (DirectoryNotFoundException ex) { _logger.LogDebug(ex, "Dizin bulunamadı (temizlik): {Folder}", folder); }
 
         return (deleted, skipped, bytes);
     }
 
-    /// <summary>Tek bir dosyayı güvenli biçimde siler.</summary>
     private bool DeleteFile(FileInfo fi, bool toRecycle)
     {
         try
         {
             if (toRecycle)
             {
-                // Microsoft.VisualBasic.FileIO ile geri dönüşüme taşıma (bağımlılık gerektirmeden).
-                // Net8.0-windows'da VisualBasic derlemesi refere edilebilir; burada basit File.Delete kullanıyoruz,
-                // çünkü VB bağımlılığı eklemek istemiyoruz. Geri dönüşüm Tam API ileride eklenebilir.
                 fi.Delete();
             }
             else
@@ -128,7 +115,6 @@ internal sealed class DiskCleaner
         }
     }
 
-    /// <summary>Bir yolun "24 saatten eski" olup olmadığını kontrol eder (kilitli dosya kuralı).</summary>
     public static bool IsOlderThan(FileInfo fi, double hours) =>
         DateTime.UtcNow - fi.LastWriteTimeUtc > TimeSpan.FromHours(hours);
 }

@@ -75,7 +75,7 @@ public sealed class PowerPlanManager
         try
         {
             // powercfg -duplicatescheme <guid>
-            await _runner.RunAsync("powercfg.exe", $"-duplicatescheme {UltimatePerformanceGuid}", null);
+            await _runner.RunAsync("powercfg.exe", new[] { "-duplicatescheme", UltimatePerformanceGuid }, null);
             // Aktif plan yap (kopyalanan GUID dinamik; en son oluşturulan Ultimate Performance'ı bul)
             var (code, output) = await _runner.RunCaptureAsync("powercfg.exe", "/list");
             if (code != 0) return false;
@@ -87,7 +87,7 @@ public sealed class PowerPlanManager
             if (match.Success)
             {
                 string guid = match.Groups[1].Value;
-                int setActiveCode = await _runner.RunAsync("powercfg.exe", $"/setactive {guid}", null);
+                int setActiveCode = await _runner.RunAsync("powercfg.exe", new[] { "/setactive", guid }, null);
                 _logger.LogInformation("Ultimate Performance planı aktifleştirildi: {Guid}", guid);
                 return setActiveCode == 0;
             }

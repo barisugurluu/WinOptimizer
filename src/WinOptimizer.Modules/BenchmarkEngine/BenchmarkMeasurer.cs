@@ -1,14 +1,18 @@
-using System.Globalization;
 using System.Management;
+using Microsoft.Extensions.Logging;
 
 namespace WinOptimizer.Modules.BenchmarkEngine;
 
 /// <summary>
 /// Benchmark ölçümü yapan yardımcı (WMI tabanlı). Master plan Bölüm 13.1 metrikleri.
+/// WMI çağrıları bazı makinelerde başarısız olabilir; her atlama Debug düzeyinde günlüklenir.
 /// </summary>
 public sealed class BenchmarkMeasurer
 {
-    /// <summary>Yeni bir sistem ölçümü alır.</summary>
+    private readonly ILogger<BenchmarkMeasurer>? _logger;
+
+    public BenchmarkMeasurer(ILogger<BenchmarkMeasurer>? logger = null) => _logger = logger;
+
     public BenchmarkSnapshot Measure()
     {
         double? boot = MeasureBootTimeSec();
@@ -23,7 +27,7 @@ public sealed class BenchmarkMeasurer
             var m = os.Get().Cast<ManagementObject>().FirstOrDefault();
             if (m is not null) freeRam = Convert.ToInt64(m["FreePhysicalMemory"]) / 1024; // KB→MB
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "Boş RAM ölçülemedi (WMA)."); }
 
         try
         {
@@ -31,7 +35,7 @@ public sealed class BenchmarkMeasurer
             var m = ld.Get().Cast<ManagementObject>().FirstOrDefault();
             if (m is not null) diskFree = Convert.ToDouble(m["FreeSpace"]) / 1e9;
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "C: boş alan ölçülemedi (WMI)."); }
 
         try
         {
@@ -39,7 +43,7 @@ public sealed class BenchmarkMeasurer
             var m = cpu.Get().Cast<ManagementObject>().FirstOrDefault();
             if (m is not null) cpuLoad = Convert.ToInt32(m["LoadPercentage"]);
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "CPU yükü ölçülemedi (WMI)."); }
 
         int secScore = ComputeSecurityScore(out rtp);
 
@@ -54,14 +58,13 @@ public sealed class BenchmarkMeasurer
         };
     }
 
-    /// <summary>İki snapshot arasındaki farkı hesaplar (son - önce).</summary>
     public static BenchmarkDelta Diff(BenchmarkSnapshot before, BenchmarkSnapshot after) => new(
         BootSec: (before.BootSec is double b && after.BootSec is double a) ? a - b : null,
         FreeRamMb: (before.FreeRamMb is long b1 && after.FreeRamMb is long a1) ? a1 - b1 : null,
         DiskFreeGb: (before.DiskFreeGb is double b2 && after.DiskFreeGb is double a2) ? a2 - b2 : null,
         SecurityScore: (before.SecurityScore is int b3 && after.SecurityScore is int a3) ? a3 - b3 : null);
 
-    private static double? MeasureBootTimeSec()
+    private double? MeasureBootTimeSec()
     {
         try
         {
@@ -73,11 +76,11 @@ public sealed class BenchmarkMeasurer
                 return (DateTime.Now - boot).TotalSeconds;
             }
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "Boot süresi ölçülemedi (WMI)."); }
         return null;
     }
 
-    private static int ComputeSecurityScore(out bool? rtp)
+    private int ComputeSecurityScore(out bool? rtp)
     {
         int score = 0;
         rtp = null;
@@ -95,14 +98,14 @@ public sealed class BenchmarkMeasurer
                 if (age <= 1) score += 30; else if (age <= 7) score += 15;
             }
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "Defender güvenlik skoru ölçülemedi (WMI)."); }
         try
         {
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                 @"SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity");
             if (key?.GetValue("Enabled") is int v && v == 1) score += 20;
         }
-        catch { }
+        catch (Exception ex) { _logger?.LogDebug(ex, "HVCI durumu okunamadı."); }
         return Math.Clamp(score, 0, 100);
     }
 }

@@ -1,29 +1,31 @@
 using System.IO;
+using System.Reflection;
 using Serilog;
 using Serilog.Events;
 
 namespace WinOptimizer.App.Infrastructure;
 
 /// <summary>
-/// LoggingBootstrap — Serilog yapılandırılmış dosya günlüğünü kurar (master plan Bölüm 8.3).
+/// LoggingBootstrap — Serilog yapılandırılmış dosya günlüğünü kurar (master plan Bölüm 8.3/§19).
 /// Rolling dosya: %ProgramData%\WinOptimizer\logs\app-YYYYMMDD.log (günlük rotasyon, 7 gün).
+/// Zenginleştirme: uygulama sürümü + kaynak bağlamı her olaya eklenir (yapılandırılmış günlük).
 /// Microsoft.Extensions.Logging'e Serilog köprüsü <c>AddSerilog</c> ile yapılır.
 /// </summary>
 public static class LoggingBootstrap
 {
-    /// <summary>Belirtilen veri dizini altında Serilog dosya günlüğçüsünü oluşturur.</summary>
-    /// <param name="baseDir">WinOptimizer veri dizini (ör. %ProgramData%\WinOptimizer).</param>
-    /// <returns>Yapılandırılmış, dispose edilmesi gereken Serilog günlükçüsü.</returns>
     public static Serilog.ILogger CreateLogger(string baseDir)
     {
         string logDir = Path.Combine(baseDir, "logs");
         Directory.CreateDirectory(logDir);
         string logPath = Path.Combine(logDir, "app-.log");
 
+        string appVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0";
+
         return new LoggerConfiguration()
             .MinimumLevel.Debug()
             .Enrich.FromLogContext()
             .Enrich.WithProperty("App", "WinOptimizer")
+            .Enrich.WithProperty("AppVersion", appVersion)
             .WriteTo.File(
                 path: logPath,
                 rollingInterval: RollingInterval.Day,
@@ -33,7 +35,6 @@ public static class LoggingBootstrap
             .CreateLogger();
     }
 
-    /// <summary>Günlük seviyesini metinden ayrıştırır (ayarlar için).</summary>
     public static LogEventLevel ParseLevel(string? value) => value?.ToLowerInvariant() switch
     {
         "trace" => LogEventLevel.Verbose,

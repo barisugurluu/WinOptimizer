@@ -40,7 +40,7 @@ public sealed class LiveMetricsProvider
         }
     }
 
-    private static LiveMetric CollectFromWmi()
+    private LiveMetric CollectFromWmi()
     {
         int ramPct = 0;
         long ramFree = 0;
@@ -71,7 +71,7 @@ public sealed class LiveMetricsProvider
             var m = cpu.Get().Cast<ManagementObject>().FirstOrDefault();
             if (m is not null) cpuPct = Convert.ToInt32(m["LoadPercentage"]);
         }
-        catch { }
+        catch (Exception ex) { _logger.LogDebug(ex, "WMI sorgusu başarısız."); }
 
         // C: disk
         try
@@ -87,7 +87,7 @@ public sealed class LiveMetricsProvider
                 cFreePct = size > 0 ? (int)(free / size * 100) : 0;
             }
         }
-        catch { }
+        catch (Exception ex) { _logger.LogDebug(ex, "WMI sorgusu başarısız."); }
 
         return new LiveMetric
         {

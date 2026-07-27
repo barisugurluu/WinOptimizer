@@ -8,22 +8,26 @@ namespace WinOptimizer.Safety;
 /// Change Journal — yapılan her değişikliği günlük JSONL dosyasına yazar
 /// ve geri almada okur (master plan Bölüm 2.1 SafetyNet, 16.3 şema).
 /// Dosya adı: journal/YYYY-MM-DD.jsonl (her gün ayrı dosya).
+/// Bütünlük: her yazım sonrası <see cref="IntegrityGuard"/> ile HMAC imzalanır
+/// (master plan §17.4) — kurcalanma geri almada tespit edilir.
 /// </summary>
 public sealed class ChangeJournal
 {
     private readonly string _journalDir;
     private readonly ILogger<ChangeJournal> _logger;
+    private readonly IntegrityGuard? _integrity;
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
         WriteIndented = false,
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    public ChangeJournal(string baseDir, ILogger<ChangeJournal> logger)
+    public ChangeJournal(string baseDir, ILogger<ChangeJournal> logger, IntegrityGuard? integrity = null)
     {
         _journalDir = Path.Combine(baseDir, "journal");
         Directory.CreateDirectory(_journalDir);
         _logger = logger;
+        _integrity = integrity;
     }
 
     /// <summary>Bugünün journal dosyasının tam yolu.</summary>
@@ -34,19 +38,36 @@ public sealed class ChangeJournal
     public async Task WriteAsync(ChangeRecord record, CancellationToken ct = default)
     {
         var line = JsonSerializer.Serialize(record, JsonOpts);
-        await using var writer = new StreamWriter(GetTodayFilePath(), append: true);
-        await writer.WriteLineAsync(line.AsMemory(), ct);
+        var path = GetTodayFilePath();
+        await using (var writer = new StreamWriter(path, append: true))
+        {
+            await writer.WriteLineAsync(line.AsMemory(), ct);
+        }
+
+        if (_integrity is not null)
+        {
+            await _integrity.SignFileAsync(path, ct);
+        }
+
         _logger.LogDebug("Journal yazıldı: {Module}/{Op} -> {Target}", record.Module, record.Operation, record.Target);
     }
 
     /// <summary>Birden çok kaydı tek seferde yazar.</summary>
     public async Task WriteRangeAsync(IEnumerable<ChangeRecord> records, CancellationToken ct = default)
     {
-        await using var writer = new StreamWriter(GetTodayFilePath(), append: true);
-        foreach (var record in records)
+        var path = GetTodayFilePath();
+        await using (var writer = new StreamWriter(path, append: true))
         {
-            var line = JsonSerializer.Serialize(record, JsonOpts);
-            await writer.WriteLineAsync(line.AsMemory(), ct);
+            foreach (var record in records)
+            {
+                var line = JsonSerializer.Serialize(record, JsonOpts);
+                await writer.WriteLineAsync(line.AsMemory(), ct);
+            }
+        }
+
+        if (_integrity is not null)
+        {
+            await _integrity.SignFileAsync(path, ct);
         }
     }
 
@@ -79,7 +100,7 @@ public sealed class ChangeJournal
     public async Task<ChangeRecord?> FindAsync(string changeId, CancellationToken ct = default)
     {
         foreach (var file in Directory.EnumerateFiles(_journalDir, "journal-*.jsonl")
-                                  .OrderByDescending(f => f))
+                                   .OrderByDescending(f => f))
         {
             foreach (var line in await File.ReadAllLinesAsync(file, ct))
             {
@@ -92,7 +113,10 @@ public sealed class ChangeJournal
                         return rec;
                     }
                 }
-                catch (JsonException) { /* atla */ }
+                catch (JsonException)
+                {
+                    _logger.LogDebug("Bozuk satır atlandı (arama): {Path}", file);
+                }
             }
         }
         return null;

@@ -91,8 +91,7 @@ public sealed class UpdateEngineModule : IOptimizationModule
                     await _runner.RunAsync("net.exe", "stop wuauserv", null, ct);
                     await _runner.RunAsync("net.exe", "stop bits", null, ct);
                     var win = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                    await _runner.RunAsync("cmd.exe",
-                        $"/c rd /s /q \"{win}\\SoftwareDistribution\\Download\"", null, ct);
+                    await _runner.RunAsync("cmd.exe", new[] { "/c", "rd", "/s", "/q", Path.Combine(win, "SoftwareDistribution", "Download") }, null, ct);
                     await _runner.RunAsync("net.exe", "start bits", null, ct);
                     await _runner.RunAsync("net.exe", "start wuauserv", null, ct);
                     succeeded++;

@@ -7,6 +7,8 @@ namespace WinOptimizer.Safety;
 /// <summary>
 /// Sistem Geri Yükleme noktası oluşturma (WMI SystemRestore).
 /// Tüm riskli işlemlerden ÖNCE çağrılır (master plan Bölüm 11.2, Faz 0).
+/// Dayanıklılık: WMI çağrısı geçici hatalara karşı <see cref="Resilience"/> boru
+/// hattı içinde yeniden denenir (§19 — RPC sunucusu meşgul vb.).
 /// </summary>
 public sealed class RestorePointService
 {
@@ -23,12 +25,12 @@ public sealed class RestorePointService
     {
         try
         {
-            using var mc = new ManagementClass(@"\\.\root\default", "SystemRestore", null);
-            var inParams = mc.GetMethodParameters("CreateRestorePoint");
-            inParams["Description"] = description;
-            inParams["RestorePointType"] = 12;   // MODIFY_SETTINGS
-            inParams["EventType"] = 100;         // BEGIN_SYSTEM_CHANGE
-            mc.InvokeMethod("CreateRestorePoint", inParams, null);
+            Resilience.ExecuteAsync(_ =>
+            {
+                InvokeCreateRestorePoint(description);
+                return Task.FromResult(true);
+            }, CancellationToken.None).GetAwaiter().GetResult();
+
             _logger.LogInformation("Sistem geri yükleme noktası oluşturuldu: {Desc}", description);
             return true;
         }
@@ -45,7 +47,17 @@ public sealed class RestorePointService
         }
     }
 
-    /// <summary>Sistem korumasının etkin olup olmadığını kontrol eder (r:SystemRestore = WMI sınıfı).</summary>
+    private void InvokeCreateRestorePoint(string description)
+    {
+        using var mc = new ManagementClass(@"\\.\root\default", "SystemRestore", null);
+        var inParams = mc.GetMethodParameters("CreateRestorePoint");
+        inParams["Description"] = description;
+        inParams["RestorePointType"] = 12;   // MODIFY_SETTINGS
+        inParams["EventType"] = 100;         // BEGIN_SYSTEM_CHANGE
+        mc.InvokeMethod("CreateRestorePoint", inParams, null);
+    }
+
+    /// <summary>Sistem korumasının etkin olup olmadığını kontrol eder.</summary>
     public bool IsEnabled()
     {
         try
@@ -54,8 +66,9 @@ public sealed class RestorePointService
                 @"\\.\root\default", "SELECT * FROM SystemRestore");
             return searcher.Get().Count > 0;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogDebug(ex, "Sistem geri yükleme koruması sorgulanamadı.");
             return false;
         }
     }

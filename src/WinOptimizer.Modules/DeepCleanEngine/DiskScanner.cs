@@ -1,13 +1,18 @@
 using Microsoft.Extensions.Logging;
+using WinOptimizer.Core;
 
 namespace WinOptimizer.Modules.DeepCleanEngine;
 
 /// <summary>
 /// Disk tarama yardımcıları — klasör boyutu/dosya sayısı, büyük/yinelenen dosya tespiti.
+/// Erişilemez/kilitli öğeler sessizce atlanır; her atlama Debug düzeyinde günlüklenir.
 /// </summary>
 internal sealed class DiskScanner
 {
-    /// <summary>Bir klasörün toplam boyutunu ve dosya sayısını döndürür.</summary>
+    private readonly ILogger<DiskScanner>? _logger;
+
+    public DiskScanner(ILogger<DiskScanner>? logger = null) => _logger = logger;
+
     public (int Count, long Bytes) ScanFolder(string folder)
     {
         if (!Directory.Exists(folder)) return (0, 0);
@@ -17,17 +22,16 @@ internal sealed class DiskScanner
             foreach (var fi in new DirectoryInfo(folder).EnumerateFiles("*", SearchOption.AllDirectories))
             {
                 try { count++; bytes += fi.Length; }
-                catch (UnauthorizedAccessException) { }
-                catch (IOException) { }
+                catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Erişim engelli dosya atlandı: {File}", fi.FullName); }
+                catch (IOException ex) { _logger?.LogDebug(ex, "Kilitli/okunamayan dosya atlandı: {File}", fi.FullName); }
             }
         }
-        catch (UnauthorizedAccessException) { }
+        catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Erişim engelli kök dizin atlandı: {Folder}", folder); }
         return (count, bytes);
     }
 
     public long GetFolderSize(string folder) => ScanFolder(folder).Bytes;
 
-    /// <summary>Bir kök dizinde büyük dosyaları listeler (>eşik). Silmez.</summary>
     public IReadOnlyList<FileInfo> FindLargeFiles(string root, long thresholdBytes, CancellationToken ct = default)
     {
         var results = new List<FileInfo>();
@@ -38,25 +42,19 @@ internal sealed class DiskScanner
             {
                 ct.ThrowIfCancellationRequested();
                 try { if (fi.Length >= thresholdBytes) results.Add(fi); }
-                catch (UnauthorizedAccessException) { }
+                catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Büyük dosya taramasında erişim engelli atlandı: {File}", fi.FullName); }
             }
         }
-        catch (UnauthorizedAccessException) { }
+        catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Erişim engelli kök dizin atlandı: {Folder}", root); }
         return results;
     }
 
-    /// <summary>
-    /// Yinelenen dosyaları bulur (hash-tabanlı — Bölüm 3.2).
-    /// Önce boyuta göre gruplar, sonra aynı boyuttakileri içerik hash'i ile karşılaştırır.
-    /// Silmez — yalnızca raporlar. Döndürür: her grup bir yinelenen kümesi (≥2 dosya).
-    /// </summary>
     public IReadOnlyList<IReadOnlyList<FileInfo>> FindDuplicateFiles(
         string root, long minSizeBytes = 1024, CancellationToken ct = default)
     {
         var duplicates = new List<IReadOnlyList<FileInfo>>();
         if (!Directory.Exists(root)) return duplicates;
 
-        // 1) Boyuta göre grupla
         var bySize = new Dictionary<long, List<FileInfo>>();
         try
         {
@@ -69,12 +67,11 @@ internal sealed class DiskScanner
                     if (!bySize.TryGetValue(fi.Length, out var list)) { list = new(); bySize[fi.Length] = list; }
                     list.Add(fi);
                 }
-                catch (UnauthorizedAccessException) { }
+                catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Yinelenen taramasında erişim engelli atlandı: {File}", fi.FullName); }
             }
         }
-        catch (UnauthorizedAccessException) { }
+        catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Erişim engelli kök dizin atlandı: {Folder}", root); }
 
-        // 2) Aynı boyuttakileri hash'le, hash'e göre grupla
         foreach (var group in bySize.Values.Where(g => g.Count > 1))
         {
             ct.ThrowIfCancellationRequested();
@@ -87,8 +84,8 @@ internal sealed class DiskScanner
                     if (!byHash.TryGetValue(hash, out var list)) { list = new(); byHash[hash] = list; }
                     list.Add(fi);
                 }
-                catch (IOException) { }
-                catch (UnauthorizedAccessException) { }
+                catch (IOException ex) { _logger?.LogDebug(ex, "Hash hesaplanamadı (kilitli): {File}", fi.FullName); }
+                catch (UnauthorizedAccessException ex) { _logger?.LogDebug(ex, "Hash hesaplanamadı (erişim engelli): {File}", fi.FullName); }
             }
             foreach (var dupGroup in byHash.Values.Where(g => g.Count > 1))
                 duplicates.Add(dupGroup);
@@ -103,11 +100,5 @@ internal sealed class DiskScanner
         return Convert.ToHexString(sha.ComputeHash(stream));
     }
 
-    public static string FormatBytes(long bytes) => bytes switch
-    {
-        >= 1L << 30 => $"{bytes / (double)(1L << 30):F2} GB",
-        >= 1L << 20 => $"{bytes / (double)(1L << 20):F1} MB",
-        >= 1L << 10 => $"{bytes / (double)(1L << 10):F0} KB",
-        _ => $"{bytes} B"
-    };
+    public static string FormatBytes(long bytes) => FileSizeFormatter.Format(bytes);
 }

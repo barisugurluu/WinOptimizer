@@ -28,12 +28,14 @@ internal static class ServiceFactory
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WinOptimizer");
         Directory.CreateDirectory(baseDir);
 
-        // Safety katmanı
+        // Safety katmanı — bütünlük koruyucu önce (§17.4)
+        services.AddSingleton<IntegrityGuard>(_ => new IntegrityGuard(
+            IntegrityKeyStore.LoadOrCreate(baseDir), _.GetRequiredService<ILogger<IntegrityGuard>>()));
         services.AddSingleton<RestorePointService>();
         services.AddSingleton<ChangeJournal>(_ =>
-            new(baseDir, _.GetRequiredService<ILogger<ChangeJournal>>()));
+            new(baseDir, _.GetRequiredService<ILogger<ChangeJournal>>(), _.GetRequiredService<IntegrityGuard>()));
         services.AddSingleton<RegistryBackup>(_ =>
-            new(baseDir, _.GetRequiredService<ILogger<RegistryBackup>>()));
+            new(baseDir, _.GetRequiredService<ILogger<RegistryBackup>>(), _.GetRequiredService<IntegrityGuard>()));
         services.AddSingleton<SafetyGuard>();
         services.AddSingleton<SafetyNet>();
         services.AddSingleton<ProcessRunner>();
