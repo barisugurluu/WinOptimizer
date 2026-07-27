@@ -133,4 +133,22 @@
   <data name="TaskCreateFailed" xml:space="preserve"><value>⚠ Task could not be created (administrator privileges may be required).</value></data>
   <data name="TaskDeleted" xml:space="preserve"><value>✓ Task deleted.</value></data>
   <data name="TaskDeleteFailed" xml:space="preserve"><value>⚠ Task could not be deleted.</value></data>
+  <data name="Module_AppManager" xml:space="preserve"><value>Apps &amp; Bloatware</value></data>
+  <data name="Module_BackupRestore" xml:space="preserve"><value>Backup &amp; Restore</value></data>
+  <data name="Module_BenchmarkEngine" xml:space="preserve"><value>Performance Benchmark</value></data>
+  <data name="Module_BootOptimizer" xml:space="preserve"><value>Startup &amp; Boot</value></data>
+  <data name="Module_CleanEngine" xml:space="preserve"><value>Disk &amp; Cache Cleanup</value></data>
+  <data name="Module_CpuEngine" xml:space="preserve"><value>CPU &amp; Startup Optimization</value></data>
+  <data name="Module_DeepCleanEngine" xml:space="preserve"><value>Deep Clean</value></data>
+  <data name="Module_DevEnvironment" xml:space="preserve"><value>Developer Environment</value></data>
+  <data name="Module_GpuOptimizer" xml:space="preserve"><value>GPU Optimization</value></data>
+  <data name="Module_HardwareMonitor" xml:space="preserve"><value>Hardware Monitoring &amp; Diagnostics</value></data>
+  <data name="Module_MemoryEngine" xml:space="preserve"><value>Memory Optimization (RAM)</value></data>
+  <data name="Module_NetworkOptimizer" xml:space="preserve"><value>Network Optimization</value></data>
+  <data name="Module_PrivacyGuard" xml:space="preserve"><value>Privacy &amp; Telemetry</value></data>
+  <data name="Module_RepairEngine" xml:space="preserve"><value>System Repair (SFC/DISM)</value></data>
+  <data name="Module_SecurityHardening" xml:space="preserve"><value>Security Hardening</value></data>
+  <data name="Module_StorageOptimizer" xml:space="preserve"><value>Disk Optimization (TRIM/Defrag)</value></data>
+  <data name="Module_SystemTweaker" xml:space="preserve"><value>System Tweaks</value></data>
+  <data name="Module_UpdateEngine" xml:space="preserve"><value>Windows Update</value></data>
 </root>

@@ -51,7 +51,7 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     {
         var mods = _registry.Modules;
         AvailableModules = mods.Count > 0
-            ? $"{Resources.Strings.InstalledModules} {string.Join(", ", mods.Select(m => m.DisplayName))}"
+            ? $"{Resources.Strings.InstalledModules} {string.Join(", ", mods.Select(Resources.ModuleDisplayNameResolver.Resolve))}"
             : Resources.Strings.NoModules;
         StatusSummary = $"{mods.Count} {Resources.Strings.ModulesActive}";
     }

@@ -133,4 +133,22 @@
   <data name="TaskCreateFailed" xml:space="preserve"><value>⚠ Görev oluşturulamadı (yönetici ayrıcalığı gerekli olabilir).</value></data>
   <data name="TaskDeleted" xml:space="preserve"><value>✓ Görev silindi.</value></data>
   <data name="TaskDeleteFailed" xml:space="preserve"><value>⚠ Görev silinemedi.</value></data>
+  <data name="Module_AppManager" xml:space="preserve"><value>Uygulama &amp; Bloatware</value></data>
+  <data name="Module_BackupRestore" xml:space="preserve"><value>Yedekleme &amp; Geri Yükleme</value></data>
+  <data name="Module_BenchmarkEngine" xml:space="preserve"><value>Performans Benchmark</value></data>
+  <data name="Module_BootOptimizer" xml:space="preserve"><value>Başlangıç &amp; Önyükleme</value></data>
+  <data name="Module_CleanEngine" xml:space="preserve"><value>Disk &amp; Önbellek Temizliği</value></data>
+  <data name="Module_CpuEngine" xml:space="preserve"><value>CPU &amp; Başlangıç Optimizasyonu</value></data>
+  <data name="Module_DeepCleanEngine" xml:space="preserve"><value>Derin Temizlik</value></data>
+  <data name="Module_DevEnvironment" xml:space="preserve"><value>Geliştirici Ortamı</value></data>
+  <data name="Module_GpuOptimizer" xml:space="preserve"><value>GPU Optimizasyonu</value></data>
+  <data name="Module_HardwareMonitor" xml:space="preserve"><value>Donanım İzleme &amp; Teşhis</value></data>
+  <data name="Module_MemoryEngine" xml:space="preserve"><value>Bellek Optimizasyonu (RAM)</value></data>
+  <data name="Module_NetworkOptimizer" xml:space="preserve"><value>Ağ Optimizasyonu</value></data>
+  <data name="Module_PrivacyGuard" xml:space="preserve"><value>Gizlilik &amp; Telemetri</value></data>
+  <data name="Module_RepairEngine" xml:space="preserve"><value>Sistem Onarımı (SFC/DISM)</value></data>
+  <data name="Module_SecurityHardening" xml:space="preserve"><value>Güvenlik Sertleştirme</value></data>
+  <data name="Module_StorageOptimizer" xml:space="preserve"><value>Disk Optimizasyonu (TRIM/Defrag)</value></data>
+  <data name="Module_SystemTweaker" xml:space="preserve"><value>Sistem İnce Ayarları</value></data>
+  <data name="Module_UpdateEngine" xml:space="preserve"><value>Windows Update</value></data>
 </root>

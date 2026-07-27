@@ -55,7 +55,7 @@ public partial class ModulePageViewModel : ObservableObject, IDisposable
             PageTitle = "Bilinmeyen modül";
             return;
         }
-        PageTitle = _module.DisplayName;
+        PageTitle = Resources.ModuleDisplayNameResolver.Resolve(_module);
         RiskBadge = _module.Risk.ToString();
         AnalysisText = "Henüz analiz edilmedi. \"Analiz Et\" ile başlayın.";
         HasActions = false;
@@ -118,13 +118,7 @@ public partial class ModulePageViewModel : ObservableObject, IDisposable
         _cts?.Cancel();
     }
 
-    private static string FormatBytes(long bytes) => bytes switch
-    {
-        >= 1L << 30 => $"{bytes / (double)(1L << 30):F2} GB",
-        >= 1L << 20 => $"{bytes / (double)(1L << 20):F1} MB",
-        >= 1L << 10 => $"{bytes / (double)(1L << 10):F0} KB",
-        _ => $"{bytes} B"
-    };
+    private static string FormatBytes(long bytes) => FileSizeFormatter.Format(bytes);
 
     public void Dispose()
     {

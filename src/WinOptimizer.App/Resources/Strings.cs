@@ -128,4 +128,9 @@ public static class Strings
     public static string TaskCreateFailed => _rm.GetString("TaskCreateFailed") ?? "⚠ Görev oluşturulamadı (yönetici ayrıcalığı gerekli olabilir).";
     public static string TaskDeleted => _rm.GetString("TaskDeleted") ?? "✓ Görev silindi.";
     public static string TaskDeleteFailed => _rm.GetString("TaskDeleteFailed") ?? "⚠ Görev silinemedi.";
+
+    // --- Modul gorunen adlari (i18n) — master plan Bolum 12.5
+    // Modul kimligine gore resx anahtari (Module_{Id}) arar; yoksa null doner
+    // (cagiran ModuleDisplayNameResolver, modulun TR varsayilanina geri doner).
+    public static string? GetModuleDisplayName(string moduleId) => _rm.GetString("Module_" + moduleId);
 }
