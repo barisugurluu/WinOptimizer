@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/specification/refs/heads/main/schemas/2025-06-18/server-config.schema.json",
+  "mcpServers": {
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\baris\\Downloads\\Kodlar\\Win_Cont\\WinOptimizer"
+      ],
+      "env": {},
+      "description": "WinOptimizer kaynak ağacına güvenli okuma/yazma erişimi. Derleme/test/format komutlarını doğrudan çalıştırmak için bu sunucu + Terminal aracı birlikte kullanılır."
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {},
+      "description": "Çok adımlı akıl yürütme — mimari kararlar, Safety katmanı değişiklikleri, modül sözleşmesi etkisi analizi için. Karmaşık refactoring'de önce düşün sonra uygula."
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "description": "Güncel .NET 8 / WPF / WPF-UI / WiX v4 / Polly dokümantasyonu. Sürüm-özel API imzaları (ör. Polly v8 ResiliencePipeline, WiX v4 SDK-style) için kullan; uydurma API'den kaçın."
+    }
+  }
+}
