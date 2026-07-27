@@ -33,8 +33,15 @@ jobs:
         # TreatWarningsAsErrors açık; sıfır uyarı hedefi (master plan Bölüm 8.6)
         run: dotnet build WinOptimizer.sln -c Release --no-restore
 
-      - name: Test
-        run: dotnet test WinOptimizer.sln -c Release --no-build --verbosity normal
+      - name: Test (with coverage)
+        run: dotnet test WinOptimizer.sln -c Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory:${{ github.workspace }}/coverage
+
+      - name: Publish coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/**/*.cobertura.xml
 
       # --- Paketleme (master plan Bölüm 20) ---
       # Cozumun tamami publish EDILMEZ: `dotnet publish <sln>` test projelerini de ayni

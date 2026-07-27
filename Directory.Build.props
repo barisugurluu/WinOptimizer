@@ -29,6 +29,8 @@
   <!-- Source Link yalnızca SDK-style C# projelerinde etkindir (WiX .wixproj hariç). -->
   <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(DisableSourceLink)' != 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <!-- Statik analiz eklentisi — Roslynator kod kalitesi kuralları (master plan §18.3). -->
+    <PackageReference Include="Roslynator.Analyzers" Version="4.12.9" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

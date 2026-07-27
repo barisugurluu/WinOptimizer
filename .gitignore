@@ -36,3 +36,7 @@ codesign.pfx
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Kod kapsamı (coverlet) ve geçici test çıktıları
+**/TestResults/
+coverage/

@@ -324,11 +324,5 @@ public sealed class CleanEngineModule : IOptimizationModule
         catch { return 0; }
     }
 
-    public static string FormatBytes(long bytes) => bytes switch
-    {
-        >= 1L << 30 => $"{bytes / (double)(1L << 30):F2} GB",
-        >= 1L << 20 => $"{bytes / (double)(1L << 20):F1} MB",
-        >= 1L << 10 => $"{bytes / (double)(1L << 10):F0} KB",
-        _ => $"{bytes} B"
-    };
+    public static string FormatBytes(long bytes) => FileSizeFormatter.Format(bytes);
 }
