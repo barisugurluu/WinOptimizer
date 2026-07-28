@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WinOptimizer.DevConsole</RootNamespace>
+    <AssemblyName>WinOptimizer.DevConsole</AssemblyName>
+    <Description>Gelistirici kontrol paneli — derle/test/format/paketle + WPF/CLI calistir.</Description>
+    <EnableDefaultApplicationManifest>false</EnableDefaultApplicationManifest>
+    <!-- Bu proje yoneticilik gerektirmez; yalnizca WPF/CLI acilirken UAC kendiliginden cikar.
+         TrePlatWarningsAsErrors kapali (gelistirme araci; mevcut proje katilarindan bagimsiz). -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Cozumdeki genel Roslynator/SourceLink ayarlarini KALDIRIR: bu bir gelistirme aracidir,
+       uretim hattinin parcasidir; mimari/analyse katilari burada uygulanmaz. -->
+  <PropertyGroup>
+    <DisableSourceLink>true</DisableSourceLink>
+    <AnalysisLevel>none</AnalysisLevel>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+
+</Project>
