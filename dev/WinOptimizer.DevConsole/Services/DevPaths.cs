@@ -1,8 +1,8 @@
 namespace WinOptimizer.DevConsole.Services;
 
 /// <summary>
-/// Cozum ve yol tespiti — DevConsole'un calistigi yerden yukari dogru .sln
-/// arar, dotnet exe'yi (PATH ya da ~/.dotnet) bulur. Statik (gelistirme araci).
+/// Cozum ve yol tespiti — DevConsole calistigi yerden yukari .sln arar,
+/// dotnet exeyi bulur (kullanici ayari > ~/.dotnet > PATH). Statik.
 /// </summary>
 public static class DevPaths
 {
@@ -12,7 +12,7 @@ public static class DevPaths
     /// <summary>Cozum koku (WinOptimizer.sln bulundugu dizin).</summary>
     public static string SolutionRoot => _solutionRoot.Value;
 
-    /// <summary>dotnet exe tam yolu (yoksa "dotnet" doner — PATH'e birakir).</summary>
+    /// <summary>dotnet exe tam yolu.</summary>
     public static string Dotnet => _dotnet.Value;
 
     /// <summary>.NET SDK surumu (bilgi cubugu icin).</summary>
@@ -20,7 +20,6 @@ public static class DevPaths
 
     private static string FindSolutionRoot()
     {
-        // AppContext.BaseDirectory'den (bin/.../Debug/net8.0-windows) yukari cik.
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null)
         {
@@ -32,13 +31,21 @@ public static class DevPaths
             dir = dir.Parent;
         }
 
-        // Bulunamazsa calisma dizinine dus.
         return Environment.CurrentDirectory;
     }
 
     private static string FindDotnet()
     {
-        // 1) ~/.dotnet/dotnet.exe (bu makinede yuklu yer).
+        // 1) Kullanici ayari (elle girilmis dotnet yolu).
+        var settings = UserSettings.Load();
+        if (!string.IsNullOrWhiteSpace(settings.DotnetOverride) &&
+            File.Exists(settings.DotnetOverride))
+        {
+            DotnetVersion = ResolveVersion(settings.DotnetOverride);
+            return settings.DotnetOverride;
+        }
+
+        // 2) ~/.dotnet/dotnet.exe.
         string userDotnet = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".dotnet", "dotnet.exe");
         if (File.Exists(userDotnet))
@@ -47,7 +54,7 @@ public static class DevPaths
             return userDotnet;
         }
 
-        // 2) PATH'teki dotnet.
+        // 3) PATH.
         string? pathVar = Environment.GetEnvironmentVariable("PATH");
         if (pathVar is not null)
         {
@@ -62,7 +69,7 @@ public static class DevPaths
             }
         }
 
-        return "dotnet"; // son care: PATH'e birak
+        return "dotnet";
     }
 
     private static string ResolveVersion(string dotnetExe)

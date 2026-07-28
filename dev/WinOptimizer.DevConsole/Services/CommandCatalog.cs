@@ -45,6 +45,13 @@ public static class CommandCatalog
             File = dotnet, Args = new[] { "test", "WinOptimizer.sln", "-c", "Release", "--no-build", "--verbosity", "minimal" },
             Description = "Tum birim/E2E testleri calistirir (yaklasik 178)."
         });
+        // Ozel: kapsam goruntuleme (surec degil, diyalog).
+        list.Add(new DevCommand
+        {
+            Title = "Kapsam Goster", Category = "Test",
+            File = "__coverage__",
+            Description = "Cobertura kapsam raporlarini proje bazinda goster (18.3 esikleri)."
+        });
         list.Add(new DevCommand
         {
             Title = "Test + Kapsam", Category = "Test",

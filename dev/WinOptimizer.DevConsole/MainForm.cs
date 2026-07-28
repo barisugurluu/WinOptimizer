@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Windows.Forms;
+using WinOptimizer.DevConsole.Views;
 using WinOptimizer.DevConsole.Models;
 using WinOptimizer.DevConsole.Services;
 
@@ -53,6 +54,22 @@ public sealed class MainForm : Form
         _status.TextAlign = ContentAlignment.MiddleLeft;
         _status.Padding = new Padding(10, 0, 10, 0);
         _status.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+        var settingsBtn = new Button
+        {
+            Text = "Ayarlar", Dock = DockStyle.Right, Width = 80, FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(60, 60, 60), ForeColor = Color.White
+        };
+        settingsBtn.FlatAppearance.BorderSize = 0;
+        settingsBtn.Click += (_, _) =>
+        {
+            using var dlg = new SettingsForm();
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                AppendOutput(new OutputLine("dotnet yolu ayari degistirildi - yeniden acinca etkinlesir.", OutputLevel.Warning));
+                UpdateStatus();
+            }
+        };
+        topBar.Controls.Add(settingsBtn);
         topBar.Controls.Add(_status);
 
         var content = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1 };
@@ -199,6 +216,14 @@ public sealed class MainForm : Form
         if (cmd.IsFolder)
         {
             OpenFolder(cmd);
+            return;
+        }
+
+        // Ozel isaretli komutlar (surec degil, diyalog).
+        if (cmd.File == "__coverage__")
+        {
+            using var dlg = new CoverageForm();
+            dlg.ShowDialog(this);
             return;
         }
 
