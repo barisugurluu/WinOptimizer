@@ -4,12 +4,19 @@
   birleştirmesinin kendisidir. O durumda FluentWindow tabanlı bir hata penceresi, hatayı
   bildirirken kendisi de patlar ve kullanıcı yine hiçbir şey görmez.
   DynamicResource SystemColors.* High Contrast temasında da doğru okunur.
+
+  BOYUTLANDIRMA — SizeToContent+MaxHeight KULLANILMAZ: Windows Sandbox'ta canlı doğrulandı,
+  bu ikili WPF'te güvenilir çalışmıyor — uzun bir istisna/yığın izinde pencere MaxHeight'i
+  aşan içerikle karşılaşınca düzgün küçülmüyor, "Kapat" düğmesi dahil alt satır görünür
+  alanın tamamen dışında kalabiliyor (bir hata penceresinin KENDİSİ kapatılamaz hale geliyordu).
+  Bunun yerine SABİT yükseklik + iki satırlı Grid (Row0="*" TEK ScrollViewer içinde tüm
+  değişken içerik, Row1="Auto" düğme çubuğu) kullanılır — bkz. FirstRunWindow.xaml.
 -->
 <Window x:Class="WinOptimizer.App.Views.ErrorDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinOptimizer — Hata"
-        Width="640" SizeToContent="Height" MinHeight="260" MaxHeight="720"
+        Width="640" Height="560"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="True"
@@ -17,38 +24,42 @@
         Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="HeadlineText" Grid.Row="0"
-                   FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
-                   Margin="0,0,0,8"
-                   AutomationProperties.HeadingLevel="Level1" />
+        <!-- Başlıktan teknik ayrıntılara kadar HER ŞEY tek bir kaydırılabilir alanda.
+             Düğme çubuğu (Row 1) bunun dışında ve her zaman garanti alan alır — bir hata
+             penceresinin "Kapat" düğmesi asla erişilemez olmamalı. -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,12,0">
+                <TextBlock x:Name="HeadlineText"
+                           FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
+                           Margin="0,0,0,8"
+                           AutomationProperties.HeadingLevel="Level1" />
 
-        <TextBlock x:Name="SummaryText" Grid.Row="1"
-                   TextWrapping="Wrap" Margin="0,0,0,12" />
+                <TextBlock x:Name="SummaryText"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
 
-        <StackPanel Grid.Row="2" Margin="0,0,0,12">
-            <TextBlock Text="Günlük ve rapor konumları:" FontWeight="SemiBold" Margin="0,0,0,4" />
-            <!-- Seçilebilir: kullanıcı yolu kopyalayıp destek mesajına yapıştırabilsin. -->
-            <TextBox x:Name="PathsText" IsReadOnly="True" TextWrapping="Wrap"
-                     BorderThickness="0" Background="Transparent"
-                     Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-        </StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Günlük ve rapor konumları:" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <!-- Seçilebilir: kullanıcı yolu kopyalayıp destek mesajına yapıştırabilsin. -->
+                    <TextBox x:Name="PathsText" IsReadOnly="True" TextWrapping="Wrap"
+                             BorderThickness="0" Background="Transparent"
+                             Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+                </StackPanel>
 
-        <Expander Grid.Row="3" Header="Teknik ayrıntılar" Margin="0,0,0,12">
-            <TextBox x:Name="DetailsText" IsReadOnly="True"
-                     FontFamily="Consolas" FontSize="11"
-                     TextWrapping="NoWrap"
-                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                     MaxHeight="260" Margin="0,8,0,0" />
-        </Expander>
+                <Expander Header="Teknik ayrıntılar" Margin="0,0,0,12">
+                    <TextBox x:Name="DetailsText" IsReadOnly="True"
+                             FontFamily="Consolas" FontSize="11"
+                             TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                             MaxHeight="260" Margin="0,8,0,0" />
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button x:Name="OpenLogsButton" Content="Günlük klasörünü aç"
                     MinWidth="150" Margin="0,0,8,0" Padding="10,5"
                     Click="OnOpenLogs" />

@@ -2,84 +2,92 @@
   İlk açılış / gereksinim kontrolü. ErrorDialog ile aynı gerekçeyle DÜZ Window ve sistem
   renkleri: bu pencere ana pencereden ÖNCE açılır ve WPF-UI tema sözlüğü sorunlarından
   bağımsız görünmek zorundadır (kullanıcının gördüğü ilk ekran budur).
+
+  BOYUTLANDIRMA — SizeToContent+MaxHeight KULLANILMAZ: Windows Sandbox'ta canlı doğrulandı,
+  bu ikili WPF'te güvenilir çalışmıyor — içerik MaxHeight'i aştığında pencere gerçekten
+  büyümüyor/kırpılmıyor, "Başla"/"Kapat" düğme satırı görünür alanın tamamen dışında kalıyor.
+  Bunun yerine SABİT yükseklik + iki satırlı Grid (Row0="*" TEK ScrollViewer içinde tüm
+  değişken içerik, Row1="Auto" düğme çubuğu) kullanılır: Grid'in Auto satırlara önce alan
+  ayırması garantidir, düğmeler içerik ne kadar uzun olursa olsun her zaman görünür.
+  Aynı desen ActionConfirmationDialog.xaml'de zaten kullanılıyor ve sorunsuz çalışıyor.
 -->
 <Window x:Class="WinOptimizer.App.Views.FirstRunWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinOptimizer — Sistem Kontrolü"
-        Width="700" SizeToContent="Height" MinHeight="500" MaxHeight="720"
+        Width="720" Height="720"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
         Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
         Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
     <Grid Margin="18">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="WinOptimizer'a hoş geldiniz"
-                   FontSize="18" FontWeight="SemiBold" Margin="0,0,0,4"
-                   AutomationProperties.HeadingLevel="Level1" />
-        <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="0,0,0,14"
-                   Text="Başlamadan önce sisteminizin bu araç için uygun olup olmadığı denetlendi. Aşağıdaki listeyi bir kez okumanız, sonradan çıkabilecek sürprizleri önler." />
+        <!-- Başlıktan onay kutusuna kadar HER ŞEY tek bir kaydırılabilir alanda.
+             Düğme çubuğu (Row 1) bunun dışında ve her zaman garanti alan alır. -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,12,0">
+                <TextBlock Text="WinOptimizer'a hoş geldiniz"
+                           FontSize="18" FontWeight="SemiBold" Margin="0,0,0,4"
+                           AutomationProperties.HeadingLevel="Level1" />
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,14"
+                           Text="Başlamadan önce sisteminizin bu araç için uygun olup olmadığı denetlendi. Aşağıdaki listeyi bir kez okumanız, sonradan çıkabilecek sürprizleri önler." />
 
-        <!-- Gereksinim listesi -->
-        <Border Grid.Row="2" BorderThickness="1" CornerRadius="4"
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                <StackPanel>
-                    <TextBlock Text="Denetleniyor…" Margin="0,4"
-                               Visibility="{Binding IsChecking, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                    <ItemsControl ItemsSource="{Binding Requirements}">
+                <!-- Gereksinim listesi -->
+                <Border BorderThickness="1" CornerRadius="4" Padding="10"
+                        BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                    <StackPanel>
+                        <TextBlock Text="Denetleniyor…" Margin="0,4"
+                                   Visibility="{Binding IsChecking, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ItemsControl ItemsSource="{Binding Requirements}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3,0,7">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="26" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Glyph}" FontSize="14"
+                                                   FontWeight="Bold" VerticalAlignment="Top" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Detail}" Opacity="0.75" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding RemedyHint}" TextWrapping="Wrap"
+                                                       FontStyle="Italic" Margin="0,2,0,0"
+                                                       Visibility="{Binding HasRemedy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ne yapar / ne yapmaz -->
+                <StackPanel Margin="0,14,0,0">
+                    <TextBlock Text="WinOptimizer nasıl davranır" FontWeight="SemiBold" Margin="0,0,0,4"
+                               AutomationProperties.HeadingLevel="Level2" />
+                    <ItemsControl ItemsSource="{Binding Principles}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,3,0,7">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="26" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="{Binding Glyph}" FontSize="14"
-                                               FontWeight="Bold" VerticalAlignment="Top" />
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                        <TextBlock Text="{Binding Detail}" Opacity="0.75" TextWrapping="Wrap" />
-                                        <TextBlock Text="{Binding RemedyHint}" TextWrapping="Wrap"
-                                                   FontStyle="Italic" Margin="0,2,0,0"
-                                                   Visibility="{Binding HasRemedy, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    </StackPanel>
-                                </Grid>
+                                <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,1" Opacity="0.85" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-            </ScrollViewer>
-        </Border>
 
-        <!-- Ne yapar / ne yapmaz -->
-        <StackPanel Grid.Row="3" Margin="0,14,0,0">
-            <TextBlock Text="WinOptimizer nasıl davranır" FontWeight="SemiBold" Margin="0,0,0,4"
-                       AutomationProperties.HeadingLevel="Level2" />
-            <ItemsControl ItemsSource="{Binding Principles}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,1" Opacity="0.85" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                <!-- İsteğe bağlı hizmet: VARSAYILAN KAPALI (güvenli varsayılanlar ilkesi). -->
+                <CheckBox Margin="0,14,0,0"
+                          IsChecked="{Binding InstallGuardService}"
+                          IsEnabled="{Binding CanInstallGuardService}"
+                          Content="RealtimeGuard arka plan hizmetini şimdi kur (isteğe bağlı — sonradan Guard sekmesinden de kurulabilir)" />
+            </StackPanel>
+        </ScrollViewer>
 
-        <!-- İsteğe bağlı hizmet: VARSAYILAN KAPALI (güvenli varsayılanlar ilkesi). -->
-        <CheckBox Grid.Row="4" Margin="0,14,0,0"
-                  IsChecked="{Binding InstallGuardService}"
-                  IsEnabled="{Binding CanInstallGuardService}"
-                  Content="RealtimeGuard arka plan hizmetini şimdi kur (isteğe bağlı — sonradan Guard sekmesinden de kurulabilir)" />
-
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center"
                        Margin="0,0,12,0" Opacity="0.8" />
             <Button x:Name="DiagnosticsButton" Content="Teşhis paketi oluştur"
