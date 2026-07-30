@@ -7,8 +7,11 @@ namespace WinOptimizer.Updater;
 /// SHA-256 ve indirme URL'si paketin bütünlüğünü garanti eder; ön sürüm bayrağı kanal süzgecinde kullanılır.
 /// </summary>
 /// <param name="Version">Yayın sürümü (tag'den, baştaki 'v' ve ön sürüm eki sıyrılır).</param>
-/// <param name="DownloadUrl">x64 MSI paketinin indirme URL'si.</param>
-/// <param name="Sha256">Beklenen SHA-256 (64 hex); bilinmiyorsa boş (best-effort).</param>
+/// <param name="DownloadUrl">x64 kurulum paketinin (<c>*-setup.exe</c>) indirme URL'si.</param>
+/// <param name="Sha256">
+/// Beklenen SHA-256 (64 hex); release'teki <c>*.sha256</c> yan dosyasından okunur.
+/// Yan dosya yoksa boş kalır ve <c>UpdateVerifier</c> bütünlük kontrolünü atlar.
+/// </param>
 /// <param name="ReleaseNotes">Sürüm notları (Markdown).</param>
 /// <param name="PublishedAt">Yayın tarihi (UTC).</param>
 /// <param name="IsPrerelease">Ön sürüm mü?</param>

@@ -24,6 +24,8 @@
     <ProjectReference Include="..\..\src\WinOptimizer.Modules\CleanEngine\WinOptimizer.Modules.CleanEngine.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Modules\MemoryEngine\WinOptimizer.Modules.MemoryEngine.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Modules\HardwareMonitor\WinOptimizer.Modules.HardwareMonitor.csproj" />
+    <!-- Teşhis paketi ve gereksinim kontrolü gerçek sistemde doğrulanır. -->
+    <ProjectReference Include="..\..\src\WinOptimizer.Orchestration\WinOptimizer.Orchestration.csproj" />
   </ItemGroup>
 
 </Project>

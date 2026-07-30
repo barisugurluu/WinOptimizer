@@ -6,11 +6,16 @@
     <RootNamespace>WinOptimizer.Cli</RootNamespace>
     <Description>Komut satırı arayüzü — optimize, analyze, clean, rollback (master plan Bölüm 15).</Description>
     <AssemblyName>WinOptimizer.Cli</AssemblyName>
+    <!-- App ile aynı ikon: Görev Yöneticisi'nde ve zamanlanmış görev listesinde tanınabilir olsun. -->
+    <ApplicationIcon>..\WinOptimizer.App\Resources\WinOptimizer.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <!-- Dosya günlüğü köprüsü (Safety/Diagnostics/LoggingBootstrap) — zamanlanmış
+         gözetimsiz çalışmaların izi kalsın. Sürüm App/Service ile aynı. -->
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

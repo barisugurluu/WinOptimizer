@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using WinOptimizer.Core;
+using WinOptimizer.Orchestration.Confirmation;
 using WinOptimizer.Safety;
 
 namespace WinOptimizer.Orchestration;
@@ -13,13 +14,21 @@ public sealed class JobOrchestrationEngine
 {
     private readonly ModuleRegistry _registry;
     private readonly SafetyNet _safety;
+    private readonly SettingsService _settings;
+    private readonly IActionConfirmation _confirmation;
     private readonly ILogger<JobOrchestrationEngine> _logger;
 
     public JobOrchestrationEngine(
-        ModuleRegistry registry, SafetyNet safety, ILogger<JobOrchestrationEngine> logger)
+        ModuleRegistry registry,
+        SafetyNet safety,
+        SettingsService settings,
+        IActionConfirmation confirmation,
+        ILogger<JobOrchestrationEngine> logger)
     {
         _registry = registry;
         _safety = safety;
+        _settings = settings;
+        _confirmation = confirmation;
         _logger = logger;
     }
 
@@ -64,22 +73,43 @@ public sealed class JobOrchestrationEngine
     }
 
     /// <summary>
-    /// Uygulama öncesi güvenlik hazırlığı: sistem geri yükleme noktası alır.
+    /// Uygulama öncesi güvenlik hazırlığı: <b>ayarda açıksa</b> sistem geri yükleme noktası alır.
+    /// (<c>SafetyNet.PrepareAsync</c> bayrağı zaten alıyordu; buradan geçirilmediği için
+    /// "otomatik geri yükleme noktası" ayarının hiçbir etkisi yoktu.)
     /// </summary>
-    public Task PrepareSafetyAsync(string description) => _safety.PrepareAsync(description);
+    public Task PrepareSafetyAsync(string description) =>
+        _safety.PrepareAsync(description, _settings.Current.SafetyNet.AutoRestorePoint);
 
     /// <summary>
-    /// Belirli modülleri sırayla (veya paralel) uygular. İptal edilebilir, ilerleme raporlar.
+    /// <b>Kayıtlı tüm modülleri</b> uygular — ileri seviye/açık istek yolu.
+    /// Tek tıkla akışı bunu KULLANMAZ (bkz. <see cref="ExecuteAsync"/>).
     /// </summary>
-    /// <param name="moduleIds">Uygulanacak modüllerin kimlikleri; boşsa tüm modüller.</param>
-    public async Task<IReadOnlyList<ExecutionResult>> ExecuteAsync(
+    public Task<IReadOnlyList<ExecutionResult>> ExecuteAllAsync(
+        IProgress<ProgressInfo>? progress, CancellationToken ct = default) =>
+        ExecuteCoreAsync(_registry.Modules.Select(m => m.Id).ToList(), progress, ct);
+
+    /// <summary>
+    /// Belirli modülleri sırayla uygular. İptal edilebilir, ilerleme raporlar.
+    /// </summary>
+    /// <param name="moduleIds">
+    /// Uygulanacak modül kimlikleri. <c>null</c> ise <b>ayarlardaki etkin modüller</b>
+    /// (<see cref="AppSettings.EnabledModules"/>) kullanılır — eskiden "tüm modüller"
+    /// anlamına geliyordu ve tek tıkla, Hyper-V etkinleştirme dahil 16 modülü tek bir
+    /// genel onayla çalıştırıyordu.
+    /// </param>
+    public Task<IReadOnlyList<ExecutionResult>> ExecuteAsync(
         IEnumerable<string>? moduleIds,
         IProgress<ProgressInfo>? progress,
-        CancellationToken ct = default)
+        CancellationToken ct = default) =>
+        ExecuteCoreAsync(moduleIds?.ToList() ?? _settings.Current.EnabledModules, progress, ct);
+
+    private async Task<IReadOnlyList<ExecutionResult>> ExecuteCoreAsync(
+        IReadOnlyCollection<string> moduleIds,
+        IProgress<ProgressInfo>? progress,
+        CancellationToken ct)
     {
-        var targets = (moduleIds is null
-                ? _registry.Modules
-                : _registry.Modules.Where(m => moduleIds.Contains(m.Id, StringComparer.OrdinalIgnoreCase)))
+        var targets = _registry.Modules
+            .Where(m => moduleIds.Contains(m.Id, StringComparer.OrdinalIgnoreCase))
             .ToList();
 
         _logger.LogInformation("Optimizasyon çalıştırması başlıyor: {Count} modül ({Modules})",
@@ -93,6 +123,36 @@ public sealed class JobOrchestrationEngine
             {
                 var analysis = await module.AnalyzeAsync(ct);
                 var preview = await module.PreviewAsync(analysis, ct);
+
+                // ONAY KAPISI — bu tek nokta hem Panosu'ndaki tek-tık'ı hem CLI'nin
+                // optimize/clean komutlarını kapsar. Onaylanmayan eylemler listeden
+                // düşürülür; modül o adımı kendiliğinden atlar.
+                if (ConfirmationGate.RequiresConfirmation(module, preview, _settings.Current))
+                {
+                    var approved = await _confirmation.ConfirmAsync(
+                        new ConfirmationRequest(module.Id, module.DisplayName, module.Risk, preview.Actions),
+                        ct);
+
+                    if (approved.Count == 0)
+                    {
+                        _logger.LogInformation("{Id}: kullanıcı onaylamadı, modül atlandı.", module.Id);
+                        results.Add(new ExecutionResult
+                        {
+                            ModuleId = module.Id,
+                            Skipped = preview.Actions.Count,
+                        });
+                        continue;
+                    }
+
+                    if (approved.Count < preview.Actions.Count)
+                    {
+                        _logger.LogInformation("{Id}: {Approved}/{Total} eylem onaylandı.",
+                            module.Id, approved.Count, preview.Actions.Count);
+                    }
+
+                    preview = ConfirmationGate.WithActions(preview, approved);
+                }
+
                 var exec = await module.ExecuteAsync(preview, progress ?? new Progress<ProgressInfo>(), ct);
                 results.Add(exec);
                 _logger.LogInformation("{Id}: {S} başarılı, {K} atlandı, {F} başarısız, {B} bayt kazanç",

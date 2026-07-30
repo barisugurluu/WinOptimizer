@@ -28,11 +28,24 @@ public sealed class DiagnosticsPackageBuilder
 {
     private readonly string _baseDir;
     private readonly ILogger<DiagnosticsPackageBuilder> _logger;
+    private readonly Func<string>? _requirementsReportProvider;
 
-    public DiagnosticsPackageBuilder(string baseDir, ILogger<DiagnosticsPackageBuilder> logger)
+    /// <summary>Teşhis paketi oluşturucuyu kurar.</summary>
+    /// <param name="baseDir">Veri dizini (<c>%ProgramData%\WinOptimizer</c>).</param>
+    /// <param name="logger">Günlükleyici.</param>
+    /// <param name="requirementsReportProvider">
+    /// Gereksinim raporunu düz metin üreten geri çağırım (isteğe bağlı). Delege olarak
+    /// alınır ki bu tür <c>SystemRequirementsChecker</c>'a bağımlı olmasın; hata penceresi
+    /// paketi ölü bir DI kapsayıcısıyla, sağlayıcı olmadan da üretebilsin.
+    /// </param>
+    public DiagnosticsPackageBuilder(
+        string baseDir,
+        ILogger<DiagnosticsPackageBuilder> logger,
+        Func<string>? requirementsReportProvider = null)
     {
         _baseDir = baseDir;
         _logger = logger;
+        _requirementsReportProvider = requirementsReportProvider;
     }
 
     /// <summary>Teşhis paketlerinin yazıldığı varsayılan dizin.</summary>
@@ -58,8 +71,13 @@ public sealed class DiagnosticsPackageBuilder
         // Dosya kilitliyken de okuyabilmek için kopyalayarak değil, akışla ekliyoruz.
         using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
         {
+            // logs\*.log artık app-*, service-* ve cli-* dosyalarını birlikte yakalar
+            // (LoggingBootstrap üç sürecin tamamını aynı klasöre yazar).
             included.AddRange(await AddDirectoryAsync(zip, "logs", "logs", "*.log", ct));
             included.AddRange(await AddDirectoryAsync(zip, "journal", "journal", "*.jsonl", ct));
+
+            // Çökme dökümleri: CrashDumper zaten yazıyordu ama pakete hiç girmiyordu.
+            included.AddRange(await AddDirectoryAsync(zip, "dumps", "dumps", "*.txt", ct));
 
             string settings = Path.Combine(_baseDir, "settings.json");
             if (File.Exists(settings) && await TryAddFileAsync(zip, settings, "settings.json", ct))
@@ -69,6 +87,23 @@ public sealed class DiagnosticsPackageBuilder
 
             await WriteEntryAsync(zip, "sistem-bilgisi.txt", BuildSystemInfo(), ct);
             included.Add("sistem-bilgisi.txt");
+
+            // Servis durumu: "servis çalışmıyor" şikâyetlerinin ilk bakılacak yeri.
+            await WriteEntryAsync(zip, "servis-durumu.txt", BuildServiceInfo(), ct);
+            // NOT: açıklama metinlerinde '/' KULLANMA — IncludedItems'ta eğik çizgi içeren
+            // her öğe arşiv yolu sayılır (DiagnosticsPackageBuilderTests bunu doğrular).
+            included.Add("servis-durumu.txt (RealtimeGuard hizmetinin durumu)");
+
+            // Windows Olay Görüntüleyici kayıtları: dosya sink'i eklenmeden önce üretilmiş
+            // (yalnız EventLog'a yazan) sürümlerden gelen bilgiyi de kurtarır.
+            await WriteEntryAsync(zip, "windows-olay-gunlugu.txt", BuildEventLogInfo(), ct);
+            included.Add("windows-olay-gunlugu.txt (Uygulama olay günlüğündeki WinOptimizer kayıtları)");
+
+            if (_requirementsReportProvider is not null)
+            {
+                await WriteEntryAsync(zip, "gereksinimler.txt", _requirementsReportProvider(), ct);
+                included.Add("gereksinimler.txt (sistem gereksinim kontrolü sonucu)");
+            }
 
             await WriteEntryAsync(zip, "OKUBENI.txt", BuildReadme(included), ct);
         }
@@ -163,6 +198,94 @@ public sealed class DiagnosticsPackageBuilder
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             sb.AppendLine("Sistem sürücüsü     : (okunamadı)");
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// RealtimeGuard hizmetinin kayıt ve durum bilgisi. Servis LocalSystem olarak çalıştığı
+    /// ve teşhis paketini oluşturan sürecin dışında olduğu için bu bilgi ayrıca toplanır.
+    /// </summary>
+    private static string BuildServiceInfo()
+    {
+        var c = CultureInfo.InvariantCulture;
+        var sb = new StringBuilder();
+        sb.AppendLine("WinOptimizer — RealtimeGuard Hizmet Durumu");
+        sb.AppendLine("==========================================");
+
+        try
+        {
+            using var controller = System.ServiceProcess.ServiceController.GetServices()
+                .FirstOrDefault(s => s.ServiceName.Equals(
+                    GuardServiceController.ServiceName, StringComparison.OrdinalIgnoreCase));
+
+            if (controller is null)
+            {
+                sb.AppendLine(c, $"Hizmet '{GuardServiceController.ServiceName}' KAYITLI DEĞİL.");
+                sb.AppendLine("Kurulum sihirbazındaki hizmet kutusu işaretlenmemiş olabilir;");
+                sb.AppendLine("uygulama içindeki Guard sekmesinden kurulabilir.");
+            }
+            else
+            {
+                sb.AppendLine(c, $"Hizmet adı  : {controller.ServiceName}");
+                sb.AppendLine(c, $"Görünen ad  : {controller.DisplayName}");
+                sb.AppendLine(c, $"Durum       : {controller.Status}");
+                sb.AppendLine(c, $"Durdurulabilir: {controller.CanStop}");
+            }
+        }
+        catch (Exception ex) when (ex is InvalidOperationException
+                                     or System.ComponentModel.Win32Exception)
+        {
+            sb.AppendLine(c, $"Hizmet durumu okunamadı: {ex.Message}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("Hizmet günlüğü: logs/service-*.log (bu pakete dahildir)");
+        sb.AppendLine("Kurulum günlüğü: logs/service-install.log");
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Windows Uygulama olay günlüğündeki son WinOptimizer kayıtları (en fazla 50).
+    /// </summary>
+    private static string BuildEventLogInfo()
+    {
+        var c = CultureInfo.InvariantCulture;
+        var sb = new StringBuilder();
+        sb.AppendLine("WinOptimizer — Windows Olay Günlüğü (Uygulama)");
+        sb.AppendLine("=============================================");
+
+        if (!OperatingSystem.IsWindows())
+        {
+            sb.AppendLine("(Windows dışı platform)");
+            return sb.ToString();
+        }
+
+        try
+        {
+            using var log = new System.Diagnostics.EventLog("Application");
+            var entries = log.Entries.Cast<System.Diagnostics.EventLogEntry>()
+                .Where(e => e.Source.StartsWith("WinOptimizer", StringComparison.OrdinalIgnoreCase))
+                .TakeLast(50)
+                .ToList();
+
+            if (entries.Count == 0)
+            {
+                sb.AppendLine("WinOptimizer kaynaklı kayıt bulunamadı.");
+            }
+
+            foreach (var entry in entries)
+            {
+                sb.AppendLine(c, $"[{entry.TimeGenerated:yyyy-MM-dd HH:mm:ss}] {entry.EntryType} " +
+                                 $"{entry.Source}: {entry.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Olay günlüğü okuma yetki/politika nedeniyle engellenebilir; paket üretimi
+            // bu yüzden başarısız olmamalı.
+            sb.AppendLine(c, $"Olay günlüğü okunamadı: {ex.GetType().Name}: {ex.Message}");
         }
 
         return sb.ToString();

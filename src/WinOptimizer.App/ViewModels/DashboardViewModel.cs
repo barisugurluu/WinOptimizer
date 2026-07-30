@@ -16,6 +16,7 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
 {
     private readonly JobOrchestrationEngine _engine;
     private readonly ModuleRegistry _registry;
+    private readonly SettingsService _settings;
     private CancellationTokenSource? _cts;
 
     /// <summary>
@@ -29,10 +30,12 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
         return _cts;
     }
 
-    public DashboardViewModel(JobOrchestrationEngine engine, ModuleRegistry registry)
+    public DashboardViewModel(
+        JobOrchestrationEngine engine, ModuleRegistry registry, SettingsService settings)
     {
         _engine = engine;
         _registry = registry;
+        _settings = settings;
         UpdateStatus();
     }
 
@@ -91,8 +94,16 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     private async Task OptimizeAsync()
     {
         if (IsBusy) return;
+
+        // Kapsam artık ayarlardaki etkin modüllerle sınırlı; kullanıcı neyin çalışacağını
+        // ÖNCEDEN görür. Riskli eylemler ayrıca eylem düzeyinde onay ister
+        // (JobOrchestrationEngine → ConfirmationGate → ActionConfirmationDialog).
+        var enabled = _settings.Current.EnabledModules;
+        string scope = enabled.Count > 0 ? string.Join(", ", enabled) : "(hiçbiri)";
         var confirm = MessageBox.Show(
-            Resources.Strings.ConfirmMessage,
+            $"{Resources.Strings.ConfirmMessage}{Environment.NewLine}{Environment.NewLine}" +
+            $"Çalıştırılacak modüller ({enabled.Count}):{Environment.NewLine}{scope}{Environment.NewLine}{Environment.NewLine}" +
+            "Kapsamı Yönetim → Modüller sekmesinden değiştirebilirsiniz.",
             Resources.Strings.ConfirmTitle, MessageBoxButton.OKCancel, MessageBoxImage.Question);
         if (confirm != MessageBoxResult.OK) return;
 

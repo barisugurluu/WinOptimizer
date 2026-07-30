@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinOptimizer.Core;
 using WinOptimizer.Orchestration;
+using WinOptimizer.Orchestration.Confirmation;
 
 namespace WinOptimizer.App.ViewModels;
 
@@ -14,6 +15,8 @@ public partial class ModulePageViewModel : ObservableObject, IDisposable
 {
     private readonly JobOrchestrationEngine _engine;
     private readonly ModuleRegistry _registry;
+    private readonly SettingsService _settings;
+    private readonly IActionConfirmation _confirmation;
     private IOptimizationModule? _module;
     private AnalysisResult? _analysis;
     private CancellationTokenSource? _cts;
@@ -40,10 +43,16 @@ public partial class ModulePageViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<string> Actions { get; } = new();
 
-    public ModulePageViewModel(JobOrchestrationEngine engine, ModuleRegistry registry)
+    public ModulePageViewModel(
+        JobOrchestrationEngine engine,
+        ModuleRegistry registry,
+        SettingsService settings,
+        IActionConfirmation confirmation)
     {
         _engine = engine;
         _registry = registry;
+        _settings = settings;
+        _confirmation = confirmation;
     }
 
     /// <summary>Bu ViewModel'i belirli bir modüle bağlar.</summary>
@@ -101,6 +110,28 @@ public partial class ModulePageViewModel : ObservableObject, IDisposable
                 AnalysisText = $"{p.Message} ({p.Percent}%)";
             });
             var preview = await _module.PreviewAsync(_analysis, ct);
+
+            // ONAY KAPISI — bu sayfa motoru bilinçli olarak atlıyor (_engine.ExecuteAsync
+            // Analyze+Preview'i yeniden çalıştırır ve kullanıcının az önce incelediği
+            // önizlemeyi çöpe atardı). Bu yüzden AYNI politika burada da uygulanır:
+            // tek predicate (ConfirmationGate), tek arayüz (IActionConfirmation), iki çağıran.
+            // Eskiden bu yolda hiçbir onay yoktu: "Uygula" düğmesi Hyper-V'yi doğrudan açardı.
+            if (ConfirmationGate.RequiresConfirmation(_module, preview, _settings.Current))
+            {
+                var approved = await _confirmation.ConfirmAsync(
+                    new ConfirmationRequest(_module.Id, _module.DisplayName, _module.Risk, preview.Actions),
+                    ct);
+
+                if (approved.Count == 0)
+                {
+                    ResultText = "İşlem onaylanmadı; hiçbir değişiklik yapılmadı.";
+                    HasResult = true;
+                    return;
+                }
+
+                preview = ConfirmationGate.WithActions(preview, approved);
+            }
+
             var result = await _module.ExecuteAsync(preview, progress, ct);
             ResultText = $"Tamamlandı: {result.Succeeded} başarılı, {result.Skipped} atlanan, " +
                          $"{result.Failed} başarısız" +

@@ -1,0 +1,32 @@
+WinOptimizer — Lisans
+Copyright (c) 2026 WinOptimizer Team. Tüm hakları saklıdır.
+
+WinOptimizer, ücretsiz (freeware) olarak dağıtılan ancak açık kaynak olmayan bir
+yazılımdır. Kullanım koşullarının tamamı ve bağlayıcı metin, kurulum sihirbazında
+gösterilen Son Kullanıcı Lisans Sözleşmesi'dir:
+
+    docs/EULA.md
+    https://github.com/barisugurluu/WinOptimizer/blob/main/docs/EULA.md
+
+Özet (bağlayıcı değildir — yukarıdaki EULA esastır):
+
+  YAPABİLECEĞİNİZ
+    - Yazılımı kişisel veya kurumsal bilgisayarlarınızda sınırsız sayıda kurmak
+      ve kullanmak.
+    - Değiştirmeden, olduğu gibi başkalarına iletmek.
+
+  YAPAMAYACAĞINIZ
+    - Kurulum paketini değiştirerek dağıtmak veya başkasının ürünüymüş gibi sunmak.
+    - Kötü amaçlı yazılım dağıtmak ya da başkalarının sistemlerine izinsiz müdahale
+      etmek için kullanmak.
+    - Adı veya markayı onay/ortaklık izlenimi verecek şekilde kullanmak.
+
+  GARANTİ YOKTUR
+    Yazılım "OLDUĞU GİBİ" sağlanır. Yönetici yetkisiyle çalışır; kayıt defterini
+    düzenler, servisleri yapılandırır ve dosya siler. Veri kaybı riskine karşı
+    kendi yedeklerinizi almak sizin sorumluluğunuzdadır. Ayrıntılar için EULA §4-§7.
+
+Gizlilik: Yazılım telemetri toplamaz. Tek ağ isteği güncelleme denetimidir.
+Ayrıntılar: PRIVACY.md → docs/GIZLILIK.md
+
+Üçüncü taraf bileşenlerin lisansları docs/EULA.md §8 tablosunda listelenmiştir.

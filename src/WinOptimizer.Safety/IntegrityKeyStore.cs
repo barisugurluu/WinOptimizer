@@ -5,16 +5,28 @@ namespace WinOptimizer.Safety;
 
 /// <summary>
 /// HMAC imzalama anahtarını DPAPI ile koruyarak üretir/saklar
-/// (<see cref="IntegrityGuard"/> için). Anahtar kuruluma özeldir; aynı Windows
-/// kullanıcısı dışında kimse okuyamaz (master plan §17.4).
+/// (<see cref="IntegrityGuard"/> için) — master plan §17.4.
 /// </summary>
+/// <remarks>
+/// <para><b>Kapsam MAKİNE'dir (LocalMachine), kullanıcı değil.</b> Anahtar
+/// <c>%ProgramData%\WinOptimizer</c> altında, yani makine geneli ve yalnız yöneticinin
+/// yazabildiği bir dizinde durur. Aynı journal'ı doğrulaması gerekenler: arayüzü çalıştıran
+/// kullanıcı, <b>LocalSystem</b> olarak çalışan RealtimeGuard servisi ve SYSTEM olarak
+/// çalışan zamanlanmış görev. <c>CurrentUser</c> kapsamı bunların hiçbirinde işe yaramıyordu:
+/// ikinci bir Windows kullanıcısı açtığında çözme başarısız oluyor, anahtar sessizce yeniden
+/// üretiliyor ve o ana kadarki TÜM <c>.hmac</c> imzaları doğrulanamaz hale geliyordu.</para>
+/// <para><b>Ödünleşim (bilinçli):</b> <c>LocalMachine</c> kapsamında aynı makinedeki herhangi
+/// bir süreç anahtarı çözebilir. Tehdit modeli gizlilik değil, <b>kurcalama tespiti</b>dir:
+/// amaç, yönetici-yazılabilir bir dizindeki journal dosyalarının fark edilmeden
+/// değiştirilememesidir. Anahtar dosyasının kendisi zaten yönetici korumasındadır.</para>
+/// </remarks>
 public static class IntegrityKeyStore
 {
     private const string KeyFileName = "integrity.key";
 
     /// <summary>
     /// Veri dizinindeki anahtarı yükler; yoksa güvenli rastgele anahtar üretip
-    /// DPAPI (CurrentUser) ile şifreleyerek saklar ve döndürür.
+    /// DPAPI (LocalMachine) ile şifreleyerek saklar ve döndürür.
     /// </summary>
     public static byte[] LoadOrCreate(string baseDir)
     {
@@ -24,18 +36,35 @@ public static class IntegrityKeyStore
         if (File.Exists(keyFile))
         {
             byte[] protectedKey = File.ReadAllBytes(keyFile);
+
             try
             {
-                return ProtectedData.Unprotect(protectedKey, null, DataProtectionScope.CurrentUser);
+                return ProtectedData.Unprotect(protectedKey, null, DataProtectionScope.LocalMachine);
             }
             catch (CryptographicException)
             {
-                // Anahtar bu kullanıcı/makine için geçersiz (taşınmış olabilir): yenisini üret.
+                // Eski sürümlerden kalma CurrentUser kapsamlı anahtar olabilir: göç dene.
+            }
+
+            try
+            {
+                byte[] legacy = ProtectedData.Unprotect(protectedKey, null, DataProtectionScope.CurrentUser);
+                // Aynı anahtarı LocalMachine kapsamıyla yeniden yaz: mevcut .hmac imzaları
+                // GEÇERLİ KALIR (anahtar değişmiyor, yalnız koruma kapsamı değişiyor).
+                File.WriteAllBytes(keyFile,
+                    ProtectedData.Protect(legacy, null, DataProtectionScope.LocalMachine));
+                return legacy;
+            }
+            catch (CryptographicException)
+            {
+                // Anahtar bu makine için de çözülemiyor (dosya kopyalanmış/bozulmuş):
+                // yenisi üretilir. Bu noktada eski .hmac dosyaları doğrulanamaz — çağıran
+                // (IntegrityGuard) bunu doğrulama hatası olarak raporlar.
             }
         }
 
         byte[] fresh = RandomNumberGenerator.GetBytes(32);
-        byte[] protectedFresh = ProtectedData.Protect(fresh, null, DataProtectionScope.CurrentUser);
+        byte[] protectedFresh = ProtectedData.Protect(fresh, null, DataProtectionScope.LocalMachine);
         File.WriteAllBytes(keyFile, protectedFresh);
         return fresh;
     }

@@ -9,6 +9,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+    <!-- Preflight/SystemRequirementsChecker: WMI erişilebilirlik yoklaması. -->
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <!-- GuardServiceController: servis durumu/başlat/durdur (yerelleştirmeden bağımsız). -->
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+    <!-- DiagnosticsPackageBuilder: EventLog'a yazan (eski) sürümlerden gelen servis
+         kayıtlarını da teşhis paketine alabilmek için. -->
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

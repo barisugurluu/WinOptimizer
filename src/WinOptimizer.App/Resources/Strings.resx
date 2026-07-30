@@ -96,6 +96,50 @@
   <data name="OverviewRecentActivity" xml:space="preserve"><value>Son Etkinlik</value></data>
   <data name="OverviewNoActivity" xml:space="preserve"><value>Henüz etkinlik yok.</value></data>
   <data name="OverviewRefresh" xml:space="preserve"><value>Yenile</value></data>
+  <data name="ServiceRunning" xml:space="preserve"><value>RealtimeGuard servisi çalışıyor</value></data>
+  <data name="ServiceStoppedUsingWmi" xml:space="preserve"><value>Servis çalışmıyor (yerel WMI ölçümü kullanılıyor)</value></data>
+  <data name="ServiceNotInstalled" xml:space="preserve"><value>Servis kurulu değil (yerel WMI ölçümü kullanılıyor)</value></data>
+  <data name="ServiceGoToGuardTab" xml:space="preserve"><value>Guard sekmesinden kurabilir/başlatabilirsiniz.</value></data>
+  <data name="GuardTitle" xml:space="preserve"><value>RealtimeGuard Hizmeti</value></data>
+  <data name="GuardDescription" xml:space="preserve"><value>Arka planda çalışan, eşik aşımlarını izleyen Windows hizmeti. İsteğe bağlıdır; kurulmadan da uygulamanın tüm işlevleri kullanılabilir (canlı metrikler yerel WMI ile okunur).</value></data>
+  <data name="GuardStateLabel" xml:space="preserve"><value>Durum</value></data>
+  <data name="GuardStateNotInstalled" xml:space="preserve"><value>Kurulu değil</value></data>
+  <data name="GuardStateStopped" xml:space="preserve"><value>Durduruldu</value></data>
+  <data name="GuardStateStartPending" xml:space="preserve"><value>Başlatılıyor…</value></data>
+  <data name="GuardStateStopPending" xml:space="preserve"><value>Durduruluyor…</value></data>
+  <data name="GuardStateRunning" xml:space="preserve"><value>Çalışıyor</value></data>
+  <data name="GuardStateUnknown" xml:space="preserve"><value>Durum okunamadı</value></data>
+  <data name="GuardInstall" xml:space="preserve"><value>Kur</value></data>
+  <data name="GuardStart" xml:space="preserve"><value>Başlat</value></data>
+  <data name="GuardStop" xml:space="preserve"><value>Durdur</value></data>
+  <data name="GuardUninstall" xml:space="preserve"><value>Kaldır</value></data>
+  <data name="GuardRepair" xml:space="preserve"><value>Onar</value></data>
+  <data name="GuardExeMissing" xml:space="preserve"><value>Servis dosyası bulunamadı — kurulum eksik veya bozuk olabilir:</value></data>
+  <data name="GuardOpFailed" xml:space="preserve"><value>İşlem başarısız. Ayrıntı için günlüklere bakın (logs\service-install.log).</value></data>
+  <data name="GuardOpSucceeded" xml:space="preserve"><value>✓ İşlem tamamlandı.</value></data>
+  <data name="SchedulerCliMissing" xml:space="preserve"><value>Görev oluşturulamaz — WinOptimizer.Cli.exe bulunamadı:</value></data>
+  <data name="GuardAutoTitle" xml:space="preserve"><value>İzleme ve Otomatik Müdahale</value></data>
+  <data name="GuardAutoDescription" xml:space="preserve"><value>Bu ayarlar hizmet tarafından 5 saniye içinde okunur; yeniden başlatma gerekmez. Otomatik müdahale varsayılan olarak KAPALIDIR: hizmet SYSTEM yetkisiyle çalışır ve size sormadan dosya silmemelidir.</value></data>
+  <data name="GuardAutoRemediate" xml:space="preserve"><value>Otomatik müdahaleye izin ver</value></data>
+  <data name="GuardAutoTrimRam" xml:space="preserve"><value>RAM eşiği aşılınca boştaki süreçlerin belleğini boşalt</value></data>
+  <data name="GuardAutoCleanDisk" xml:space="preserve"><value>Disk kritik seviyeye inince geçici dosyaları sil (geri alınamaz)</value></data>
+  <data name="GuardAutoDefender" xml:space="preserve"><value>Defender imzaları eskiyince güncelle (hiçbir şey silmez)</value></data>
+  <data name="GuardSettingsSaved" xml:space="preserve"><value>✓ Kaydedildi. Hizmet 5 saniye içinde uygulayacak.</value></data>
+  <data name="GuardAlerts" xml:space="preserve"><value>Son Uyarılar</value></data>
+  <data name="GuardNoAlerts" xml:space="preserve"><value>Uyarı yok.</value></data>
+  <data name="RequirementsTitle" xml:space="preserve"><value>Sistem Gereksinim Kontrolü</value></data>
+  <data name="RequirementsDescription" xml:space="preserve"><value>Uygulamanın düzgün çalışması için gereken koşullar. Bir sorun bildirirken bu listeyi ve teşhis paketini paylaşmak, sorunu doğrudan gösterir.</value></data>
+  <data name="RequirementsRecheck" xml:space="preserve"><value>Yeniden denetle</value></data>
+  <data name="DiagnosticsPackage" xml:space="preserve"><value>Teşhis paketi</value></data>
+  <data name="OverviewLiveMetricsDisabled" xml:space="preserve"><value>Canlı metrikler ayarlardan kapatıldı.</value></data>
+  <data name="ModulesTitle" xml:space="preserve"><value>Tek Tıkla Kapsamı</value></data>
+  <data name="ModulesDescription" xml:space="preserve"><value>"Tek Tıkla En İyi Hale Getir" yalnızca burada işaretli modülleri çalıştırır. Varsayılan liste bilinçli olarak dardır: uzun süren (SFC/DISM), yeniden başlatma isteyen (Hyper-V, winsock) veya kullanıcının seçmesi gereken (kayıt defteri, uygulama kaldırma) işlemler dışarıda bırakılmıştır. İşaretlenmemiş modüller kendi sayfalarından elle çalıştırılabilir.</value></data>
+  <data name="ModulesResetSafe" xml:space="preserve"><value>Güvenli varsayılana dön</value></data>
+  <data name="ModulesSelectAll" xml:space="preserve"><value>Tümünü seç</value></data>
+  <data name="ModulesResetHint" xml:space="preserve"><value>Güvenli varsayılan seçildi. Kalıcı olması için Kaydet'e basın.</value></data>
+  <data name="ModulesSelectAllHint" xml:space="preserve"><value>Tüm modüller seçildi. Riskli eylemler yine ayrıca onay isteyecek. Kalıcı olması için Kaydet'e basın.</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>✕ Ayarlar KAYDEDİLEMEDİ. Günlüklere bakın (logs\app-*.log).</value></data>
+  <data name="SettingsSavedRestartRequired" xml:space="preserve"><value>✓ Ayarlar kaydedildi. Dil değişikliği uygulama yeniden başlatıldığında etkin olur.</value></data>
   <data name="SettingsGeneral" xml:space="preserve"><value>Genel</value></data>
   <data name="SettingsLanguage" xml:space="preserve"><value>Dil</value></data>
   <data name="SettingsTheme" xml:space="preserve"><value>Tema</value></data>

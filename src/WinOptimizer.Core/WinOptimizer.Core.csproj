@@ -6,4 +6,10 @@
     <Description>Çekirdek modeller, arayüzler ve enum'lar — IOptimizationModule sözleşmesi.</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- WindowsVersionInfo.MapEditionToProOrHigher saf/test edilebilir tutuldu
+         (Safety'deki desenle aynı). -->
+    <InternalsVisibleTo Include="WinOptimizer.Core.Tests" />
+  </ItemGroup>
+
 </Project>

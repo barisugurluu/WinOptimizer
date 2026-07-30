@@ -31,12 +31,14 @@ public partial class ManagementPage : Page
         AddTab(Strings.TabOverview, SymbolRegular.Gauge24, App.GetService<OverviewTab>());
         AddTab(Strings.TabSettings, SymbolRegular.Settings24, App.GetService<SettingsTab>());
         AddTab(Strings.TabScheduler, SymbolRegular.CalendarClock24, App.GetService<SchedulerTab>());
-        AddPlaceholder(Strings.TabModules, SymbolRegular.AppFolder24);
+        AddTab(Strings.TabGuard, SymbolRegular.Shield24, App.GetService<GuardTab>());
+        AddTab(Strings.TabModules, SymbolRegular.AppFolder24, App.GetService<ModulesTab>());
+        // Profiller: ProfileManagerModule DI'ya kayıtlı DEĞİL ve ActiveProfile ayarını
+        // hiçbir kod okumuyor. Çalışmayan bir kontrol koymaktansa yer tutucu dürüsttür.
         AddPlaceholder(Strings.TabProfiles, SymbolRegular.PersonStar24);
-        AddPlaceholder(Strings.TabGuard, SymbolRegular.Shield24);
         AddPlaceholder(Strings.TabReports, SymbolRegular.DocumentBulletList24);
         AddPlaceholder(Strings.TabUpdate, SymbolRegular.ArrowSync24);
-        AddPlaceholder(Strings.TabData, SymbolRegular.FolderZip24);
+        AddTab(Strings.TabData, SymbolRegular.FolderZip24, App.GetService<SystemDataTab>());
     }
 
     private void AddTab(string title, SymbolRegular icon, FrameworkElement view) =>

@@ -1,43 +1,62 @@
-# Winget manifest — Installer (master plan Bölüm 20.5)
-# SHA256, GitHub Release yayınlandıktan sonra güncellenir:
-#   (Get-FileHash .\WinOptimizer-0.1.0-setup.msi -Algorithm SHA256).Hash
+# Winget manifest — Installer
+#
+# DAĞITIM TİPİ: Inno Setup (setup.exe). Eski WiX/MSI hattı kaldırıldı —
+# gerekçe: docs/KURULUM.md → "Neden MSI değil?".
+#
+# Bu dosya bir ŞABLONDUR. Sürüm, indirme adresi ve SHA256 alanları GitHub Release
+# yayınlanırken CI (.github/workflows/build.yml → release job) tarafından yamalanır.
+# Elle güncelliyorsanız üç değeri birlikte güncelleyin, yoksa winget doğrulaması
+# (veya daha kötüsü: kullanıcının kurulumu) kırılır:
+#   PackageVersion · Installers[0].InstallerUrl · Installers[0].InstallerSha256
+#
+# NOT: winget imzasız kurulumları kabul eder; doğrulama yalnızca erişilebilir bir URL
+# ve doğru SHA256 ister. SmartScreen uyarısı ilk çalıştırmada yine görünür.
+#
+# winget'e gönderim yalnızca SUFFIX'SİZ (ör. 0.1.0) kararlı bir sürümde yapılır;
+# `-alpha` gibi ön sürümler yalnızca GitHub pre-release olarak yayınlanır.
 PackageIdentifier: WinOptimizer.WinOptimizer
 PackageVersion: 0.1.0
 InstallerLocale: en-US
 Platform:
   - Windows.Desktop
+# AYNI SAYI üç yerde: burada, installer/WinOptimizer.iss MinVersion ve
+# WinOptimizer.Core WindowsVersionInfo.Windows10Build2004.
 MinimumOSVersion: 10.0.19041.0
-InstallerType: wix
+InstallerType: inno
 Scope: machine
 InstallModes:
   - interactive
   - silent
   - silentWithProgress
 InstallerSwitches:
-  Silent: /qn /norestart
-  SilentWithProgress: /qb /norestart
-  Interactive: /passive /norestart
-  InstallLocation: INSTALLFOLDER="<INSTALLPATH>"
-  Log: /log "<LOGPATH>"
-UpgradeBehavior: install                              # MajorUpgrade zaten eskiyi kaldırır
+  # Inno Setup anahtarları (msiexec anahtarları DEĞİL).
+  # Interactive tanımlanmaz: Inno'nun varsayılan davranışı zaten etkileşimlidir.
+  Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+  SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART
+  InstallLocation: /DIR="<INSTALLPATH>"
+  Log: /LOG="<LOGPATH>"
+# Inno kendi kaldırma mantığıyla önceki sürümü kaldırır (MSI MajorUpgrade değil).
+UpgradeBehavior: install
+# Kurulum, kurulum dizinini sistem PATH'ine ekler (bkz. .iss [Registry]),
+# bu yüzden bu iki komut gerçekten çözülebilir.
 Commands:
   - WinOptimizer.App
   - WinOptimizer.Cli
-Protocols:
-  - winoptimizer
 Installers:
   - Architecture: x64
-    InstallerType: wix
-    InstallerUrl: https://github.com/WinOptimizer/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup.msi
-    InstallerSha256: 3FEA64820A787AF68F30941A95B999564FF0375E1496E0E621353A74A496675E
-    ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'  # UpgradeCode ile aynı (Product ID)
+    InstallerType: inno
+    InstallerUrl: https://github.com/barisugurluu/WinOptimizer/releases/download/v0.1.0/WinOptimizer-0.1.0-setup.exe
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    # Inno'nun "Programlar ve Özellikler" anahtarı {AppId}_is1 biçimindedir
+    # (.iss AppId ile aynı GUID). MSI ProductCode/UpgradeCode alanları KULLANILMAZ:
+    # WiX her derlemede yeni ProductCode üretiyordu, bu yüzden winget'in yükseltme
+    # ve kaldırma tespiti yanlış çalışıyordu.
     AppsAndFeaturesEntries:
       - DisplayName: WinOptimizer
         DisplayVersion: 0.1.0
         Publisher: WinOptimizer Team
-        ProductCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
-        UpgradeCode: '{8F4E2A1B-3C5D-4E6F-90A1-2B3C4D5E6F70}'
-# arm64: henüz üretilmiyor. arm64 MSI derlenip gerçek donanımda doğrulanana kadar
-# giriş eklenmez — sahte SHA256 ile yayınlanan manifest kurulumu bozar.
+        ProductCode: '{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}_is1'
+# arm64: üretilmiyor. Test edilebilecek arm64 donanım olmadığı için giriş eklenmez —
+# sahte SHA256'lı bir manifest kurulumu bozar.
 ManifestType: installer
 ManifestVersion: 1.4.0

@@ -3,7 +3,9 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WinOptimizer.App.Infrastructure;
+using WinOptimizer.App.Resources;
 using WinOptimizer.Modules.CleanEngine;
+using WinOptimizer.Orchestration;
 using WinOptimizer.Safety;
 
 namespace WinOptimizer.App.ViewModels;
@@ -17,6 +19,7 @@ public partial class OverviewViewModel : ObservableObject
 {
     private readonly LiveMetricsProvider _metrics;
     private readonly ChangeJournal _journal;
+    private readonly GuardServiceController _guardService;
     private DispatcherTimer? _timer;
 
     [ObservableProperty] private bool _isServiceRunning;
@@ -32,10 +35,12 @@ public partial class OverviewViewModel : ObservableObject
 
     public ObservableCollection<string> RecentActivity { get; } = new();
 
-    public OverviewViewModel(LiveMetricsProvider metrics, ChangeJournal journal)
+    public OverviewViewModel(
+        LiveMetricsProvider metrics, ChangeJournal journal, GuardServiceController guardService)
     {
         _metrics = metrics;
         _journal = journal;
+        _guardService = guardService;
     }
 
     /// <summary>Canlı metrik yoklamasını başlatır (sayfa yüklenince çağrılır).</summary>
@@ -60,14 +65,38 @@ public partial class OverviewViewModel : ObservableObject
         _timer = null;
     }
 
+    /// <summary>
+    /// Canlı metrikler ayardan kapatıldığında çağrılır: boş göstergeler yerine
+    /// durumun neden böyle olduğu yazılır.
+    /// </summary>
+    public void SetLiveMetricsDisabled()
+    {
+        MetricSourceText = Strings.OverviewLiveMetricsDisabled;
+        CpuText = "—";
+        RamFreeText = "—";
+        DiskFreeText = "—";
+        _ = LoadActivityAsync();
+    }
+
     /// <summary>Servis durumu + metrikleri yeniler.</summary>
     public async Task RefreshAsync()
     {
         bool running = await _metrics.IsServiceRunningAsync();
         IsServiceRunning = running;
-        ServiceStatusText = running
-            ? "RealtimeGuard servisi çalışıyor"
-            : "Servis çalışmıyor (yerel WMA ölçüm kullanılıyor)";
+
+        // Servis yoksa "kurulu değil" ile "durdurulmuş" ayrılır: kullanıcıya ne yapacağını
+        // söylemek için gereken bilgi bu. (Eskiden tek hardcoded Türkçe cümle vardı ve
+        // içinde "WMA" yazım hatası bulunuyordu.)
+        if (running)
+        {
+            ServiceStatusText = Strings.ServiceRunning;
+        }
+        else
+        {
+            bool installed = _guardService.GetState() != GuardServiceState.NotInstalled;
+            ServiceStatusText = (installed ? Strings.ServiceStoppedUsingWmi : Strings.ServiceNotInstalled)
+                + " " + Strings.ServiceGoToGuardTab;
+        }
 
         var metric = await _metrics.GetAsync();
         if (metric is null)

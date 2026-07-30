@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using WinOptimizer.App.ViewModels;
+using WinOptimizer.Orchestration;
 
 namespace WinOptimizer.App.Views.Management;
 
@@ -19,8 +21,19 @@ public partial class OverviewTab : UserControl
         DataContext = _viewModel;
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e) =>
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        // "Canlı metrikler" ayarı kapalıysa yoklama HİÇ başlatılmaz. Eskiden ayar
+        // kaydediliyor ama okunmuyordu; kapatmanın hiçbir etkisi yoktu.
+        var settings = App.Services.GetRequiredService<SettingsService>();
+        if (!settings.Current.DashboardLiveMetrics)
+        {
+            _viewModel.SetLiveMetricsDisabled();
+            return;
+        }
+
         _viewModel.StartPolling(App.PollingIntervalSeconds);
+    }
 
     private void OnUnloaded(object sender, RoutedEventArgs e) =>
         _viewModel.StopPolling();

@@ -1,13 +1,19 @@
 namespace WinOptimizer.Updater;
 
 /// <summary>Güncelleme denetleyicisi seçenekleri.</summary>
-/// <param name="Owner">GitHub repo sahibi (ör. "WinOptimizer").</param>
-/// <param name="Repo">GitHub repo adı (ör. "WinOptimizer").</param>
+/// <remarks>
+/// Varsayılan <see cref="Owner"/>/<see cref="Repo"/> gerçek depoyu göstermek ZORUNDADIR.
+/// Daha önce burada var olmayan bir <c>WinOptimizer/WinOptimizer</c> deposu yazılıydı:
+/// API 404 dönüyor, denetim <c>null</c> ile sonuçlanıyor ve CLI kullanıcıya "Güncel"
+/// diyordu — yani güncelleme sistemi sessizce yanlış bilgi veriyordu.
+/// </remarks>
+/// <param name="Owner">GitHub repo sahibi.</param>
+/// <param name="Repo">GitHub repo adı.</param>
 /// <param name="Channel">Hangi kanal denetlenecek (Stable/Beta).</param>
 /// <param name="CurrentVersion">Şu anki uygulama sürümü; verilmezse 0.0.0.0 (her zaman güncelleme var sayılır).</param>
 /// <param name="Timeout">Ağ işlemleri zaman aşımı; verilmezse 30 sn.</param>
 public sealed record UpdateOptions(
-    string Owner = "WinOptimizer",
+    string Owner = "barisugurluu",
     string Repo = "WinOptimizer",
     UpdateChannel Channel = UpdateChannel.Stable,
     Version? CurrentVersion = null,

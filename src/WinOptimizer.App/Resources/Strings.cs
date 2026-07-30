@@ -92,6 +92,54 @@ public static class Strings
     public static string OverviewRecentActivity => _rm.GetString("OverviewRecentActivity") ?? "Son Etkinlik";
     public static string OverviewNoActivity => _rm.GetString("OverviewNoActivity") ?? "Henüz etkinlik yok.";
     public static string OverviewRefresh => _rm.GetString("OverviewRefresh") ?? "Yenile";
+    public static string ServiceRunning => _rm.GetString("ServiceRunning") ?? "RealtimeGuard servisi çalışıyor";
+    public static string ServiceStoppedUsingWmi => _rm.GetString("ServiceStoppedUsingWmi") ?? "Servis çalışmıyor (yerel WMI ölçümü kullanılıyor)";
+    public static string ServiceNotInstalled => _rm.GetString("ServiceNotInstalled") ?? "Servis kurulu değil (yerel WMI ölçümü kullanılıyor)";
+    public static string ServiceGoToGuardTab => _rm.GetString("ServiceGoToGuardTab") ?? "Guard sekmesinden kurabilir/başlatabilirsiniz.";
+
+    // --- Guard sekmesi (servis yönetimi) ---
+    public static string GuardTitle => _rm.GetString("GuardTitle") ?? "RealtimeGuard Hizmeti";
+    public static string GuardDescription => _rm.GetString("GuardDescription") ?? "Arka planda çalışan, eşik aşımlarını izleyen Windows hizmeti. İsteğe bağlıdır; kurulmadan da uygulamanın tüm işlevleri kullanılabilir (canlı metrikler yerel WMI ile okunur).";
+    public static string GuardStateLabel => _rm.GetString("GuardStateLabel") ?? "Durum";
+    public static string GuardStateNotInstalled => _rm.GetString("GuardStateNotInstalled") ?? "Kurulu değil";
+    public static string GuardStateStopped => _rm.GetString("GuardStateStopped") ?? "Durduruldu";
+    public static string GuardStateStartPending => _rm.GetString("GuardStateStartPending") ?? "Başlatılıyor…";
+    public static string GuardStateStopPending => _rm.GetString("GuardStateStopPending") ?? "Durduruluyor…";
+    public static string GuardStateRunning => _rm.GetString("GuardStateRunning") ?? "Çalışıyor";
+    public static string GuardStateUnknown => _rm.GetString("GuardStateUnknown") ?? "Durum okunamadı";
+    public static string GuardInstall => _rm.GetString("GuardInstall") ?? "Kur";
+    public static string GuardStart => _rm.GetString("GuardStart") ?? "Başlat";
+    public static string GuardStop => _rm.GetString("GuardStop") ?? "Durdur";
+    public static string GuardUninstall => _rm.GetString("GuardUninstall") ?? "Kaldır";
+    public static string GuardRepair => _rm.GetString("GuardRepair") ?? "Onar";
+    public static string GuardExeMissing => _rm.GetString("GuardExeMissing") ?? "Servis dosyası bulunamadı — kurulum eksik veya bozuk olabilir:";
+    public static string GuardOpFailed => _rm.GetString("GuardOpFailed") ?? "İşlem başarısız. Ayrıntı için günlüklere bakın (logs\\service-install.log).";
+    public static string GuardOpSucceeded => _rm.GetString("GuardOpSucceeded") ?? "✓ İşlem tamamlandı.";
+    public static string SchedulerCliMissing => _rm.GetString("SchedulerCliMissing") ?? "Görev oluşturulamaz — WinOptimizer.Cli.exe bulunamadı:";
+    public static string GuardAutoTitle => _rm.GetString("GuardAutoTitle") ?? "İzleme ve Otomatik Müdahale";
+    public static string GuardAutoDescription => _rm.GetString("GuardAutoDescription") ?? "Bu ayarlar hizmet tarafından 5 saniye içinde okunur; yeniden başlatma gerekmez. Otomatik müdahale varsayılan olarak KAPALIDIR: hizmet SYSTEM yetkisiyle çalışır ve size sormadan dosya silmemelidir.";
+    public static string GuardAutoRemediate => _rm.GetString("GuardAutoRemediate") ?? "Otomatik müdahaleye izin ver";
+    public static string GuardAutoTrimRam => _rm.GetString("GuardAutoTrimRam") ?? "RAM eşiği aşılınca boştaki süreçlerin belleğini boşalt";
+    public static string GuardAutoCleanDisk => _rm.GetString("GuardAutoCleanDisk") ?? "Disk kritik seviyeye inince geçici dosyaları sil (geri alınamaz)";
+    public static string GuardAutoDefender => _rm.GetString("GuardAutoDefender") ?? "Defender imzaları eskiyince güncelle (hiçbir şey silmez)";
+    public static string GuardSettingsSaved => _rm.GetString("GuardSettingsSaved") ?? "✓ Kaydedildi. Hizmet 5 saniye içinde uygulayacak.";
+    public static string GuardAlerts => _rm.GetString("GuardAlerts") ?? "Son Uyarılar";
+    public static string GuardNoAlerts => _rm.GetString("GuardNoAlerts") ?? "Uyarı yok.";
+
+    // --- Sistem & Veri sekmesi (gereksinim kontrolü + teşhis) ---
+    public static string RequirementsTitle => _rm.GetString("RequirementsTitle") ?? "Sistem Gereksinim Kontrolü";
+    public static string RequirementsDescription => _rm.GetString("RequirementsDescription") ?? "Uygulamanın düzgün çalışması için gereken koşullar. Bir sorun bildirirken bu listeyi ve teşhis paketini paylaşmak, sorunu doğrudan gösterir.";
+    public static string RequirementsRecheck => _rm.GetString("RequirementsRecheck") ?? "Yeniden denetle";
+    public static string DiagnosticsPackage => _rm.GetString("DiagnosticsPackage") ?? "Teşhis paketi";
+    public static string OverviewLiveMetricsDisabled => _rm.GetString("OverviewLiveMetricsDisabled") ?? "Canlı metrikler ayarlardan kapatıldı.";
+    public static string ModulesTitle => _rm.GetString("ModulesTitle") ?? "Tek Tıkla Kapsamı";
+    public static string ModulesDescription => _rm.GetString("ModulesDescription") ?? "\"Tek Tıkla En İyi Hale Getir\" yalnızca burada işaretli modülleri çalıştırır. Varsayılan liste bilinçli olarak dardır: uzun süren (SFC/DISM), yeniden başlatma isteyen (Hyper-V, winsock) veya kullanıcının seçmesi gereken (kayıt defteri, uygulama kaldırma) işlemler dışarıda bırakılmıştır. İşaretlenmemiş modüller kendi sayfalarından elle çalıştırılabilir.";
+    public static string ModulesResetSafe => _rm.GetString("ModulesResetSafe") ?? "Güvenli varsayılana dön";
+    public static string ModulesSelectAll => _rm.GetString("ModulesSelectAll") ?? "Tümünü seç";
+    public static string ModulesResetHint => _rm.GetString("ModulesResetHint") ?? "Güvenli varsayılan seçildi. Kalıcı olması için Kaydet'e basın.";
+    public static string ModulesSelectAllHint => _rm.GetString("ModulesSelectAllHint") ?? "Tüm modüller seçildi. Riskli eylemler yine ayrıca onay isteyecek. Kalıcı olması için Kaydet'e basın.";
+    public static string SettingsSaveFailed => _rm.GetString("SettingsSaveFailed") ?? "✕ Ayarlar KAYDEDİLEMEDİ. Günlüklere bakın (logs\\app-*.log).";
+    public static string SettingsSavedRestartRequired => _rm.GetString("SettingsSavedRestartRequired") ?? "✓ Ayarlar kaydedildi. Dil değişikliği uygulama yeniden başlatıldığında etkin olur.";
 
     public static string SettingsGeneral => _rm.GetString("SettingsGeneral") ?? "Genel";
     public static string SettingsLanguage => _rm.GetString("SettingsLanguage") ?? "Dil";

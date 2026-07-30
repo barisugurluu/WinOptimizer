@@ -33,18 +33,22 @@ public readonly record struct CompatibilityResult(bool IsSupported, string Reaso
 /// <param name="Build">Windows derleme numarası (Win10 21H2 = 19044, Win11 = 22000+).</param>
 /// <param name="IsWindows11">Windows 11 veya üzeri mi.</param>
 /// <param name="IsProOrHigher">
-/// Pro/Enterprise/Education sürümü mü. <see cref="Current"/> bunu <c>true</c> kabul eder:
-/// Core platform-nötr olduğundan sürüm (edition) okumaz. Home/Pro ayrımına gerçekten duyarlı
-/// bir çağıran, edition'ı kendi tespit edip <see cref="CompatibilityChecker.IsSupported(string, WindowsVersionInfo)"/>
-/// aşırı yüklemesine geçirmelidir. Varsayılanın izin verici olması bilinçlidir — bir özelliği
-/// yanlışlıkla kapatmaktansa çalıştırıp hatayı zarifçe ele almak yeğdir.
+/// Pro/Enterprise/Education sürümü mü. <see cref="Current"/> bunu kayıt defterindeki
+/// <c>EditionID</c> değerinden tespit eder (bkz. <see cref="MapEditionToProOrHigher"/>).
+/// Tanınmayan/okunamayan sürümler <c>true</c> kabul edilir: bir özelliği yanlışlıkla
+/// kapatmaktansa çalıştırıp hatayı zarifçe ele almak yeğdir.
 /// </param>
 public sealed record WindowsVersionInfo(int Build, bool IsWindows11, bool IsProOrHigher)
 {
     /// <summary>Windows 11'in başladığı derleme numarası.</summary>
     public const int Windows11FirstBuild = 22000;
 
-    /// <summary>Windows 10 sürüm 2004 — HAGS, WSL2, HVCI/VBS için alt sınır.</summary>
+    /// <summary>
+    /// Windows 10 sürüm 2004 — HAGS, WSL2, HVCI/VBS için alt sınır ve ürünün desteklediği
+    /// en düşük Windows sürümü. <b>AYNI SAYI üç yerde:</b> burada,
+    /// <c>installer/WinOptimizer.iss</c> <c>MinVersion</c> ve
+    /// <c>installer/winget/*.installer.yaml</c> <c>MinimumOSVersion</c>.
+    /// </summary>
     public const int Windows10Build2004 = 19041;
 
     private static WindowsVersionInfo? _current;
@@ -52,11 +56,64 @@ public sealed record WindowsVersionInfo(int Build, bool IsWindows11, bool IsProO
     /// <summary>Üzerinde çalışılan sistemin sürüm bilgisi.</summary>
     public static WindowsVersionInfo Current => _current ??= Detect();
 
+    /// <summary>
+    /// Kayıt defterinden okunan ham sürüm kimliği (ör. <c>Professional</c>, <c>Core</c>).
+    /// Okunamadıysa boş — teşhis/gereksinim raporunda gösterilir.
+    /// </summary>
+    public string EditionId { get; init; } = string.Empty;
+
     private static WindowsVersionInfo Detect()
     {
         int build = Environment.OSVersion.Version.Build;
-        return new WindowsVersionInfo(build, IsWindows11: build >= Windows11FirstBuild, IsProOrHigher: true);
+        string edition = ReadEditionId();
+        return new WindowsVersionInfo(
+            build,
+            IsWindows11: build >= Windows11FirstBuild,
+            IsProOrHigher: MapEditionToProOrHigher(edition))
+        {
+            EditionId = edition,
+        };
     }
+
+    /// <summary>
+    /// <c>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\EditionID</c> değerini okur.
+    /// Windows dışında veya okunamazsa boş döner.
+    /// </summary>
+    private static string ReadEditionId()
+    {
+        // Core net8.0 (platform-nötr) hedefler; Microsoft.Win32.Registry Windows'a özeldir.
+        // Bu guard olmadan CA1416 + TreatWarningsAsErrors derlemeyi kırar.
+        if (!OperatingSystem.IsWindows())
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                @"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+            return key?.GetValue("EditionID") as string ?? string.Empty;
+        }
+        catch (Exception ex) when (ex is System.Security.SecurityException
+                                      or UnauthorizedAccessException
+                                      or IOException)
+        {
+            // Okuma başarısız → izin verici varsayılana düşülür (aşağıdaki eşleme boş metni
+            // Pro sayar). Sessiz geçilir çünkü Core'da günlükleyici yok; sürüm bilgisi
+            // gereksinim raporunda "bilinmiyor" olarak görünür.
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// <c>EditionID</c> değerini Pro-veya-üzeri kararına çevirir. Saf fonksiyon — test edilebilir.
+    /// Home aileleri <c>false</c>; diğer her şey (bilinmeyen/boş dahil) <c>true</c>.
+    /// </summary>
+    internal static bool MapEditionToProOrHigher(string editionId) =>
+        !editionId.Equals("Core", StringComparison.OrdinalIgnoreCase) &&
+        !editionId.Equals("CoreN", StringComparison.OrdinalIgnoreCase) &&
+        !editionId.Equals("CoreSingleLanguage", StringComparison.OrdinalIgnoreCase) &&
+        !editionId.Equals("CoreCountrySpecific", StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>

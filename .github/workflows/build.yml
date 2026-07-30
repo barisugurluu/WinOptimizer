@@ -6,15 +6,26 @@ on:
     tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
+  # Etiket atmadan kurulum üretebilmek için (Actions → build → Run workflow).
+  workflow_dispatch:
+
+# Aynı dal/etiket için yeni bir push geldiğinde eskisini iptal et: 60 sn'lik
+# LZMA2/ultra64 sıkıştırması yüzünden bu iş akışı pahalıdır.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    # windows-latest'e sabitlenmedi: runner imajı sürüm atladığında (VS/SDK değişimi)
+    # TreatWarningsAsErrors yüzünden derleme habersiz kırılabilir.
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # Source Link için tam geçmiş
 
+      # global.json (8.0.400, rollForward=latestFeature) sürümü belirler.
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -24,8 +35,9 @@ jobs:
         run: dotnet restore WinOptimizer.sln
 
       # Biçim kapısı — .editorconfig kurallarına uymayan kod derlemeden önce yakalanır
-      # (master plan Bölüm 18.3). Roslyn analiz kapısı Directory.Build.props'ta
-      # (AnalysisLevel=latest-recommended + TreatWarningsAsErrors) zorlanır.
+      # (master plan Bölüm 18.3). DİKKAT: LF satır sonlu tek bir yeni dosya bile bu
+      # adımı düşürür (.editorconfig: end_of_line = crlf). Roslyn analiz kapısı
+      # Directory.Build.props'ta (AnalysisLevel + TreatWarningsAsErrors) zorlanır.
       - name: Verify formatting
         run: dotnet format WinOptimizer.sln --verify-no-changes --verbosity minimal
 
@@ -43,86 +55,116 @@ jobs:
           name: coverage-report
           path: coverage/**/*.cobertura.xml
 
-      # --- Paketleme (master plan Bölüm 20) ---
-      # Cozumun tamami publish EDILMEZ: `dotnet publish <sln>` test projelerini de ayni
-      # klasore koyar ve xunit/Moq/FluentAssertions/testhost ikilileri MSI ile son
-      # kullaniciya gonderilir. Yalnizca dagitilacak uc proje yayinlanir.
-      - name: Publish (App + Service + CLI)
-        run: |
-          dotnet publish src\WinOptimizer.App\WinOptimizer.App.csproj -c Release -o publish -p:PublishSingleFile=false
-          dotnet publish src\WinOptimizer.Service\WinOptimizer.Service.csproj -c Release -o publish -p:PublishSingleFile=false
-          dotnet publish src\WinOptimizer.Cli\WinOptimizer.Cli.csproj -c Release -o publish -p:PublishSingleFile=false
+      # --- Paketleme: TEK hat, build/build-installer.ps1 ---
+      # Publish + sağlık kontrolü + license.rtf + ISCC + SHA256 adımlarının tamamı
+      # betiğin içindedir; CI ile yerel derleme arasında sürüklenme olamaz.
+      # Testler yukarıda kapsam toplayarak koştuğu için burada -SkipTests.
+      #
+      # KOD İMZALAMA ADIMI YOKTUR — bilinçli karar (docs/KURULUM.md). Buraya canlı bir
+      # imzalama adımı eklemeyin: kendinden imzalı bir sertifikanın release'e sızma yolu
+      # tam olarak budur ve hedef PC'de "geçersiz imza" imzasızdan daha kötüdür.
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
 
-      - name: Setup WiX v4
-        run: dotnet tool install --global wix
-
-      - name: Generate Payload.wxs
-        run: .\build\generate-payload.ps1 -PublishDir publish -OutputFile installer\wix\Payload.wxs
+      - name: Build installer
+        run: .\build\build-installer.ps1 -SkipTests
         shell: pwsh
 
-      # EULA ekrani icin license.rtf, docs\EULA.md'den uretilir (commit edilmez).
-      - name: Generate license.rtf
-        run: .\build\generate-license.ps1
-        shell: pwsh
-
-      - name: Build MSI
-        working-directory: installer/wix
-        run: dotnet build WinOptimizer.wixproj -c Release -p:PublishSourceDir=${{ github.workspace }}\publish
-
-      # İmzalama — yalnızca sertifika gizli değişkenleri tanımlıysa (Bölüm 20.4).
-      - name: Sign binaries & MSI
-        if: ${{ env.SIGN_PFX_BASE64 != '' }}
-        env:
-          SIGN_PFX_BASE64: ${{ secrets.SIGN_PFX_BASE64 }}
-          SIGN_PFX_PASSWORD: ${{ secrets.SIGN_PFX_PASSWORD }}
-        run: |
-          $pfx = Join-Path $env:RUNNER_TEMP "codesign.pfx"
-          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:SIGN_PFX_BASE64))
-          .\build\sign-release.ps1 -PublishDir publish -PfxPath $pfx -PfxPassword $env:SIGN_PFX_PASSWORD
-          .\build\sign-release.ps1 -PublishDir installer\wix\bin -PfxPath $pfx -PfxPassword $env:SIGN_PFX_PASSWORD
-
-      - name: Upload MSI artifact
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
-          name: WinOptimizer-msi
-          path: installer/wix/bin/*.msi
+          name: WinOptimizer-setup
+          path: |
+            installer/build/*-setup.exe
+            installer/build/*-setup.exe.sha256
           if-no-files-found: error
 
-  # --- Sürüm (tag) yayını: GitHub Release + Winget PR (Bölüm 20.5) ---
+  # --- Sürüm (tag) yayını: GitHub Release + Winget manifest yaması ---
   release:
     needs: build-and-test
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: windows-latest
+    runs-on: windows-2022
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download MSI
+      - name: Download installer
         uses: actions/download-artifact@v4
         with:
-          name: WinOptimizer-msi
+          name: WinOptimizer-setup
           path: release
 
-      - name: Compute SHA256
+      # Hash'i yeniden hesaplamak yerine build işinin ürettiği yan dosyayla DOĞRULA:
+      # böylece artifact aktarımı sırasında bozulma sessizce release'e geçmez.
+      - name: Verify SHA256 sidecar
         id: sha
         working-directory: release
-        run: echo "sha256=$((Get-FileHash *.msi -Algorithm SHA256).Hash)" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem *-setup.exe | Select-Object -First 1
+          if (-not $setup) { throw 'Kurulum dosyasi artifact icinde yok.' }
+          $sidecar = Get-Content "$($setup.Name).sha256" -Raw
+          $expected = ($sidecar -split '\s+')[0].Trim()
+          $actual = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash
+          if ($expected -ne $actual) {
+            throw "SHA256 uyusmuyor. Beklenen=$expected Gercek=$actual"
+          }
+          Write-Host "SHA256 dogrulandi: $actual"
+          "sha256=$actual" >> $env:GITHUB_OUTPUT
+          "setupName=$($setup.Name)" >> $env:GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*.msi
+          files: release/*
           generate_release_notes: true
+          # Ön sürüm etiketleri (v0.1.0-alpha gibi) pre-release olarak yayınlanır.
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          body: |
+            ## Kurulum
 
-      # Winget manifest PR — gerçek repo (winget-pkgs) ekip üyesi tarafından yapılır.
-      # Burada yalnızca SHA256 manifest'i güncellenmiş bir kopya artifact olarak sunulur.
-      - name: Prepare Winget manifest (SHA256 patch)
+            `${{ steps.sha.outputs.setupName }}` dosyasını indirin ve çalıştırın.
+            Hedef PC'de **.NET kurulu olması gerekmez** — runtime kurulumun içinde gömülüdür.
+
+            ### ⚠ SmartScreen uyarısı normaldir
+
+            Kurulum **kod imzalı değildir**. Windows "Bilgisayarınız korundu" uyarısı
+            gösterebilir:
+
+            1. **Daha fazla bilgi** bağlantısına tıklayın
+            2. **Yine de çalıştır** düğmesine tıklayın
+
+            İndirdiğiniz dosyanın bozulmadığını doğrulamak için:
+
+            ```powershell
+            Get-FileHash .\${{ steps.sha.outputs.setupName }} -Algorithm SHA256
+            ```
+
+            Beklenen SHA256:
+
+            ```
+            ${{ steps.sha.outputs.sha256 }}
+            ```
+
+            Ayrıntılar: [docs/KURULUM.md](https://github.com/${{ github.repository }}/blob/main/docs/KURULUM.md)
+
+      # Winget manifest PR'ı winget-pkgs deposuna elle açılır. Burada yalnızca
+      # sürüm/URL/SHA256 alanları yamalanmış bir kopya artifact olarak sunulur.
+      - name: Prepare Winget manifest
         working-directory: installer/winget
+        shell: pwsh
         run: |
-          (Get-Content WinOptimizer.WinOptimizer.installer.yaml) `
-            -replace '(?<=InstallerSha256:\s)[0-9A-Fa-f]{64}', '${{ steps.sha.outputs.sha256 }}' `
-            | Set-Content WinOptimizer.WinOptimizer.installer.yaml
+          $version = '${{ github.ref_name }}' -replace '^v', ''
+          $url = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ steps.sha.outputs.setupName }}"
+          foreach ($file in Get-ChildItem *.yaml) {
+            (Get-Content $file.FullName) `
+              -replace '(?<=^PackageVersion:\s).+', $version `
+              -replace '(?<=InstallerUrl:\s).+', $url `
+              -replace '(?<=InstallerSha256:\s)[0-9A-Fa-f]{64}', '${{ steps.sha.outputs.sha256 }}' `
+              -replace '(?<=DisplayVersion:\s).+', $version `
+              | Set-Content $file.FullName
+          }
           Get-Content WinOptimizer.WinOptimizer.installer.yaml
 
       - name: Upload Winget manifest

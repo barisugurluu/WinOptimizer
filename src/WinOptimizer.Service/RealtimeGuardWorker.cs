@@ -15,6 +15,7 @@ public sealed class RealtimeGuardWorker : BackgroundService
     private readonly GuardIpcServer _ipc;
     private readonly GuardState _state;
     private readonly RemediationEngine _remediation;
+    private readonly GuardSettingsProvider _settings;
     private readonly ILogger<RealtimeGuardWorker> _logger;
     private readonly TimeSpan _pollInterval = TimeSpan.FromSeconds(5);
 
@@ -24,6 +25,7 @@ public sealed class RealtimeGuardWorker : BackgroundService
         GuardIpcServer ipc,
         GuardState state,
         RemediationEngine remediation,
+        GuardSettingsProvider settings,
         ILogger<RealtimeGuardWorker> logger)
     {
         _collector = collector;
@@ -31,6 +33,7 @@ public sealed class RealtimeGuardWorker : BackgroundService
         _ipc = ipc;
         _state = state;
         _remediation = remediation;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -44,6 +47,17 @@ public sealed class RealtimeGuardWorker : BackgroundService
         {
             try
             {
+                // Ayar dosyası her tikte kontrol edilir (stat, ~bedava). Guard kapalıysa
+                // metrik toplanmaz ve müdahale edilmez — AMA IPC sunucusu ayakta kalır,
+                // böylece arayüz "guard kapalı" ile "servis yok"u ayırt edebilir.
+                _settings.RefreshIfChanged();
+                if (!_settings.Enabled)
+                {
+                    try { await Task.Delay(_pollInterval, stoppingToken); }
+                    catch (OperationCanceledException) { break; }
+                    continue;
+                }
+
                 var metric = _collector.Collect();
                 var alerts = _engine.Evaluate(metric);
                 _state.Update(metric, alerts);
@@ -55,7 +69,7 @@ public sealed class RealtimeGuardWorker : BackgroundService
                     _logger.LogWarning("[{Metric}] {Message}", alert.Metric, alert.Message);
 
                 // Otomatik müdahale: güvenli eylemleri uygula (Bölüm 3.17)
-                int remediated = await _remediation.ApplyAsync(alerts);
+                int remediated = await _remediation.ApplyAsync(alerts, stoppingToken);
                 if (remediated > 0)
                     _logger.LogInformation("{N} otomatik müdahale uygulandı.", remediated);
             }

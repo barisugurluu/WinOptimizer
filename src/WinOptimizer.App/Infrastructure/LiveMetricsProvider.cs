@@ -73,11 +73,12 @@ public sealed class LiveMetricsProvider
         }
         catch (Exception ex) { _logger.LogDebug(ex, "WMI sorgusu başarısız."); }
 
-        // C: disk
+        // Sistem sürücüsü (C: sabit değil — Windows başka bir sürücüde kurulu olabilir).
         try
         {
+            string systemDrive = System.IO.Path.GetPathRoot(Environment.SystemDirectory)!.TrimEnd('\\');
             using var ld = new ManagementObjectSearcher(
-                "SELECT Size, FreeSpace FROM Win32_LogicalDisk WHERE DeviceID='C:'");
+                $"SELECT Size, FreeSpace FROM Win32_LogicalDisk WHERE DeviceID='{systemDrive}'");
             var m = ld.Get().Cast<ManagementObject>().FirstOrDefault();
             if (m is not null)
             {

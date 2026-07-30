@@ -25,9 +25,49 @@ public class RollbackServiceTests : IDisposable
     {
         _dir = Path.Combine(Path.GetTempPath(), "WinOptimizerRollbackTests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_dir);
-        _journal = new ChangeJournal(_dir, NullLogger<ChangeJournal>.Instance);
+        // Bütünlük koruyucu artık geri alma yolunda zorunlu: kurcalanmış bir journal
+        // dosyasından geri alma yapılmaz (RollbackService.IsDayVerifiedAsync).
+        var integrity = new IntegrityGuard(
+            IntegrityKeyStore.LoadOrCreate(_dir), NullLogger<IntegrityGuard>.Instance);
+        _journal = new ChangeJournal(_dir, NullLogger<ChangeJournal>.Instance, integrity);
         _registry = new ModuleRegistry(NullLogger<ModuleRegistry>.Instance);
-        _service = new RollbackService(_registry, _journal, NullLogger<RollbackService>.Instance);
+        _service = new RollbackService(
+            _registry, _journal, integrity, NullLogger<RollbackService>.Instance);
+    }
+
+    [Fact]
+    public async Task Rollback_is_refused_when_the_journal_file_was_tampered_with()
+    {
+        var target = new FakeModule("Alpha", succeeds: true);
+        _registry.Register(target);
+        var change = new ChangeRecord { Module = "Alpha", Target = @"HKLM\Test", NewValue = "2", PreviousValue = "1" };
+        await _journal.WriteAsync(change);
+
+        // Journal dosyasını elle değiştir — HMAC yan dosyası artık eşleşmez.
+        string journalFile = _journal.GetFilePath(change.Timestamp.UtcDateTime);
+        await File.AppendAllTextAsync(journalFile,
+            """{"id":"sahte","module":"Alpha","op":"RegistrySetValue","target":"HKLM\\Evil"}""" + "\n");
+
+        var outcome = await _service.RollbackAsync(change);
+
+        // CLAUDE.md §3.2'nin "kurcalama geri almayı durdurur" güvencesi artık GERÇEK:
+        // daha önce VerifyFileAsync yalnızca testlerden çağrılıyordu.
+        outcome.IsSuccess.Should().BeFalse();
+        outcome.Message.Should().Contain("doğrulanamadı");
+        target.ReceivedChanges.Should().BeEmpty("kurcalanmış günlükten hiçbir işlem çalıştırılmamalı");
+    }
+
+    [Fact]
+    public async Task Rollback_proceeds_when_the_journal_is_intact()
+    {
+        var target = new FakeModule("Alpha", succeeds: true);
+        _registry.Register(target);
+        var change = new ChangeRecord { Module = "Alpha", Target = @"HKLM\Test", NewValue = "2", PreviousValue = "1" };
+        await _journal.WriteAsync(change);
+
+        var outcome = await _service.RollbackAsync(change);
+
+        outcome.IsSuccess.Should().BeTrue("bozulmamış günlükte geri alma çalışmalı");
     }
 
     [Fact]

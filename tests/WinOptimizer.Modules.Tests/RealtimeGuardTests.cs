@@ -148,11 +148,26 @@ public class ThresholdEngineTests
 /// Otomatik müdahale kapısı — yalnızca <c>CanAutoRemediate</c> işaretli uyarılar eyleme dönüşür.
 /// (Bu testler sistemi değiştirmez: müdahale edilemez uyarılar hiçbir eylem tetiklemez.)
 /// </summary>
-public class RemediationEngineTests
+public class RemediationEngineTests : IDisposable
 {
-    private static RemediationEngine Create() =>
-        new(new ProcessRunner(NullLogger<ProcessRunner>.Instance),
+    private readonly string _dataDir = Path.Combine(
+        Path.GetTempPath(), "winopt-remed-" + Guid.NewGuid().ToString("N")[..8]);
+
+    private RemediationEngine Create()
+    {
+        Directory.CreateDirectory(_dataDir);
+        var integrity = new IntegrityGuard(
+            IntegrityKeyStore.LoadOrCreate(_dataDir), NullLogger<IntegrityGuard>.Instance);
+        var journal = new ChangeJournal(_dataDir, NullLogger<ChangeJournal>.Instance, integrity);
+        var settings = new GuardSettingsProvider(NullLogger<GuardSettingsProvider>.Instance);
+        settings.RefreshIfChanged();
+
+        return new RemediationEngine(
+            new ProcessRunner(NullLogger<ProcessRunner>.Instance),
+            settings,
+            journal,
             NullLogger<RemediationEngine>.Instance);
+    }
 
     [Fact]
     public async Task No_alerts_means_no_action()
@@ -160,6 +175,22 @@ public class RemediationEngineTests
         var applied = await Create().ApplyAsync(Array.Empty<GuardAlert>());
 
         applied.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Auto_remediation_is_off_by_default()
+    {
+        // GÜVENLİ VARSAYILAN: LocalSystem yetkisiyle çalışan servis, kullanıcının açık
+        // izni olmadan dosya silmez. AutoRemediate varsayılan olarak kapalıdır.
+        var alerts = new[]
+        {
+            new GuardAlert(AlertSeverity.Critical, "Disk", "Disk kritik", "Temizle", CanAutoRemediate: true),
+            new GuardAlert(AlertSeverity.Warning, "RAM", "RAM yüksek", "Boşalt", CanAutoRemediate: true),
+        };
+
+        var applied = await Create().ApplyAsync(alerts);
+
+        applied.Should().Be(0, "otomatik müdahale açık onay olmadan çalışmamalı");
     }
 
     [Fact]
@@ -188,5 +219,21 @@ public class RemediationEngineTests
         var applied = await Create().ApplyAsync(alerts);
 
         applied.Should().Be(0);
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            if (Directory.Exists(_dataDir))
+            {
+                Directory.Delete(_dataDir, recursive: true);
+            }
+        }
+        catch (IOException)
+        {
+            // Geçici klasör silinemezse test sonucu etkilenmez.
+        }
+        GC.SuppressFinalize(this);
     }
 }

@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     docs\EULA.md dosyasını kurulum sihirbazının gösterdiği license.rtf'e dönüştürür.

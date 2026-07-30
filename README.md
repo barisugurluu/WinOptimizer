@@ -73,12 +73,30 @@ C# 12 / .NET 8 WPF · Fluent Dark (WPF-UI) · Katmanlı & modüler mimari.
 
 | Belge | İçerik |
 |-------|--------|
+| [`docs/KURULUM.md`](docs/KURULUM.md) | **Kurulum kılavuzu** — indirme, SmartScreen, SHA256 doğrulama, kaldırma, sorun giderme, kaynaktan derleme |
 | [`docs/EULA.md`](docs/EULA.md) | Son kullanıcı lisans sözleşmesi — kurulum sihirbazındaki EULA ekranının **tek kaynağı** (taslak; dağıtım öncesi hukukçu incelemesi gerekir) |
 | [`docs/GIZLILIK.md`](docs/GIZLILIK.md) | Gizlilik politikası — sıfır telemetri; tek ağ isteği güncelleme denetimidir |
 
-## Ön Koşullar
+## Kurulum (son kullanıcı)
 
-- **.NET 8 SDK** (`dotnet --version` çalışmalı). İndir: <https://dotnet.microsoft.com/download>
+[Releases](https://github.com/barisugurluu/WinOptimizer/releases) sayfasından
+`WinOptimizer-<sürüm>-setup.exe` indirip çalıştırın. **Hedef PC'de .NET kurulu olması
+gerekmez** — çalışma zamanı kurulumun içinde gömülüdür.
+
+- Windows 10 2004 (19041) veya üzeri, 64-bit, yönetici yetkisi.
+- Kurulum **kod imzalı değildir**: SmartScreen uyarısında *Daha fazla bilgi → Yine de çalıştır*.
+- İndirmeyi doğrulayın: `Get-FileHash .\WinOptimizer-...-setup.exe -Algorithm SHA256`
+
+Ayrıntılar, sessiz kurulum ve sorun giderme: [`docs/KURULUM.md`](docs/KURULUM.md)
+
+## Ön Koşullar (geliştirme)
+
+> Aşağıdakiler **yalnızca kaynaktan derlemek** için gereklidir. Son kullanıcı yalnızca
+> `setup.exe` indirir; SDK/runtime kurmasına gerek yoktur.
+
+- **.NET 8 SDK** (`dotnet --version` çalışmalı; sürüm `global.json` ile sabit).
+  İndir: <https://dotnet.microsoft.com/download>
+- **Inno Setup 6** — yalnız kurulum paketi üretmek için: `winget install JRSoftware.InnoSetup`
 - Windows 10/11 (64-bit). WMI, yönetici ayrıcalığı gereklidir.
 
 ## Derleme & Çalıştırma
@@ -164,9 +182,16 @@ Kalan adımlar (üretim sertleştirme):
   SHA256'lı arm64 girişi kaldırıldı), EV kod imzalama sertifikası (imzalama hattı kod olarak hazır)
 
 ### Paketleme Hattı
+
+**Tek hat, tek komut** (MSI/WiX hattı kaldırıldı — gerekçe: [`docs/KURULUM.md`](docs/KURULUM.md#neden-msi-değil)):
+
 ```powershell
-# Tam hat: derle + test + publish + imzala + WiX MSI
 .\build\build-installer.ps1
-# Sadece geliştirme: imzasız
-.\build\build-installer.ps1 -SkipSign
 ```
+
+Derle → test → **self-contained** publish → publish sağlık kontrolü → `license.rtf` →
+Inno Setup → SHA256 yan dosyası. Çıktı:
+`installer\build\WinOptimizer-<sürüm>-setup.exe` (+ `.sha256`, ~48 MB).
+
+Sürümün tek kaynağı `Directory.Build.props` (`VersionPrefix`/`VersionSuffix`);
+kurulum ve winget manifestleri bundan türer. Dağıtım **imzasızdır** (bilinçli karar).

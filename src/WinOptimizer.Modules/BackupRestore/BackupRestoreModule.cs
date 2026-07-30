@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using WinOptimizer.Core;
+using WinOptimizer.Core.Compatibility;
 using WinOptimizer.Safety;
 
 namespace WinOptimizer.Modules.BackupRestore;
@@ -55,17 +56,47 @@ public sealed class BackupRestoreModule : IOptimizationModule
 
     public Task<PreviewResult> PreviewAsync(AnalysisResult analysis, CancellationToken ct = default)
     {
-        var actions = new List<PreviewAction>
+        var actions = new List<PreviewAction>();
+
+        // wbadmin Home sürümünde yok/sınırlı. Guard olmadan bu eylemler Home'da sunuluyor,
+        // sonra Process.Start seviyesinde başarısız oluyordu (kullanıcıya "denedim, olmadı"
+        // yerine hiç sunmamak doğrusu — vssadmin alternatifi aşağıda zaten var).
+        var wbadminSupport = CompatibilityChecker.IsSupported("WbadminBmr");
+        if (wbadminSupport.IsSupported)
         {
-            new() { Description = "Sistem görüntüsü yedeği (BMR) — hedef sürücü seçilmeli",
-                Risk = RiskLevel.Low, Target = "BmrBackup", RequiresExtraConfirmation = true },
-            new() { Description = "Sistem durumu yedeği (kayıt defteri, boot)",
-                Risk = RiskLevel.Low, Target = "SystemState", RequiresExtraConfirmation = true },
-            new() { Description = "Birim gölge kopyası oluştur (vssadmin — Home alternatifi)",
-                Risk = RiskLevel.Low, Target = "ShadowCopy" },
-            new() { Description = "Yedek sürümlerini listele",
-                Risk = RiskLevel.None, Target = "ListVersions" }
-        };
+            actions.Add(new PreviewAction
+            {
+                Description = "Sistem görüntüsü yedeği (BMR) — hedef sürücü seçilmeli",
+                Risk = RiskLevel.Low,
+                Target = "BmrBackup",
+                RequiresExtraConfirmation = true
+            });
+            actions.Add(new PreviewAction
+            {
+                Description = "Sistem durumu yedeği (kayıt defteri, boot)",
+                Risk = RiskLevel.Low,
+                Target = "SystemState",
+                RequiresExtraConfirmation = true
+            });
+        }
+        else
+        {
+            _logger.LogInformation("wbadmin eylemleri atlandı: {Reason}", wbadminSupport.Reason);
+        }
+
+        actions.Add(new PreviewAction
+        {
+            Description = "Birim gölge kopyası oluştur (vssadmin — Home alternatifi)",
+            Risk = RiskLevel.Low,
+            Target = "ShadowCopy"
+        });
+        actions.Add(new PreviewAction
+        {
+            Description = "Yedek sürümlerini listele",
+            Risk = RiskLevel.None,
+            Target = "ListVersions"
+        });
+
         return Task.FromResult(new PreviewResult { ModuleId = Id, Actions = actions, IsDryRun = true });
     }
 

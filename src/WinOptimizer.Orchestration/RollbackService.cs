@@ -30,18 +30,60 @@ public sealed class RollbackService
 {
     private readonly ModuleRegistry _registry;
     private readonly ChangeJournal _journal;
+    private readonly IntegrityGuard _integrity;
     private readonly ILogger<RollbackService> _logger;
 
-    public RollbackService(ModuleRegistry registry, ChangeJournal journal, ILogger<RollbackService> logger)
+    public RollbackService(
+        ModuleRegistry registry,
+        ChangeJournal journal,
+        IntegrityGuard integrity,
+        ILogger<RollbackService> logger)
     {
         _registry = registry;
         _journal = journal;
+        _integrity = integrity;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Bir günün journal dosyasının HMAC imzası geçerli mi?
+    /// </summary>
+    /// <remarks>
+    /// CLAUDE.md §3.2 ve README "kurcalama geri almayı durdurur" diyordu ama
+    /// <c>IntegrityGuard.VerifyFileAsync</c> yalnızca testlerden çağrılıyordu — yani
+    /// bu güvence gerçekte yoktu. Artık geri alma öncesi doğrulanır.
+    /// </remarks>
+    public async Task<bool> IsDayVerifiedAsync(DateTime day, CancellationToken ct = default)
+    {
+        string path = _journal.GetFilePath(day);
+        if (!File.Exists(path))
+        {
+            return true;   // dosya yoksa doğrulanacak bir şey de yok
+        }
+
+        bool ok = await _integrity.VerifyFileAsync(path, ct).ConfigureAwait(false);
+        if (!ok)
+        {
+            _logger.LogError(
+                "Değişiklik günlüğü bütünlük doğrulaması BAŞARISIZ: {Path}. " +
+                "Bu güne ait kayıtlar geri alınmayacak.", path);
+        }
+
+        return ok;
     }
 
     /// <summary>Tek bir değişiklik kaydını geri alır.</summary>
     public async Task<RollbackOutcome> RollbackAsync(ChangeRecord change, CancellationToken ct = default)
     {
+        // BÜTÜNLÜK KAPISI: kaydın geldiği gün dosyası kurcalanmışsa geri alma yapılmaz.
+        // Kurcalanmış bir journal, "geri alma" adı altında saldırganın seçtiği işlemleri
+        // yönetici yetkisiyle çalıştırmak için kullanılabilirdi.
+        if (!await IsDayVerifiedAsync(change.Timestamp.UtcDateTime, ct).ConfigureAwait(false))
+        {
+            return new RollbackOutcome(change.Id, change.Module, false,
+                "Değişiklik günlüğü doğrulanamadı (dosya değiştirilmiş olabilir); geri alma reddedildi.");
+        }
+
         var module = _registry.Find(change.Module);
         if (module is null)
         {

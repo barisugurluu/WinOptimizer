@@ -22,9 +22,23 @@ public sealed class SchedulerService
     {
         try
         {
-            // schtasks /create /tn WinOptimizerWeekly /tr "..." /sc weekly /d Sunday /st 03:00 /rl highest /f
-            var args = $"/create /tn {TaskName} /tr \"\\\"{cliPath}\\\" optimize --yes\" " +
-                       $"/sc weekly /d {day} /st {time} /rl highest /f";
+            // ArgumentList: gün/saat/yol kullanıcıdan gelir; string birleştirmeyle komuta
+            // gömülmez (CLAUDE.md §3 — komut enjeksiyonu kapalı).
+            //
+            // /ru SYSTEM + /np: görev, kullanıcı OTURUM AÇMAMIŞ olsa da çalışır. Bunlar
+            // olmadan görev "yalnızca kullanıcı oturum açtığında" kipinde oluşuyordu ve
+            // 03:00'teki haftalık bakım pratikte hiç çalışmıyordu.
+            // (Bu, integrity.key'in LocalMachine kapsamına geçmesinden SONRA güvenlidir:
+            //  aksi halde SYSTEM olarak çalışan görev anahtarı çözemez ve journal imzalarını
+            //  geçersiz kılardı.)
+            string[] args =
+            [
+                "/create", "/tn", TaskName,
+                "/tr", $"\"{cliPath}\" optimize --yes",
+                "/sc", "weekly", "/d", day, "/st", time,
+                "/ru", "SYSTEM", "/np",
+                "/rl", "highest", "/f",
+            ];
             return RunSchtasks(args);
         }
         catch (Exception ex)
@@ -35,7 +49,7 @@ public sealed class SchedulerService
     }
 
     /// <summary>Zamanlanmış görevi siler.</summary>
-    public bool DeleteWeeklyTask() => RunSchtasks($"/delete /tn {TaskName} /f");
+    public bool DeleteWeeklyTask() => RunSchtasks(["/delete", "/tn", TaskName, "/f"]);
 
     /// <summary>Görevin var olup olmadığını kontrol eder.</summary>
     public bool IsTaskExists()
@@ -55,20 +69,46 @@ public sealed class SchedulerService
         catch { return false; }
     }
 
-    private bool RunSchtasks(string args)
+    private bool RunSchtasks(string[] args)
     {
         try
         {
-            var psi = new ProcessStartInfo("schtasks.exe", args)
+            var psi = new ProcessStartInfo("schtasks.exe")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
             };
+            foreach (string arg in args)
+            {
+                psi.ArgumentList.Add(arg);
+            }
+
             using var p = Process.Start(psi);
-            p?.WaitForExit();
-            bool ok = p?.ExitCode == 0;
-            _logger.LogInformation("schtasks {Args}: {Result}", args, ok ? "başarılı" : "başarısız");
+            if (p is null)
+            {
+                _logger.LogError("schtasks.exe başlatılamadı.");
+                return false;
+            }
+
+            string stdout = p.StandardOutput.ReadToEnd();
+            string stderr = p.StandardError.ReadToEnd();
+            p.WaitForExit();
+
+            bool ok = p.ExitCode == 0;
+            if (ok)
+            {
+                _logger.LogInformation("schtasks {Args}: başarılı", string.Join(' ', args));
+            }
+            else
+            {
+                // Sebep artık yutulmuyor: kullanıcı "oluşturuldu" yazısını görüp görevin
+                // aslında oluşmadığını fark edemiyordu.
+                _logger.LogError("schtasks {Args}: başarısız (exit {Code}){NewLine}{Out}{Err}",
+                    string.Join(' ', args), p.ExitCode, Environment.NewLine, stdout.Trim(), stderr.Trim());
+            }
+
             return ok;
         }
         catch (Exception ex)

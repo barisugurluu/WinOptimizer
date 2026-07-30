@@ -23,74 +23,115 @@ public static class CommandCatalog
         // --- Derle ---
         list.Add(new DevCommand
         {
-            Title = "Build Release", Category = "Derle",
-            File = dotnet, Args = new[] { "build", "WinOptimizer.sln", "-c", "Release", "--verbosity", "minimal" },
+            Title = "Build Release",
+            Category = "Derle",
+            File = dotnet,
+            Args = new[] { "build", "WinOptimizer.sln", "-c", "Release", "--verbosity", "minimal" },
             Description = "Tum cozumu Release yapilandirmasinda derler."
         });
         list.Add(new DevCommand
         {
-            Title = "Build Debug", Category = "Derle",
-            File = dotnet, Args = new[] { "build", "WinOptimizer.sln", "-c", "Debug", "--verbosity", "minimal" }
+            Title = "Build Debug",
+            Category = "Derle",
+            File = dotnet,
+            Args = new[] { "build", "WinOptimizer.sln", "-c", "Debug", "--verbosity", "minimal" }
         });
         list.Add(new DevCommand
         {
-            Title = "Restore", Category = "Derle",
-            File = dotnet, Args = new[] { "restore", "WinOptimizer.sln" }
+            Title = "Restore",
+            Category = "Derle",
+            File = dotnet,
+            Args = new[] { "restore", "WinOptimizer.sln" }
         });
 
         // --- Test ---
         list.Add(new DevCommand
         {
-            Title = "Test", Category = "Test",
-            File = dotnet, Args = new[] { "test", "WinOptimizer.sln", "-c", "Release", "--no-build", "--verbosity", "minimal" },
+            Title = "Test",
+            Category = "Test",
+            File = dotnet,
+            Args = new[] { "test", "WinOptimizer.sln", "-c", "Release", "--no-build", "--verbosity", "minimal" },
             Description = "Tum birim/E2E testleri calistirir (yaklasik 178)."
         });
         // Ozel: kapsam goruntuleme (surec degil, diyalog).
         list.Add(new DevCommand
         {
-            Title = "Kapsam Goster", Category = "Test",
+            Title = "Kapsam Goster",
+            Category = "Test",
             File = "__coverage__",
             Description = "Cobertura kapsam raporlarini proje bazinda goster (18.3 esikleri)."
         });
         list.Add(new DevCommand
         {
-            Title = "Test + Kapsam", Category = "Test",
-            File = dotnet, Args = new[] { "test", "WinOptimizer.sln", "-c", "Release", "--no-build", "--collect:", "XPlat Code Coverage", "--verbosity", "minimal" },
+            Title = "Test + Kapsam",
+            Category = "Test",
+            File = dotnet,
+            Args = new[] { "test", "WinOptimizer.sln", "-c", "Release", "--no-build", "--collect:", "XPlat Code Coverage", "--verbosity", "minimal" },
             Description = "Testleri calistirir + cobertura kapsam raporu uretir."
         });
 
         // --- Format ---
         list.Add(new DevCommand
         {
-            Title = "Format Kontrol", Category = "Format",
-            File = dotnet, Args = new[] { "format", "WinOptimizer.sln", "--verify-no-changes", "--verbosity", "minimal" },
+            Title = "Format Kontrol",
+            Category = "Format",
+            File = dotnet,
+            Args = new[] { "format", "WinOptimizer.sln", "--verify-no-changes", "--verbosity", "minimal" },
             Description = "Kod stilini kontrol eder (CI kapisi). Temizse 0 doner."
         });
         list.Add(new DevCommand
         {
-            Title = "Format Uygula", Category = "Format",
-            File = dotnet, Args = new[] { "format", "WinOptimizer.sln", "--verbosity", "minimal" },
+            Title = "Format Uygula",
+            Category = "Format",
+            File = dotnet,
+            Args = new[] { "format", "WinOptimizer.sln", "--verbosity", "minimal" },
             Description = "CRLF/bicim sorunlarini duzeltir."
         });
 
         // --- Paketle ---
+        // TEK dagitim hatti: build-installer.ps1 -> installer\build\*-setup.exe (self-contained).
+        // MSI/WiX hatti ve self-signed test sertifikasi kaldirildi (bkz. docs\KURULUM.md).
         list.Add(new DevCommand
         {
-            Title = "MSI Uret", Category = "Paketle",
-            File = "powershell.exe", Args = new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build\\build-installer.ps1", "-SkipSign" },
-            Description = "Imzasiz gelistirme MSI uretir (~3 MB). WiX gerekli."
+            Title = "Kurulum Uret (setup.exe)",
+            Category = "Paketle",
+            File = "powershell.exe",
+            Args = new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build\\build-installer.ps1" },
+            Description = "Tam hat: derle + test + self-contained publish + setup.exe + SHA256 (~48 MB). Inno Setup gerekli."
         });
         list.Add(new DevCommand
         {
-            Title = "MSI klasorunu ac", Category = "Paketle",
-            File = "explorer.exe", Args = new[] { "installer\\wix\\bin" }, IsFolder = true
+            Title = "Kurulum Uret (testsiz)",
+            Category = "Paketle",
+            File = "powershell.exe",
+            Args = new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build\\build-installer.ps1", "-SkipTests" },
+            Description = "Ayni hat, dotnet test adimi atlanir (hizli yineleme)."
+        });
+        list.Add(new DevCommand
+        {
+            Title = "Ikonu Yeniden Uret",
+            Category = "Paketle",
+            File = "powershell.exe",
+            Args = new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build\\generate-icon.ps1" },
+            Description = "src\\WinOptimizer.App\\Resources\\WinOptimizer.ico dosyasini yeniden uretir."
+        });
+
+        list.Add(new DevCommand
+        {
+            Title = "Kurulum klasorunu ac",
+            Category = "Paketle",
+            File = "explorer.exe",
+            Args = new[] { "installer\\build" },
+            IsFolder = true
         });
 
         // --- Calistir ---
         list.Add(new DevCommand
         {
-            Title = "WPF Uygulamayi Ac", Category = "Calistir",
-            File = dotnet, Args = new[] { "run", "--project", "src\\WinOptimizer.App", "-c", "Debug", "--no-build" },
+            Title = "WPF Uygulamayi Ac",
+            Category = "Calistir",
+            File = dotnet,
+            Args = new[] { "run", "--project", "src\\WinOptimizer.App", "-c", "Debug", "--no-build" },
             Description = "Fluent Dark dashboard'u acar. Yonetici (UAC) onayi ister."
         });
 
@@ -111,6 +152,28 @@ public static class CommandCatalog
         list.Add(new DevCommand { Title = "benchmark", Category = "CLI", File = dotnet, Args = new[] { "run", "--project", cliProj, "-c", "Release", "--no-build", "--", "benchmark" } });
         list.Add(new DevCommand { Title = "rollback --list", Category = "CLI", File = dotnet, Args = new[] { "run", "--project", cliProj, "-c", "Release", "--no-build", "--", "rollback", "--list" } });
         list.Add(new DevCommand { Title = "update --check", Category = "CLI", File = dotnet, Args = new[] { "run", "--project", cliProj, "-c", "Release", "--no-build", "--", "update", "--check" } });
+
+
+        // --- Servis (RealtimeGuard Windows servisi kontrolu) ---
+        // sc.exe yonetici gerektirir; DevConsole normal kullanicida calisirsa hata konsola duser.
+        list.Add(new DevCommand { Title = "Servis Baslat", Category = "Servis", File = "sc.exe", Args = new[] { "start", "WinOptimizerGuard" }, Description = "RealtimeGuard servisini baslatir (yonetici gerekir)." });
+        list.Add(new DevCommand { Title = "Servis Durdur", Category = "Servis", File = "sc.exe", Args = new[] { "stop", "WinOptimizerGuard" }, Description = "RealtimeGuard servisini durdurur (yonetici gerekir)." });
+        list.Add(new DevCommand { Title = "Servis Durum", Category = "Servis", File = "sc.exe", Args = new[] { "query", "WinOptimizerGuard" }, Description = "RealtimeGuard servis durumunu gosterir." });
+        list.Add(new DevCommand { Title = "Servis Listesi", Category = "Servis", File = "sc.exe", Args = new[] { "query", "type=", "service", "state=", "all" }, Description = "Tum Windows servislerini listeler." });
+
+        // --- Bakim (gunluk/yedek/publish klasorleri) ---
+        list.Add(new DevCommand { Title = "Publish Klasoru", Category = "Bakim", File = "explorer.exe", Args = new[] { "src\\WinOptimizer.App\\bin\\Release\\net8.0-windows\\publish" }, IsFolder = true });
+        list.Add(new DevCommand { Title = "Backup Klasoru", Category = "Bakim", File = "explorer.exe", Args = new[] { Path.Combine(programData, "backups") }, IsFolder = true });
+        list.Add(new DevCommand
+        {
+            Title = "Gunlukleri Temizle",
+            Category = "Bakim",
+            File = "powershell.exe",
+            Args = new[] { "-NoProfile", "-Command",
+                "Get-ChildItem -Path (Join-Path $env:ProgramData 'WinOptimizer\\logs') -Recurse -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue; Write-Output 'Gunlukler temizlendi.'" },
+            Description = "C:\\ProgramData\\WinOptimizer\\logs altindaki tum gunluk dosyalarini siler (klasorleri korur)."
+        });
+
 
         return list;
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using WinOptimizer.Core;
 using WinOptimizer.Modules.BenchmarkEngine;
 using WinOptimizer.Orchestration;
+using WinOptimizer.Orchestration.Preflight;
 using WinOptimizer.Updater;
 using WinOptimizer.Safety;
 
@@ -33,12 +34,28 @@ public static class Program
         string command = args[0].ToLowerInvariant();
         var opts = ParseOptions(args[1..]);
 
-        var sp = ServiceFactory.Build();
-        var registry = sp.GetRequiredService<ModuleRegistry>();
-        var engine = sp.GetRequiredService<JobOrchestrationEngine>();
+        // Yönetici kapısı: sistemi DEĞİŞTİREN komutlar için önden ve anlaşılır biçimde.
+        // (status/analyze/update --check bilinçli olarak yükseltilmemiş hâlde kullanılabilir;
+        // bu yüzden CLI'ya requireAdministrator manifesti EKLENMEZ — aksi halde betikten
+        // veya etkileşimsiz kabuktan çağrılamaz.)
+        if (RequiresAdministrator(command) && !Elevation.IsAdministrator())
+        {
+            Console.Error.WriteLine(
+                $"'{command}' komutu yönetici ayrıcalığı gerektirir " +
+                "(kayıt defteri, servis ve sistem klasörü erişimi).");
+            Console.Error.WriteLine(
+                "Terminali 'Yönetici olarak çalıştır' ile açıp komutu tekrar deneyin.");
+            return ExitError;
+        }
 
         try
         {
+            // ServiceFactory.Build() bilinçli olarak try İÇİNDE: %ProgramData% erişilemezse
+            // kullanıcı çıplak yığın izi yerine PreflightException'ın mesajını görür.
+            var sp = ServiceFactory.Build(new ConsoleActionConfirmation(opts.Yes, opts.AllowRisky));
+            var registry = sp.GetRequiredService<ModuleRegistry>();
+            var engine = sp.GetRequiredService<JobOrchestrationEngine>();
+
             return command switch
             {
                 "analyze" => await RunAnalyze(engine, opts),
@@ -57,6 +74,14 @@ public static class Program
             return ExitError;
         }
     }
+
+    /// <summary>
+    /// Sistemi değiştiren komutlar. Salt okunur komutlar (<c>status</c>, <c>analyze</c>,
+    /// <c>update</c>) yükseltme istemez — teşhis için yükseltilmemiş kabuktan çalışmaları
+    /// bilinçli bir tercihtir.
+    /// </summary>
+    private static bool RequiresAdministrator(string command) =>
+        command is "optimize" or "clean" or "rollback" or "benchmark";
 
     private static async Task<int> RunAnalyze(JobOrchestrationEngine engine, CliOptions opts)
     {
@@ -139,6 +164,19 @@ public static class Program
         var result = await new UpdateChecker(checkerOpts).CheckAsync();
         var m = result.Latest;
 
+        // "Denetleyemedim" ile "güncelsin" ayrı şeyler. Eskiden 404/ağ hatası da
+        // "Güncel: v0.1.0" olarak yazdırılıyordu; kullanıcı bozuk bir güncelleme
+        // sisteminde kendini güncel sanıyordu.
+        if (result.CheckFailed)
+        {
+            if (opts.Json)
+                Console.WriteLine(JsonSerializer.Serialize(new
+                { checkFailed = true, reason = result.FailureReason, current = result.CurrentVersion.ToString() }));
+            else
+                Console.Error.WriteLine($"Güncelleme denetlenemedi: {result.FailureReason}");
+            return ExitError;
+        }
+
         if (!result.IsUpdateAvailable || m is null)
         {
             if (opts.Json)
@@ -166,7 +204,7 @@ public static class Program
             return ExitError;
         }
 
-        string tmp = Path.Combine(Path.GetTempPath(), $"WinOptimizer-{m.Version}.msi");
+        string tmp = Path.Combine(Path.GetTempPath(), $"WinOptimizer-{m.Version}-setup.exe");
         Console.Write("İndiriliyor... ");
         await new UpdateDownloader().DownloadAsync(m.DownloadUrl, tmp);
         Console.WriteLine("tamam.");
@@ -177,6 +215,12 @@ public static class Program
             Console.Error.WriteLine($"Doğrulama başarısız (hash={vr.HashOk}, imza={vr.SignatureOk}). Kurulum iptal.");
             return ExitError;
         }
+
+        // Dağıtım imzasız olduğu için imza kontrolü her zaman false döner; güvenlik
+        // SHA256'ya dayanır. Hash de yoksa kullanıcı bunu bilmeli.
+        if (string.IsNullOrEmpty(m.Sha256))
+            Console.WriteLine("UYARI: Yayında SHA256 yan dosyası yok — paket bütünlüğü doğrulanamadı.");
+
         Console.WriteLine("Doğrulama tamam. Kurulum başlatılıyor (uygulama kapanacak)...");
         new UpdateInstaller().Install(tmp, quiet: true);
         return ExitSuccess;
@@ -316,6 +360,7 @@ public static class Program
             {
                 case "--json": o.Json = true; break;
                 case "--yes": o.Yes = true; break;
+                case "--allow-risky": o.AllowRisky = true; break;
                 case "--module" when i + 1 < args.Length:
                     o.Modules = args[++i].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     break;
@@ -338,6 +383,13 @@ public static class Program
     {
         public bool Json { get; set; }
         public bool Yes { get; set; }
+
+        /// <summary>
+        /// Ek onay isteyen eylemleri de uygula (geri dönüşüm boşaltma, HAGS, Hyper-V…).
+        /// <c>--yes</c>'ten AYRI tutulur: haftalık zamanlanmış görev <c>optimize --yes</c>
+        /// olarak gözetimsiz çalışır ve bu tür işlemleri kendiliğinden yapmamalıdır.
+        /// </summary>
+        public bool AllowRisky { get; set; }
         public string[]? Modules { get; set; }
         public string? Profile { get; set; }
         public UpdateChannel? Channel { get; set; }

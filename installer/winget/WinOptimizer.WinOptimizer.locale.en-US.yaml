@@ -1,25 +1,28 @@
-# Winget manifest — Default locale (en-US) (master plan Bölüm 20.5)
+# Winget manifest — Default locale (en-US)
 PackageIdentifier: WinOptimizer.WinOptimizer
 PackageVersion: 0.1.0
 PackageLocale: en-US
 Publisher: WinOptimizer Team
-PublisherUrl: https://github.com/WinOptimizer/WinOptimizer
-PublisherSupportUrl: https://github.com/WinOptimizer/WinOptimizer/issues
-PrivacyUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/PRIVACY.md
+PublisherUrl: https://github.com/barisugurluu/WinOptimizer
+PublisherSupportUrl: https://github.com/barisugurluu/WinOptimizer/issues
+PrivacyUrl: https://github.com/barisugurluu/WinOptimizer/blob/main/PRIVACY.md
 Author: WinOptimizer Team
 PackageName: WinOptimizer
-PackageUrl: https://github.com/WinOptimizer/WinOptimizer
-License: MIT
-LicenseUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/LICENSE
+PackageUrl: https://github.com/barisugurluu/WinOptimizer
+# Freeware, açık kaynak değil. Bağlayıcı metin docs/EULA.md'dir; kök LICENSE ona işaret eder.
+# (Eskiden burada "MIT" yazıyordu — repoda MIT lisansı yoktu ve EULA proprietary'dir.)
+License: Freeware
+LicenseUrl: https://github.com/barisugurluu/WinOptimizer/blob/main/LICENSE
 Copyright: Copyright © 2026 WinOptimizer Team
-CopyrightUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/LICENSE
+CopyrightUrl: https://github.com/barisugurluu/WinOptimizer/blob/main/LICENSE
 ShortDescription: Single-click Windows maintenance & optimization tool with repair, cleanup and real-time protection.
 Description: |-
   WinOptimizer is a non-destructive Windows maintenance and optimization suite.
   It repairs (SFC/DISM), cleans (TEMP/cache), optimizes (RAM/CPU/disk), hardens
-  security (Defender/ASR), and provides a background real-time protection service
-  with threshold-based automatic remediation. Every change is reversible via
-  System Restore points and a change journal.
+  security (Defender/ASR), and provides an optional background real-time protection
+  service with threshold-based automatic remediation. Every change is recorded in a
+  change journal and can be rolled back; System Restore points are taken before
+  risky operations.
 Tags:
   - optimization
   - cleanup
@@ -33,16 +36,17 @@ Tags:
   - gpu
   - real-time
 ReleaseNotes: |-
-  Initial preview release (v0.1.0-alpha).
-  - 19 optimization modules (clean, memory, CPU, repair, GPU, security...)
-  - RealtimeGuard background service
-  - WPF Fluent Dark dashboard + CLI
-  - Turkish & English localization
-ReleaseNotesUrl: https://github.com/WinOptimizer/WinOptimizer/releases/tag/v0.1.0
-PurchaseUrl: https://github.com/WinOptimizer/WinOptimizer
+  Initial preview release.
+  - 16 optimization modules (clean, memory, CPU, repair, GPU, security, privacy...)
+  - Optional RealtimeGuard background service (off by default in the installer)
+  - WPF Fluent Dark dashboard + command line interface
+  - The installer bundles the .NET runtime: no prerequisites on the target PC
+  Known limitations:
+  - The installer is NOT code-signed; SmartScreen will warn on first run.
+    Verify the published SHA256 before installing.
+  - The user interface is currently Turkish-first; English localization is partial.
+ReleaseNotesUrl: https://github.com/barisugurluu/WinOptimizer/releases
+PurchaseUrl: https://github.com/barisugurluu/WinOptimizer
 InstallationNotes: Requires administrator privileges (SFC/DISM/registry access).
-Documentations:
-  - DocumentLabel: Master Plan
-    DocumentUrl: https://github.com/WinOptimizer/WinOptimizer/blob/main/maintenance_master_plan.md
 ManifestType: defaultLocale
 ManifestVersion: 1.4.0

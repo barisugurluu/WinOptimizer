@@ -4,12 +4,25 @@ using Microsoft.Extensions.Logging;
 namespace WinOptimizer.Orchestration;
 
 /// <summary>
-/// Ayar modeli (master plan Bölüm 16.1 — settings.json). Sürüm 2.
+/// Ayar modeli (master plan Bölüm 16.1 — settings.json). Sürüm 3.
 /// </summary>
 public sealed class AppSettings
 {
-    /// <summary>Ayar şeması sürümü. v1→v2: EnabledModules + canlı metrik alanları eklendi.</summary>
-    public int SchemaVersion { get; set; } = 2;
+    /// <summary>Geçerli şema sürümü. Yeni alan eklerken burayı ve <c>Migrate</c>'i güncelle.</summary>
+    public const int CurrentSchemaVersion = 3;
+
+    /// <summary>
+    /// Ayar şeması sürümü. v1→v2: EnabledModules + canlı metrik alanları eklendi.
+    /// v2→v3: FirstRunCompletedVersion eklendi.
+    /// </summary>
+    public int SchemaVersion { get; set; } = CurrentSchemaVersion;
+
+    /// <summary>
+    /// İlk açılış sihirbazının tamamlandığı uygulama sürümü (<c>null</c> = hiç gösterilmedi).
+    /// Sürüm karşılaştırıldığı için sihirbaz büyük bir yükseltmeden sonra bir kez daha
+    /// görünür — "ne değişti" bilgisinin doğal yeri orasıdır.
+    /// </summary>
+    public string? FirstRunCompletedVersion { get; set; }
     public string Language { get; set; } = "tr-TR";
     public string Theme { get; set; } = "dark";
     public string ActiveProfile { get; set; } = "balanced";
@@ -18,10 +31,35 @@ public sealed class AppSettings
     public SchedulerSettings Scheduler { get; set; } = new();
 
     /// <summary>
-    /// "Tek Tıkla" kapsamında etkin modül kimlikleri. Boşliste = tüm kayıtlı modüller.
-    /// (Bölüm 16.1 — modül aç/kapa kalıcılığı.)
+    /// Tek tıkla optimizasyonun <b>güvenli varsayılan</b> modül listesi.
     /// </summary>
-    public List<string> EnabledModules { get; set; } = new();
+    /// <remarks>
+    /// <para>Küratörlü bir liste; risk seviyesi filtresi <b>değil</b>. Modül metadata'sındaki
+    /// <c>Risk</c> fazla kaba: CleanEngine <c>Low</c> ama geri dönüşüm kutusunu boşaltıyor,
+    /// SecurityHardening <c>Low</c>, BackupRestore <c>Low</c> ama vssadmin çalıştırıyor,
+    /// GpuOptimizer <c>Low</c> ama HAGS çeviriyor. "Low olanları çalıştır" kuralı bunların
+    /// hepsini kapsardı.</para>
+    /// <para>Dışarıda bırakma gerekçeleri: RepairEngine (SFC/DISM 20+ dk, "hızlı" bir
+    /// işlemde şaşırtıcı) · NetworkOptimizer (winsock sıfırlama reboot ister, VPN bozar) ·
+    /// SystemTweaker/PrivacyGuard/SecurityHardening (kullanıcının seçmesi gereken
+    /// kayıt defteri/politika değişiklikleri) · BootOptimizer/CpuEngine/GpuOptimizer ·
+    /// AppManager (uygulama kaldırır) · BackupRestore (vssadmin) · DevEnvironment
+    /// (Hyper-V/Geliştirici Modu, reboot) · HardwareMonitor (salt okunur, anlamsız).</para>
+    /// </remarks>
+    public static readonly IReadOnlyList<string> DefaultOneClickModules =
+        ["CleanEngine", "MemoryEngine", "StorageOptimizer", "UpdateEngine"];
+
+    /// <summary>
+    /// "Tek Tıkla" kapsamında etkin modül kimlikleri.
+    /// </summary>
+    /// <remarks>
+    /// <b>Boş liste artık "tüm modüller" DEMEK DEĞİLDİR.</b> Eski davranışta tek tıkla,
+    /// kayıtlı 16 modülün tamamını tek bir genel "Devam?" sorusuyla çalıştırıyordu —
+    /// Hyper-V etkinleştirme ve geri dönüşüm boşaltma dahil. Varsayılan artık
+    /// <see cref="DefaultOneClickModules"/>'dur; tümünü çalıştırmak için
+    /// <see cref="JobOrchestrationEngine.ExecuteAllAsync"/> açıkça çağrılır.
+    /// </remarks>
+    public List<string> EnabledModules { get; set; } = [.. DefaultOneClickModules];
 
     /// <summary>Genel Bakış sekmesinde canlı metrikler gösterilsin mi?</summary>
     public bool DashboardLiveMetrics { get; set; } = true;
@@ -39,7 +77,31 @@ public sealed class SafetyNetSettings
 
 public sealed class RealtimeGuardSettings
 {
+    /// <summary>
+    /// Gerçek zamanlı izleme etkin mi. Kapalıyken servis çalışmaya devam eder ama metrik
+    /// toplamaz — böylece arayüz "guard kapalı" ile "servis kurulu değil"i ayırt edebilir.
+    /// </summary>
     public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Otomatik müdahale ana anahtarı. <b>Varsayılan KAPALI</b> (CLAUDE.md §3.4 güvenli
+    /// varsayılanlar): LocalSystem yetkisiyle çalışan bir servisin kullanıcıya sormadan
+    /// dosya silmesi, açık onay gerektirir.
+    /// </summary>
+    public bool AutoRemediate { get; set; }
+
+    /// <summary>RAM eşiği aşılınca boştaki süreçlerin working set'ini boşalt.</summary>
+    public bool AutoTrimRam { get; set; }
+
+    /// <summary>Disk kritik seviyeye inince geçici dosyaları temizle (geri alınamaz).</summary>
+    public bool AutoCleanDiskCritical { get; set; }
+
+    /// <summary>
+    /// Defender imzalarını güncelle. Varsayılan olarak açık tutulabilen tek otomatik
+    /// eylem: hiçbir şey silmez, geri alınacak bir değişiklik üretmez.
+    /// </summary>
+    public bool AutoUpdateDefenderSignatures { get; set; } = true;
+
     public GuardThresholdValues Thresholds { get; set; } = new();
 }
 
@@ -105,7 +167,7 @@ public sealed class SettingsService
         }
     }
 
-    /// <summary>Eski şema sürümlerini geçerli sürüme yükseltir (şimdilik v1→v2).</summary>
+    /// <summary>Eski şema sürümlerini geçerli sürüme yükseltir.</summary>
     private static void Migrate(AppSettings s)
     {
         if (s.SchemaVersion < 2)
@@ -116,9 +178,35 @@ public sealed class SettingsService
             s.MetricsPollSeconds = 3;
             s.SchemaVersion = 2;
         }
+
+        if (s.SchemaVersion < 3)
+        {
+            // v2 kullanıcıları uygulamayı zaten kullanıyor: ilk açılış sihirbazı onlara
+            // gösterilmez. null bırakılırsa mevcut kullanıcılara "hoş geldiniz" ekranı
+            // açılır ki yanıltıcı olur.
+            s.FirstRunCompletedVersion ??= "0.0.0";
+
+            // v2'de boş liste "tüm modüller" anlamına geliyordu. Sessizce v3 semantiğine
+            // geçirmek (boş = hiçbiri) tek tıkla'yı işlevsiz bırakır; bunun yerine güvenli
+            // varsayılan YAZILIR — böylece kimse farkında olmadan "16 modül"de kalmaz.
+            if (s.EnabledModules is null || s.EnabledModules.Count == 0)
+            {
+                s.EnabledModules = [.. AppSettings.DefaultOneClickModules];
+            }
+
+            s.SchemaVersion = 3;
+        }
     }
 
-    public void Save()
+    /// <summary>
+    /// Ayarları diske yazar.
+    /// </summary>
+    /// <returns>
+    /// Yazma başarılıysa <c>true</c>. <b>Çağıran bu değeri kontrol etmek zorundadır:</b>
+    /// eskiden hata yutuluyor, arayüz ise her koşulda "kaydedildi" diyordu — kalıcılık
+    /// konusunda yalan söyleyen bir ayar ekranı, az seçeneği olandan kötüdür.
+    /// </returns>
+    public bool Save()
     {
         try
         {
@@ -126,10 +214,12 @@ public sealed class SettingsService
             File.WriteAllText(_filePath, json);
             _logger.LogInformation("Ayarlar kaydedildi: {Path}", _filePath);
             SettingsChanged?.Invoke(this, EventArgs.Empty);
+            return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ayarlar kaydedilemedi.");
+            return false;
         }
     }
 }

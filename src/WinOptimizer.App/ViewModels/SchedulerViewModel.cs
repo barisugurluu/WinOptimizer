@@ -32,21 +32,29 @@ public partial class SchedulerViewModel : ObservableObject
     [ObservableProperty] private bool _hasStatus;
     [ObservableProperty] private bool _isBusy;
 
+    /// <summary>CLI exe'si bulunamadı — görev oluşturma devre dışı.</summary>
+    [ObservableProperty] private bool _isCliMissing;
+
     public SchedulerViewModel(SchedulerService scheduler)
     {
         _scheduler = scheduler;
-        _cliPath = ResolveCliPath();
+        string? cli = ResolveCliPath();
+        // ÖNEMLİ: bulunamadıysa "en iyi tahmin" yol DÖNDÜRÜLMEZ. Eskiden var olmayan yol
+        // döndürülüyor, schtasks o yola işaret eden bir görev oluşturuyor ve arayüz
+        // "oluşturuldu" diyordu — görev 03:00'te sessizce başarısız oluyordu.
+        IsCliMissing = cli is null;
+        _cliPath = cli ?? Path.Combine(AppContext.BaseDirectory, "WinOptimizer.Cli.exe");
         _ = RefreshAsync();
     }
 
-    /// <summary>WinOptimizer.Cli.exe yolunu uygulama dizininde arar (kurulum yanında).</summary>
-    private static string ResolveCliPath()
+    /// <summary>
+    /// WinOptimizer.Cli.exe yolunu uygulama dizininde arar (kurulum yanında).
+    /// Dosya yoksa <c>null</c>.
+    /// </summary>
+    private static string? ResolveCliPath()
     {
-        string dir = AppContext.BaseDirectory;
-        string exe = Path.Combine(dir, "WinOptimizer.Cli.exe");
-        if (File.Exists(exe)) return exe;
-        // Geliştirme/derleme senaryosu: net8.0-windows yanında olmayabilir; en iyi tahmin.
-        return exe;
+        string exe = Path.Combine(AppContext.BaseDirectory, "WinOptimizer.Cli.exe");
+        return File.Exists(exe) ? exe : null;
     }
 
     /// <summary>Zamanlanmış görevin varlığını denetler.</summary>
@@ -62,6 +70,14 @@ public partial class SchedulerViewModel : ObservableObject
     private async Task CreateTaskAsync()
     {
         if (IsBusy) return;
+        if (IsCliMissing)
+        {
+            // Var olmayan exe'ye görev oluşturmak, 03:00'te sessizce başarısız olan bir
+            // "otomatik bakım" demektir — hiç oluşturmamak daha dürüsttür.
+            ShowStatus($"{Strings.SchedulerCliMissing} {CliPath}");
+            return;
+        }
+
         IsBusy = true;
         try
         {

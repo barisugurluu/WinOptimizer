@@ -53,11 +53,14 @@ public sealed class MetricsCollector
         }
         catch (Exception ex) { _logger.LogDebug(ex, "CPU metrik hatası."); }
 
-        // C: disk doluluk
+        // Sistem sürücüsü doluluk. C: SABİT DEĞİL: Windows başka bir sürücüde kurulu
+        // olabilir; sabitken o makinelerde disk metrikleri sessizce 0 raporlanıyordu.
+        // (Alan adları geçmişe dönük uyumluluk için CDriveFree* olarak kaldı.)
         try
         {
+            string systemDrive = Path.GetPathRoot(Environment.SystemDirectory)!.TrimEnd('\\');
             using var ld = new ManagementObjectSearcher(
-                "SELECT DeviceID, Size, FreeSpace FROM Win32_LogicalDisk WHERE DeviceID='C:'");
+                $"SELECT DeviceID, Size, FreeSpace FROM Win32_LogicalDisk WHERE DeviceID='{systemDrive}'");
             var mo = ld.Get().Cast<ManagementObject>().FirstOrDefault();
             if (mo is not null)
             {

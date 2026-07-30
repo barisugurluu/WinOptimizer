@@ -26,8 +26,8 @@ Yazılımı kişisel veya kurumsal bilgisayarlarınızda sınırsız sayıda kur
 
 - Yazılımı, kötü amaçlı yazılım dağıtmak veya başkalarının sistemlerine izinsiz
   müdahale etmek için kullanmak.
-- Yazılımın kendisini veya kurulum paketini, **dijital imzasını kaldırarak ya da
-  değiştirerek** dağıtmak; başkasının ürünüymüş gibi sunmak.
+- Yazılımın kendisini veya kurulum paketini **değiştirerek** dağıtmak; başkasının
+  ürünüymüş gibi sunmak.
 - Yazılımın adını veya markasını, onay/ortaklık izlenimi verecek şekilde kullanmak.
 
 ## 4. Yazılımın niteliği ve sizin sorumluluğunuz

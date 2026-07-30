@@ -1,0 +1,62 @@
+<!--
+  Bilinçli olarak DÜZ System.Windows.Window ve SİSTEM RENKLERİ kullanılır — ui:FluentWindow DEĞİL.
+  Sebep: olası başlangıç hatalarından biri App.xaml'deki WPF-UI ThemesDictionary/ControlsDictionary
+  birleştirmesinin kendisidir. O durumda FluentWindow tabanlı bir hata penceresi, hatayı
+  bildirirken kendisi de patlar ve kullanıcı yine hiçbir şey görmez.
+  DynamicResource SystemColors.* High Contrast temasında da doğru okunur.
+-->
+<Window x:Class="WinOptimizer.App.Views.ErrorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WinOptimizer — Hata"
+        Width="640" SizeToContent="Height" MinHeight="260" MaxHeight="720"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="True"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+        Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="HeadlineText" Grid.Row="0"
+                   FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
+                   Margin="0,0,0,8"
+                   AutomationProperties.HeadingLevel="Level1" />
+
+        <TextBlock x:Name="SummaryText" Grid.Row="1"
+                   TextWrapping="Wrap" Margin="0,0,0,12" />
+
+        <StackPanel Grid.Row="2" Margin="0,0,0,12">
+            <TextBlock Text="Günlük ve rapor konumları:" FontWeight="SemiBold" Margin="0,0,0,4" />
+            <!-- Seçilebilir: kullanıcı yolu kopyalayıp destek mesajına yapıştırabilsin. -->
+            <TextBox x:Name="PathsText" IsReadOnly="True" TextWrapping="Wrap"
+                     BorderThickness="0" Background="Transparent"
+                     Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        </StackPanel>
+
+        <Expander Grid.Row="3" Header="Teknik ayrıntılar" Margin="0,0,0,12">
+            <TextBox x:Name="DetailsText" IsReadOnly="True"
+                     FontFamily="Consolas" FontSize="11"
+                     TextWrapping="NoWrap"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     MaxHeight="260" Margin="0,8,0,0" />
+        </Expander>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="OpenLogsButton" Content="Günlük klasörünü aç"
+                    MinWidth="150" Margin="0,0,8,0" Padding="10,5"
+                    Click="OnOpenLogs" />
+            <Button x:Name="DiagnosticsButton" Content="Teşhis paketi oluştur"
+                    MinWidth="150" Margin="0,0,8,0" Padding="10,5"
+                    Click="OnCreateDiagnostics" />
+            <Button x:Name="CloseButton" Content="Kapat" IsDefault="True" IsCancel="True"
+                    MinWidth="90" Padding="10,5" Click="OnClose" />
+        </StackPanel>
+    </Grid>
+</Window>

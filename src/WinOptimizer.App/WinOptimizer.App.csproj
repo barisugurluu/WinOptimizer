@@ -8,6 +8,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyTitle>WinOptimizer</AssemblyTitle>
     <Description>Windows Sistem Bakım &amp; Optimizasyon yazılımı — giriş noktası.</Description>
+    <!-- build/generate-icon.ps1 ile üretilir. Olmadan Başlat menüsü/görev çubuğu/kurulum
+         sihirbazı boş varsayılan exe ikonu gösterir (kullanıcı uygulamayı tanıyamaz). -->
+    <ApplicationIcon>Resources\WinOptimizer.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +32,9 @@
          Strings.cs elle yazılmış strongly-typed erişimci kullanır (Generator gerekmez). -->
     <EmbeddedResource Update="Resources\Strings.resx" />
     <EmbeddedResource Update="Resources\Strings.en.resx" />
+    <!-- Win32 exe ikonu olmanın yanı sıra WPF kaynağı olarak da gömülür: başlık
+         çubuğundaki ui:ImageIcon pack:// URI ile buradan okur. -->
+    <Resource Include="Resources\WinOptimizer.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WinOptimizer.Native\WinOptimizer.Native.csproj" />
@@ -41,7 +47,6 @@
     <ProjectReference Include="..\WinOptimizer.Modules\SystemTweaker\WinOptimizer.Modules.SystemTweaker.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\HardwareMonitor\WinOptimizer.Modules.HardwareMonitor.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\StorageOptimizer\WinOptimizer.Modules.StorageOptimizer.csproj" />
-    <ProjectReference Include="..\WinOptimizer.Modules\ProfileManager\WinOptimizer.Modules.ProfileManager.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\PrivacyGuard\WinOptimizer.Modules.PrivacyGuard.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\NetworkOptimizer\WinOptimizer.Modules.NetworkOptimizer.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\BootOptimizer\WinOptimizer.Modules.BootOptimizer.csproj" />
@@ -51,8 +56,11 @@
     <ProjectReference Include="..\WinOptimizer.Modules\BackupRestore\WinOptimizer.Modules.BackupRestore.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\GpuOptimizer\WinOptimizer.Modules.GpuOptimizer.csproj" />
     <ProjectReference Include="..\WinOptimizer.Modules\DevEnvironment\WinOptimizer.Modules.DevEnvironment.csproj" />
-    <ProjectReference Include="..\WinOptimizer.Modules\DeepCleanEngine\WinOptimizer.Modules.DeepCleanEngine.csproj" />
-    <ProjectReference Include="..\WinOptimizer.Modules\BenchmarkEngine\WinOptimizer.Modules.BenchmarkEngine.csproj" />
+    <!-- ProfileManager, DeepCleanEngine ve BenchmarkEngine BİLİNÇLİ OLARAK referanslanmaz:
+         hiçbiri App'in DI kapsayıcısına kaydedilmiyor, yani arayüzden erişilemiyorlardı ama
+         DLL'leri kurulum paketinde taşınıyordu. BenchmarkEngine, gerçekten kullanıldığı yer
+         olan WinOptimizer.Cli'de referanslı kalır. Bu modüller arayüze eklenecekse önce
+         App.xaml.cs'te ModuleRegistry'ye kaydedilmeli. -->
   </ItemGroup>
 
 </Project>

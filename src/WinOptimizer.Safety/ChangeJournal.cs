@@ -31,8 +31,11 @@ public sealed class ChangeJournal
     }
 
     /// <summary>Bugünün journal dosyasının tam yolu.</summary>
-    public string GetTodayFilePath() =>
-        Path.Combine(_journalDir, $"journal-{DateTime.UtcNow:yyyy-MM-dd}.jsonl");
+    public string GetTodayFilePath() => GetFilePath(DateTime.UtcNow);
+
+    /// <summary>Belirli bir güne ait journal dosyasının yolu (bütünlük doğrulaması için).</summary>
+    public string GetFilePath(DateTime day) =>
+        Path.Combine(_journalDir, $"journal-{day:yyyy-MM-dd}.jsonl");
 
     /// <summary>Bir değişikliği günlüğe yazar (ekleme modu, bir satır = bir JSON kayıt).</summary>
     public async Task WriteAsync(ChangeRecord record, CancellationToken ct = default)

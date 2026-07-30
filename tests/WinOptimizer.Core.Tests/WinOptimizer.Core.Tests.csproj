@@ -22,6 +22,11 @@
     <ProjectReference Include="..\..\src\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Modules\SystemTweaker\WinOptimizer.Modules.SystemTweaker.csproj" />
     <ProjectReference Include="..\..\src\WinOptimizer.Modules\BenchmarkEngine\WinOptimizer.Modules.BenchmarkEngine.csproj" />
+    <!-- ServiceInstallerArgumentTests: sc.exe argüman dizilerinin şekli doğrulanır.
+         Gerçek servis kurulumu unit test edilmez (yönetici + sistem durumu gerektirir). -->
+    <ProjectReference Include="..\..\src\WinOptimizer.Service\WinOptimizer.Service.csproj" />
+    <!-- ConfirmationGateTests: onay politikası (riskli eylemlerin tek kapısı). -->
+    <ProjectReference Include="..\..\src\WinOptimizer.Orchestration\WinOptimizer.Orchestration.csproj" />
   </ItemGroup>
 
 </Project>

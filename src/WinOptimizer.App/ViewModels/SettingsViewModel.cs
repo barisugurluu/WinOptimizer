@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WinOptimizer.App.Infrastructure;
 using WinOptimizer.App.Resources;
 using WinOptimizer.Orchestration;
 
@@ -76,6 +77,7 @@ public partial class SettingsViewModel : ObservableObject
     private void Save()
     {
         var c = _settings.Current;
+        bool languageChanged = !string.Equals(c.Language, SelectedLanguage.Key, StringComparison.Ordinal);
         c.Language = SelectedLanguage.Key;
         c.Theme = SelectedTheme.Key;
         c.SafetyNet.AutoRestorePoint = AutoRestorePoint;
@@ -87,8 +89,18 @@ public partial class SettingsViewModel : ObservableObject
         c.RealtimeGuard.Thresholds.DiskFreeCriticalPercent = DiskFreeCriticalThreshold;
         c.RealtimeGuard.Thresholds.CpuPerProcessPercent = CpuPerProcessThreshold;
         c.RealtimeGuard.Thresholds.TempCelsius = TempThreshold;
-        _settings.Save();
-        ShowStatus(Strings.SettingsSaved);
+
+        if (!_settings.Save())
+        {
+            ShowStatus(Strings.SettingsSaveFailed);
+            return;
+        }
+
+        // Tema anında uygulanır; dil ise XAML x:Static bağları sayfa kurulumunda bir kez
+        // çözüldüğü için yeniden başlatma ister. Canlı geçişi TAKLİT ETME.
+        ThemeBootstrap.Apply(c.Theme);
+
+        ShowStatus(languageChanged ? Strings.SettingsSavedRestartRequired : Strings.SettingsSaved);
     }
 
     /// <summary>Düzenlemeleri atar, kayıtlı değerlere döner.</summary>
@@ -127,22 +139,8 @@ public partial class SettingsViewModel : ObservableObject
     private bool CanExportDiagnostics() => !IsExportingDiagnostics;
 
     /// <summary>Üretilen paketi Dosya Gezgini'nde seçili olarak gösterir.</summary>
-    private static void RevealInExplorer(string filePath)
-    {
-        try
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "explorer.exe",
-                Arguments = $"/select,\"{filePath}\"",
-                UseShellExecute = true
-            })?.Dispose();
-        }
-        catch (System.ComponentModel.Win32Exception)
-        {
-            // Gezgin açılamadıysa sorun değil — yol zaten durum metninde gösteriliyor.
-        }
-    }
+    private static void RevealInExplorer(string filePath) =>
+        Infrastructure.ExplorerReveal.SelectFile(filePath);
 
     private void ShowStatus(string msg)
     {

@@ -107,4 +107,38 @@ public class CompatibilityCheckerTests
         current.Build.Should().Be(Environment.OSVersion.Version.Build);
         current.IsWindows11.Should().Be(current.Build >= WindowsVersionInfo.Windows11FirstBuild);
     }
+
+    [Theory]
+    // Home aileleri -> Pro-only özellikler (wbadmin BMR) sunulmaz.
+    [InlineData("Core", false)]
+    [InlineData("CoreN", false)]
+    [InlineData("CoreSingleLanguage", false)]
+    [InlineData("CoreCountrySpecific", false)]
+    [InlineData("core", false)]                 // kayıt defteri değeri büyük/küçük harf duyarsız okunur
+    // Pro ve üzeri.
+    [InlineData("Professional", true)]
+    [InlineData("Enterprise", true)]
+    [InlineData("Education", true)]
+    [InlineData("ServerStandard", true)]
+    // Bilinmeyen/okunamayan -> İZİN VERİCİ. Bir özelliği yanlışlıkla kapatmaktansa
+    // çalıştırıp hatayı zarifçe ele almak yeğdir (belgelenmiş varsayılan).
+    [InlineData("", true)]
+    [InlineData("SomeFutureEdition", true)]
+    public void MapEditionToProOrHigher_treats_only_home_families_as_limited(string editionId, bool expected)
+        => WindowsVersionInfo.MapEditionToProOrHigher(editionId).Should().Be(expected);
+
+    [Fact]
+    public void Current_reports_the_real_edition_not_a_hardcoded_true()
+    {
+        var current = WindowsVersionInfo.Current;
+
+        // EditionID okunabildiyse IsProOrHigher onunla tutarlı olmalı. Eskiden IsProOrHigher
+        // sabit true'ydu; Home makinelerde wbadmin/Hyper-V yolları sunulup Process.Start
+        // seviyesinde patlıyordu.
+        if (!string.IsNullOrEmpty(current.EditionId))
+        {
+            current.IsProOrHigher.Should()
+                .Be(WindowsVersionInfo.MapEditionToProOrHigher(current.EditionId));
+        }
+    }
 }

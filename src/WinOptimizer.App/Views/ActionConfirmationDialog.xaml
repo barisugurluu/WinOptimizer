@@ -1,0 +1,55 @@
+<!--
+  Eylem onay penceresi. MessageBox DEĞİL: CLAUDE.md §3.3 "kullanıcı her veriyi, her komutu
+  görür" ilkesi "Optimizasyon başlatılacak. Devam?" ile karşılanmaz — hangi eylemin ne
+  yapacağı, riski ve boyutu tek tek görünmek zorunda.
+  Ek onay isteyen eylemler İŞARETSİZ başlar: kullanıcı bilerek işaretlemedikçe uygulanmaz.
+-->
+<Window x:Class="WinOptimizer.App.Views.ActionConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WinOptimizer — Onay"
+        Width="680" Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+        Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="HeadlineText" Grid.Row="0" FontSize="16" FontWeight="SemiBold"
+                   TextWrapping="Wrap" Margin="0,0,0,4"
+                   AutomationProperties.HeadingLevel="Level1" />
+        <TextBlock x:Name="SummaryText" Grid.Row="1" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+        <Border Grid.Row="2" BorderThickness="1" CornerRadius="4"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                <ItemsControl x:Name="ActionsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsApproved}" Margin="0,4,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding Badge}" Opacity="0.7" FontSize="11" />
+                                </StackPanel>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="Tümünü seç" MinWidth="110" Padding="10,5" Margin="0,0,8,0"
+                    Click="OnSelectAll" />
+            <Button Content="Onaylananları uygula" MinWidth="160" Padding="10,5" Margin="0,0,8,0"
+                    IsDefault="True" Click="OnApply" />
+            <Button Content="İptal" MinWidth="90" Padding="10,5" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </Grid>
+</Window>

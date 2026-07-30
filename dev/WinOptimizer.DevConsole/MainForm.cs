@@ -56,8 +56,12 @@ public sealed class MainForm : Form
         _status.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
         var settingsBtn = new Button
         {
-            Text = "Ayarlar", Dock = DockStyle.Right, Width = 80, FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(60, 60, 60), ForeColor = Color.White
+            Text = "Ayarlar",
+            Dock = DockStyle.Right,
+            Width = 80,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(60, 60, 60),
+            ForeColor = Color.White
         };
         settingsBtn.FlatAppearance.BorderSize = 0;
         settingsBtn.Click += (_, _) =>

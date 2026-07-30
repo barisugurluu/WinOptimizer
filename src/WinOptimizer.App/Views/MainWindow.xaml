@@ -20,7 +20,7 @@
                      AutomationProperties.Name="WinOptimizer"
                      AutomationProperties.HelpText="{x:Static p:Strings.AppTitle}">
             <ui:TitleBar.Icon>
-                <ui:ImageIcon />
+                <ui:ImageIcon Source="pack://application:,,,/Resources/WinOptimizer.ico" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
@@ -75,6 +75,35 @@
                                        Tag="UpdateEngine"
                                        TargetPageType="{x:Type local:ModulePage}"
                                        Icon="{ui:SymbolIcon ArrowSync24}" />
+                <!-- Aşağıdaki 6 modül DI'ya kayıtlıydı ama hiçbir sayfadan erişilemiyordu:
+                     kullanıcı ne inceleyebiliyor ne kapatabiliyordu, buna rağmen eski
+                     "tek tıkla" onları çalıştırıyordu. Artık tek tıkla yalnızca
+                     EnabledModules'ü çalıştırdığı için bunları göstermek güvenli ve
+                     görünürlük şart. (Sayfa altyapısı jenerik: ModulePage + Tag yeterli.) -->
+                <ui:NavigationViewItem Content="İşlemci"
+                                       Tag="CpuEngine"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Developer24}" />
+                <ui:NavigationViewItem Content="Önyükleme"
+                                       Tag="BootOptimizer"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Power24}" />
+                <ui:NavigationViewItem Content="Uygulamalar"
+                                       Tag="AppManager"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Apps24}" />
+                <ui:NavigationViewItem Content="Yedekleme"
+                                       Tag="BackupRestore"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Save24}" />
+                <ui:NavigationViewItem Content="Ekran Kartı"
+                                       Tag="GpuOptimizer"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Games24}" />
+                <ui:NavigationViewItem Content="Geliştirici"
+                                       Tag="DevEnvironment"
+                                       TargetPageType="{x:Type local:ModulePage}"
+                                       Icon="{ui:SymbolIcon Code24}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="{x:Static p:Strings.Management}"

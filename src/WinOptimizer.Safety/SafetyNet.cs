@@ -38,6 +38,18 @@ public sealed class SafetyNet
     public RestorePointService RestorePoint => _restorePoint;
 
     /// <summary>
+    /// Kayıt defteri değişikliklerinden önce otomatik <c>.reg</c> yedeği alınsın mı.
+    /// </summary>
+    /// <remarks>
+    /// <b>Neden burada, ayar sınıfında değil?</b> Modüller <see cref="BackupRegistryAsync"/>'i
+    /// doğrudan çağırır; kapının Safety içinde olması şart. <c>SettingsService</c> ise
+    /// Orchestration'da, yani Safety'nin ÜSTÜNDE — Safety'nin ona bakması katmanlamayı
+    /// ters çevirirdi. Bu yüzden değeri App/Cli başlangıçta ve <c>SettingsChanged</c>'da
+    /// buraya yazar; bağımlılık oku aşağı bakmaya devam eder.
+    /// </remarks>
+    public bool AutoRegistryBackup { get; set; } = true;
+
+    /// <summary>
     /// Bir bakım/tweak paketi öncesi güvenlik hazırlığı:
     /// sistem geri yükleme noktası oluşturur (mümkünse).
     /// </summary>
@@ -61,7 +73,20 @@ public sealed class SafetyNet
     public Task RecordAsync(ChangeRecord record, CancellationToken ct = default) =>
         _journal.WriteAsync(record, ct);
 
-    /// <summary>Bir registry anahtarını yedekler (geri alma için).</summary>
-    public Task<string?> BackupRegistryAsync(string hive, string subKey) =>
-        _registryBackup.ExportAsync(hive, subKey);
+    /// <summary>
+    /// Bir registry anahtarını yedekler (geri alma için).
+    /// <see cref="AutoRegistryBackup"/> kapalıysa yedek alınmaz ve <c>null</c> döner —
+    /// modüller zaten <c>null</c> dönüşünü "yedek yok" olarak ele alır.
+    /// </summary>
+    public Task<string?> BackupRegistryAsync(string hive, string subKey)
+    {
+        if (!AutoRegistryBackup)
+        {
+            _logger.LogDebug("Otomatik kayıt defteri yedeği kapalı; {Hive}\\{SubKey} yedeklenmedi.",
+                hive, subKey);
+            return Task.FromResult<string?>(null);
+        }
+
+        return _registryBackup.ExportAsync(hive, subKey);
+    }
 }

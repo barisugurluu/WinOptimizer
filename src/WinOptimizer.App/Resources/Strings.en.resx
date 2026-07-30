@@ -96,6 +96,50 @@
   <data name="OverviewRecentActivity" xml:space="preserve"><value>Recent Activity</value></data>
   <data name="OverviewNoActivity" xml:space="preserve"><value>No activity yet.</value></data>
   <data name="OverviewRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="ServiceRunning" xml:space="preserve"><value>RealtimeGuard service is running</value></data>
+  <data name="ServiceStoppedUsingWmi" xml:space="preserve"><value>Service is stopped (using local WMI readings)</value></data>
+  <data name="ServiceNotInstalled" xml:space="preserve"><value>Service is not installed (using local WMI readings)</value></data>
+  <data name="ServiceGoToGuardTab" xml:space="preserve"><value>You can install/start it from the Guard tab.</value></data>
+  <data name="GuardTitle" xml:space="preserve"><value>RealtimeGuard Service</value></data>
+  <data name="GuardDescription" xml:space="preserve"><value>A background Windows service that watches threshold breaches. It is optional — every feature works without it (live metrics fall back to local WMI).</value></data>
+  <data name="GuardStateLabel" xml:space="preserve"><value>State</value></data>
+  <data name="GuardStateNotInstalled" xml:space="preserve"><value>Not installed</value></data>
+  <data name="GuardStateStopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="GuardStateStartPending" xml:space="preserve"><value>Starting…</value></data>
+  <data name="GuardStateStopPending" xml:space="preserve"><value>Stopping…</value></data>
+  <data name="GuardStateRunning" xml:space="preserve"><value>Running</value></data>
+  <data name="GuardStateUnknown" xml:space="preserve"><value>State unavailable</value></data>
+  <data name="GuardInstall" xml:space="preserve"><value>Install</value></data>
+  <data name="GuardStart" xml:space="preserve"><value>Start</value></data>
+  <data name="GuardStop" xml:space="preserve"><value>Stop</value></data>
+  <data name="GuardUninstall" xml:space="preserve"><value>Uninstall</value></data>
+  <data name="GuardRepair" xml:space="preserve"><value>Repair</value></data>
+  <data name="GuardExeMissing" xml:space="preserve"><value>Service executable not found — the installation may be incomplete or damaged:</value></data>
+  <data name="GuardOpFailed" xml:space="preserve"><value>Operation failed. See the logs for details (logs\service-install.log).</value></data>
+  <data name="GuardOpSucceeded" xml:space="preserve"><value>✓ Operation completed.</value></data>
+  <data name="SchedulerCliMissing" xml:space="preserve"><value>Cannot create the task — WinOptimizer.Cli.exe was not found:</value></data>
+  <data name="GuardAutoTitle" xml:space="preserve"><value>Monitoring and Automatic Remediation</value></data>
+  <data name="GuardAutoDescription" xml:space="preserve"><value>The service picks these up within 5 seconds; no restart needed. Automatic remediation is OFF by default: the service runs as SYSTEM and must not delete files without asking you.</value></data>
+  <data name="GuardAutoRemediate" xml:space="preserve"><value>Allow automatic remediation</value></data>
+  <data name="GuardAutoTrimRam" xml:space="preserve"><value>Trim idle process memory when the RAM threshold is exceeded</value></data>
+  <data name="GuardAutoCleanDisk" xml:space="preserve"><value>Delete temporary files when disk space is critical (not reversible)</value></data>
+  <data name="GuardAutoDefender" xml:space="preserve"><value>Update Defender signatures when they get stale (deletes nothing)</value></data>
+  <data name="GuardSettingsSaved" xml:space="preserve"><value>✓ Saved. The service will apply it within 5 seconds.</value></data>
+  <data name="GuardAlerts" xml:space="preserve"><value>Recent Alerts</value></data>
+  <data name="GuardNoAlerts" xml:space="preserve"><value>No alerts.</value></data>
+  <data name="RequirementsTitle" xml:space="preserve"><value>System Requirements Check</value></data>
+  <data name="RequirementsDescription" xml:space="preserve"><value>Conditions the application needs in order to work correctly. When reporting a problem, sharing this list and the diagnostics package points straight at the cause.</value></data>
+  <data name="RequirementsRecheck" xml:space="preserve"><value>Re-check</value></data>
+  <data name="DiagnosticsPackage" xml:space="preserve"><value>Diagnostics package</value></data>
+  <data name="OverviewLiveMetricsDisabled" xml:space="preserve"><value>Live metrics are turned off in settings.</value></data>
+  <data name="ModulesTitle" xml:space="preserve"><value>One-Click Scope</value></data>
+  <data name="ModulesDescription" xml:space="preserve"><value>"One-Click Optimize" runs only the modules checked here. The default list is deliberately narrow: long-running (SFC/DISM), reboot-requiring (Hyper-V, winsock) and choice-dependent operations (registry, app removal) are excluded. Unchecked modules can still be run manually from their own pages.</value></data>
+  <data name="ModulesResetSafe" xml:space="preserve"><value>Reset to safe default</value></data>
+  <data name="ModulesSelectAll" xml:space="preserve"><value>Select all</value></data>
+  <data name="ModulesResetHint" xml:space="preserve"><value>Safe default selected. Press Save to make it permanent.</value></data>
+  <data name="ModulesSelectAllHint" xml:space="preserve"><value>All modules selected. Risky actions will still ask for confirmation. Press Save to make it permanent.</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>✕ Settings COULD NOT be saved. Check the logs (logs\app-*.log).</value></data>
+  <data name="SettingsSavedRestartRequired" xml:space="preserve"><value>✓ Settings saved. The language change takes effect after restarting the application.</value></data>
   <data name="SettingsGeneral" xml:space="preserve"><value>General</value></data>
   <data name="SettingsLanguage" xml:space="preserve"><value>Language</value></data>
   <data name="SettingsTheme" xml:space="preserve"><value>Theme</value></data>
