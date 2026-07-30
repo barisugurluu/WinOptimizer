@@ -59,6 +59,15 @@ public static class Program
         int exitCode = 0;
         try
         {
+            // XAML AYRIŞTIRMA DOĞRULAMASI — render'dan önce.
+            // MainWindow'u yalnızca OLUŞTURUR (göstermez): InitializeComponent XAML'i
+            // ayrıştırır ve SymbolRegular gibi ENUM değerlerini çözer. Geçersiz bir ikon
+            // adı DERLEYİCİ TARAFINDAN YAKALANMAZ, yalnız çalışma zamanında patlar ve
+            // uygulama hiç açılmaz. Gerçekten böyle oldu: `Brain24` ve `Developer24`
+            // SymbolRegular'da yoktu, MainWindow yüklenemiyordu.
+            // Gösterilmez çünkü OnSourceInitialized DI kapsayıcısını (App.Services) ister.
+            VerifyXamlParses("MainWindow", () => new WinOptimizer.App.Views.MainWindow());
+
             Capture(outputDir, "01-FirstRunWindow.png", CreateFirstRunWindow(dataDir));
 
             // Aynı pencere sona kaydırılmış: onay kutusunun ETİKETİ ve ilke listesi
@@ -84,8 +93,17 @@ public static class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Önizleme başarısız: {ex.GetType().Name}: {ex.Message}");
-            Console.Error.WriteLine(ex.StackTrace);
+            // İÇ İSTİSNA ZİNCİRİ ŞART: XamlParseException'ın kendi mesajı ("değer sağlama
+            // işlemi özel durum döndürdü") hiçbir şey söylemez; asıl sebep — geçersiz enum
+            // adı, bulunamayan pack:// kaynağı — en içteki istisnadadır.
+            Console.Error.WriteLine("Önizleme başarısız:");
+            for (Exception? current = ex; current is not null; current = current.InnerException)
+            {
+                Console.Error.WriteLine($"  {current.GetType().Name}: {current.Message}");
+            }
+
+            Console.Error.WriteLine();
+            Console.Error.WriteLine(ex.ToString());
             exitCode = 1;
         }
         finally
@@ -152,6 +170,18 @@ public static class Program
         Console.WriteLine(string.Format(
             CultureInfo.InvariantCulture,
             "  {0,-34} {1}x{2}px", fileName, pixelWidth, pixelHeight));
+    }
+
+    /// <summary>
+    /// Bir pencerenin XAML'inin ayrıştırılabildiğini doğrular. Başarısızlıkta istisnayı
+    /// yeniden fırlatır — araç sıfırdan farklı çıkış koduyla biter, CI/geliştirici görür.
+    /// </summary>
+    private static void VerifyXamlParses(string name, Func<Window> factory)
+    {
+        Window window = factory();
+        window.Close();
+        Console.WriteLine(string.Format(
+            CultureInfo.InvariantCulture, "  {0,-34} XAML ayrıştırma OK", name));
     }
 
     /// <summary>Penceredeki ilk <see cref="System.Windows.Controls.ScrollViewer"/>'ı sona kaydırır.</summary>

@@ -20,7 +20,8 @@
                      AutomationProperties.Name="WinOptimizer"
                      AutomationProperties.HelpText="{x:Static p:Strings.AppTitle}">
             <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="pack://application:,,,/Resources/WinOptimizer.ico" />
+                <!-- Derleme-nitelikli URI: kısa form giriş derlemesine göre çözülür. -->
+                <ui:ImageIcon Source="pack://application:,,,/WinOptimizer.App;component/Resources/WinOptimizer.ico" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
@@ -39,10 +40,14 @@
                                        Tag="CleanEngine"
                                        TargetPageType="{x:Type local:ModulePage}"
                                        Icon="{ui:SymbolIcon Broom24}" />
+                <!-- DİKKAT: SymbolRegular bir ENUM; geçersiz bir ad XAML ayrıştırma
+                     hatasına yol açar ve MainWindow HİÇ yüklenemez (uygulama açılmaz).
+                     Derleyici yakalamaz — hata yalnız çalışma zamanında çıkar.
+                     Geçerlilik dev/WinOptimizer.UiPreview ile doğrulanır. -->
                 <ui:NavigationViewItem Content="Bellek"
                                        Tag="MemoryEngine"
                                        TargetPageType="{x:Type local:ModulePage}"
-                                       Icon="{ui:SymbolIcon Brain24}" />
+                                       Icon="{ui:SymbolIcon TopSpeed24}" />
                 <ui:NavigationViewItem Content="Onarım"
                                        Tag="RepairEngine"
                                        TargetPageType="{x:Type local:ModulePage}"
@@ -83,7 +88,7 @@
                 <ui:NavigationViewItem Content="İşlemci"
                                        Tag="CpuEngine"
                                        TargetPageType="{x:Type local:ModulePage}"
-                                       Icon="{ui:SymbolIcon Developer24}" />
+                                       Icon="{ui:SymbolIcon DeveloperBoard24}" />
                 <ui:NavigationViewItem Content="Önyükleme"
                                        Tag="BootOptimizer"
                                        TargetPageType="{x:Type local:ModulePage}"
