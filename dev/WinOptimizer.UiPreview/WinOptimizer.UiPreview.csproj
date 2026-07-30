@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>WinOptimizer.UiPreview</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <!-- Kendi Main'imiz var (STAThread + Application elle kurulur). -->
+    <StartupObject>WinOptimizer.UiPreview.Program</StartupObject>
+    <Description>
+      GELİŞTİRME ARACI — dağıtılmaz. Pencereleri uygulamayı çalıştırmadan PNG'ye render
+      eder, böylece UI değişiklikleri kurulum/Sandbox döngüsüne girmeden gözle doğrulanır.
+    </Description>
+    <!-- ApplicationManifest YOK: WinOptimizer.App requireAdministrator ile çalışır ve
+         her açılışta UAC ister. Bu araç yükseltilmemiş çalışır ki hızlı yinelenebilsin. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- App'e referans: pencereler ve AppResources.xaml oradan gelir. -->
+    <ProjectReference Include="..\..\src\WinOptimizer.App\WinOptimizer.App.csproj" />
+    <ProjectReference Include="..\..\src\WinOptimizer.Core\WinOptimizer.Core.csproj" />
+    <ProjectReference Include="..\..\src\WinOptimizer.Safety\WinOptimizer.Safety.csproj" />
+    <ProjectReference Include="..\..\src\WinOptimizer.Orchestration\WinOptimizer.Orchestration.csproj" />
+  </ItemGroup>
+
+</Project>

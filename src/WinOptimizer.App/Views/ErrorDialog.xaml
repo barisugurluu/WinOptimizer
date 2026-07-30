@@ -22,6 +22,15 @@
         ShowInTaskbar="True"
         Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
         Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+    <Window.Resources>
+        <!-- ZORUNLU: pencere sistem renklerini zorluyor; bu olmadan WPF-UI'ın
+             ControlsDictionary'si düğme/TextBox/Expander yazılarını BEYAZ yapar ve
+             beyaz zeminde görünmez olurlar — bir HATA penceresinin "Kapat" düğmesinin
+             okunamaması özellikle kötüdür. Ayrıntı sözlüğün kendi başlığında. -->
+        <!-- Derleme-nitelikli URI ŞART: bkz. FirstRunWindow.xaml. -->
+        <ResourceDictionary Source="pack://application:,,,/WinOptimizer.App;component/Resources/SystemChromeDictionary.xaml" />
+    </Window.Resources>
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -43,10 +52,11 @@
 
                 <StackPanel Margin="0,0,0,12">
                     <TextBlock Text="Günlük ve rapor konumları:" FontWeight="SemiBold" Margin="0,0,0,4" />
-                    <!-- Seçilebilir: kullanıcı yolu kopyalayıp destek mesajına yapıştırabilsin. -->
+                    <!-- Seçilebilir: kullanıcı yolu kopyalayıp destek mesajına yapıştırabilsin.
+                         Foreground/Background el yaması KALDIRILDI: aynı hatanın tek kontrole
+                         uygulanmış hâliydi, artık SystemChromeDictionary tümünü kapsıyor. -->
                     <TextBox x:Name="PathsText" IsReadOnly="True" TextWrapping="Wrap"
-                             BorderThickness="0" Background="Transparent"
-                             Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+                             BorderThickness="0" />
                 </StackPanel>
 
                 <Expander Header="Teknik ayrıntılar" Margin="0,0,0,12">

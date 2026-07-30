@@ -161,6 +161,49 @@ Bu yüzden sıra: **App → Service → Cli**. App en sona alınırsa yalnızca 
 patlar. Sağlık kontrolü (adım 4) bu dosyayı ve `en\WinOptimizer.App.resources.dll`'i ayrıca
 doğrular — sırayı değiştirirsen kontrol seni uyarır.
 
+## 10. WPF-UI tema tuzağı — açık zeminli pencereler (ZORUNLU KURAL)
+
+`App.xaml` → `Resources/AppResources.xaml` içindeki `<ui:ControlsDictionary />`, WPF-UI'ın
+**yerel WPF tiplerine de** örtük stil uygulayan sözlüğüdür (96 tip: `Button`, `CheckBox`,
+`TextBox`, `Expander`, `ScrollViewer`, hatta `Window`). Koyu temada bunların `Foreground`'u
+**saf beyaz** (`#FFFFFFFF`) olur.
+
+> **Düz `System.Windows.Window` + `SystemColors` kullanan HER pencere
+> `Resources/SystemChromeDictionary.xaml`'i merge ETMEK ZORUNDADIR:**
+> ```xaml
+> <Window.Resources>
+>     <ResourceDictionary Source="pack://application:,,,/WinOptimizer.App;component/Resources/SystemChromeDictionary.xaml" />
+> </Window.Resources>
+> ```
+
+Yoksa: pencere beyaz (`SystemColors.WindowBrush`), düğme yazısı beyaz → **görünmez düğme.**
+`TextBlock`'lar görünmeye devam ettiği için hata "yerleşim bozuk" sanılır; Sandbox'ta iki kez
+yanlış teşhis edildi. WPF-UI'ın `TextBlock` stili `Foreground` set etmez, diğerleri eder —
+asimetrinin sebebi budur.
+
+`ui:FluentWindow` tabanlı pencerelere (MainWindow + sekmeleri) **uygulanmaz**; onlar koyu
+temayı ve `ui:Button`'ları bilerek kullanır.
+
+**`pack://` URI'leri derleme-nitelikli yazılır** (`/WinOptimizer.App;component/...`): kısa
+form giriş derlemesine göre çözülür ve XAML başka bir host'tan yüklenince bulunamaz.
+
+## 11. UI önizleme aracı — sandbox'a gitmeden pencereyi gör
+
+```powershell
+dotnet run --project dev\WinOptimizer.UiPreview -c Release -- <çıktı-dizini>
+```
+
+`WinOptimizer.App` `requireAdministrator` ile çalışır: arayüzü görmek normalde kurulum ya da
+Windows Sandbox turu gerektirir. Bu araç pencereleri **uygulamayı çalıştırmadan** PNG'ye
+render eder (yükseltilmemiş, UAC istemez) — bir XAML değişikliğinin doğru olup olmadığı
+paket üretmeden anlaşılır. Üretilenler: FirstRunWindow (normal + sona kaydırılmış),
+ErrorDialog (normal + Expander açık), ActionConfirmationDialog.
+
+Araç `AppResources.xaml`'i **merge eder, kopyalamaz** — bu yüzden App.xaml'de kaynak
+tanımı yapılmaz, hepsi `AppResources.xaml`'e yazılır; aksi halde önizleme uygulamadan
+sürüklenir ve yanlış güven verir. Dağıtıma girmez (`build-installer.ps1` yalnız
+App/Service/Cli publish eder).
+
 ## 8. Önemli Notlar
 
 - SourceLink "uzak depo yok" uyarıları beklenen (git remote yok); hata değildir.

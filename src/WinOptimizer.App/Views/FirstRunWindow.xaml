@@ -20,6 +20,15 @@
         ResizeMode="CanResize"
         Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
         Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+    <Window.Resources>
+        <!-- ZORUNLU: pencere sistem renklerini zorluyor; bu olmadan WPF-UI'ın
+             ControlsDictionary'si düğme/onay kutusu yazılarını BEYAZ yapar ve
+             beyaz zeminde görünmez olurlar. Ayrıntı sözlüğün kendi başlığında. -->
+        <!-- Derleme-nitelikli URI ŞART: kısa form giriş derlemesine göre çözülür ve bu XAML
+             başka bir host'tan (dev/WinOptimizer.UiPreview) yüklendiğinde bulunamaz. -->
+        <ResourceDictionary Source="pack://application:,,,/WinOptimizer.App;component/Resources/SystemChromeDictionary.xaml" />
+    </Window.Resources>
+
     <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -79,11 +88,15 @@
                     </ItemsControl>
                 </StackPanel>
 
-                <!-- İsteğe bağlı hizmet: VARSAYILAN KAPALI (güvenli varsayılanlar ilkesi). -->
+                <!-- İsteğe bağlı hizmet: VARSAYILAN KAPALI (güvenli varsayılanlar ilkesi).
+                     İçerik düz metin DEĞİL TextBlock: CheckBox'ın string içeriği kaydırılmaz
+                     ve uzun etiket pencere kenarından kesilirdi. -->
                 <CheckBox Margin="0,14,0,0"
                           IsChecked="{Binding InstallGuardService}"
-                          IsEnabled="{Binding CanInstallGuardService}"
-                          Content="RealtimeGuard arka plan hizmetini şimdi kur (isteğe bağlı — sonradan Guard sekmesinden de kurulabilir)" />
+                          IsEnabled="{Binding CanInstallGuardService}">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="RealtimeGuard arka plan hizmetini şimdi kur (isteğe bağlı — sonradan Guard sekmesinden de kurulabilir)" />
+                </CheckBox>
             </StackPanel>
         </ScrollViewer>
 

@@ -1,37 +1,17 @@
 <Application x:Class="WinOptimizer.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              Startup="OnStartup"
              Exit="OnExit">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- WPF-UI Fluent (Dark) teması — master plan Bölüm 12.1 -->
-                <ui:ThemesDictionary Theme="Dark" />
-                <ui:ControlsDictionary />
+                <!-- Tüm uygulama kaynakları Resources/AppResources.xaml içindedir.
+                     Burada tanım YAPILMAZ: dev/WinOptimizer.UiPreview aracı da aynı
+                     dosyayı merge ediyor; kaynakları burada tutmak ikisinin
+                     sürüklenmesine ve önizlemenin yanlış güven vermesine yol açardı. -->
+                <ResourceDictionary Source="pack://application:,,,/WinOptimizer.App;component/Resources/AppResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Erişilebilirlik (a11y) — master plan Bölüm 21.2 (WCAG 2.1 AA) -->
-            <!-- BooleanToVisibilityConverter (ModulePage'de kullanılır) -->
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
-            <!-- Görünür odak göstergesi (WCAG 2.4.7 Focus Visible).
-                 SystemParameters.FocusVisualStyleKey global varsayılanı geçersiz kılar;
-                 ControlTextBrush HC tema değişiminde otomatik güncellenir (DynamicResource). -->
-            <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" TargetType="Control">
-                <Setter Property="Control.Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Control">
-                            <Rectangle Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                       StrokeThickness="2"
-                                       RadiusX="3" RadiusY="3"
-                                       Margin="-2"
-                                       SnapsToDevicePixels="True" />
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

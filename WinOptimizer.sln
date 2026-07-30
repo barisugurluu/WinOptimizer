@@ -74,6 +74,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev", "dev", "{A5426347-C42
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinOptimizer.DevConsole", "dev\WinOptimizer.DevConsole\WinOptimizer.DevConsole.csproj", "{DAC039EF-D5D9-4217-9E22-F2E49B2E81B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinOptimizer.UiPreview", "dev\WinOptimizer.UiPreview\WinOptimizer.UiPreview.csproj", "{78119BDF-F113-40F1-B285-8688593C5E32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -208,6 +210,10 @@ Global
 		{DAC039EF-D5D9-4217-9E22-F2E49B2E81B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAC039EF-D5D9-4217-9E22-F2E49B2E81B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAC039EF-D5D9-4217-9E22-F2E49B2E81B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78119BDF-F113-40F1-B285-8688593C5E32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78119BDF-F113-40F1-B285-8688593C5E32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78119BDF-F113-40F1-B285-8688593C5E32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78119BDF-F113-40F1-B285-8688593C5E32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,5 +236,6 @@ Global
 		{C891FA1A-4D51-4E91-99DD-ADBC1D23CC73} = {4E90927D-65EC-41AF-8E23-9A763CBFFC8D}
 		{A5069CBF-454A-4956-986E-183B3AD271AC} = {4E90927D-65EC-41AF-8E23-9A763CBFFC8D}
 		{DAC039EF-D5D9-4217-9E22-F2E49B2E81B2} = {A5426347-C42C-46CF-9002-0D2120691FBE}
+		{78119BDF-F113-40F1-B285-8688593C5E32} = {A5426347-C42C-46CF-9002-0D2120691FBE}
 	EndGlobalSection
 EndGlobal

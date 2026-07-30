@@ -1,0 +1,52 @@
+<!--
+  Uygulama geneli kaynaklar. App.xaml BURAYI merge eder ve başka hiçbir şey tanımlamaz.
+
+  NEDEN AYRI DOSYA: dev/WinOptimizer.UiPreview aracı pencereleri uygulamayı çalıştırmadan
+  PNG'ye render eder ve bunun için AYNI kaynakları yüklemek zorundadır. Kaynaklar App.xaml
+  içinde kalsaydı önizleme aracı onları elle kopyalamak zorunda kalır, App.xaml'e sonradan
+  eklenen bir sözlük önizlemede eksik kalır ve araç YANLIŞ GÜVEN verirdi.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <!-- WPF-UI Fluent (Dark) teması — master plan Bölüm 12.1.
+             DİKKAT: ControlsDictionary yalnız ui:* kontrollerini değil, YEREL WPF
+             tiplerini de (Button, CheckBox, TextBox, Expander, ScrollViewer, hatta
+             Window) örtük stille kaplar ve koyu tema fırçalarını uygular. Açık zeminli
+             bir pencere açacaksanız Resources/SystemChromeDictionary.xaml'i merge edin;
+             yoksa beyaz zeminde beyaz yazı oluşur. -->
+        <ui:ThemesDictionary Theme="Dark" />
+        <ui:ControlsDictionary />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Erişilebilirlik (a11y) — master plan Bölüm 21.2 (WCAG 2.1 AA) -->
+    <!-- BooleanToVisibilityConverter (ModulePage, FirstRunWindow, SystemDataTab'de kullanılır) -->
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+    <!--
+      Görünür odak göstergesi (WCAG 2.4.7 Focus Visible).
+      SystemParameters.FocusVisualStyleKey global varsayılanı geçersiz kılar.
+
+      ÇİFT DİKDÖRTGEN: beyaz dış + siyah kesikli iç. Tek renkli bir çerçeve, zeminin
+      rengine bağlı olarak görünmez kalıyordu — SystemColors.ControlTextBrush (siyah)
+      koyu MainWindow (#FF202020) üzerinde okunmuyordu. Bu desen her iki zeminde de
+      kontrast garanti eder: açık zeminde siyah iç çizgi, koyu zeminde beyaz dış çizgi
+      görünür. (Aynı yaklaşım Windows'un kendi odak göstergesinde kullanılır.)
+    -->
+    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}" TargetType="Control">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Grid Margin="-2" SnapsToDevicePixels="True">
+                        <Rectangle Stroke="White" StrokeThickness="3"
+                                   RadiusX="3" RadiusY="3" />
+                        <Rectangle Stroke="Black" StrokeThickness="1"
+                                   StrokeDashArray="2 2"
+                                   RadiusX="3" RadiusY="3" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
