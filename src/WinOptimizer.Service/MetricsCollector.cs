@@ -13,7 +13,29 @@ public sealed class MetricsCollector
 {
     private readonly ILogger<MetricsCollector> _logger;
 
+    // İSTEĞE BAĞLI YOKLAMALAR — bir kez başarısız olursa bir daha DENENMEZ.
+    // Gerçek makinede görüldü: SMART (root\wmi) çoğu tüketici donanımında desteklenmiyor,
+    // her 5 sn'lik tikte istisna atıyor ve yığın iziyle günlüğe yazılıyordu — 247 satırın
+    // 40'ı, günde ~17.000 kayıt. Ayrıca desteklenmeyen bir WMI sorgusunu saniyede bir
+    // tekrarlamak "<%1 CPU" bütçesine de aykırı. Donanım/namespace desteği çalışma
+    // sırasında değişmez, bu yüzden ilk hatada kalıcı olarak devre dışı bırakılır.
+    private bool _smartUnsupported;
+    private bool _batteryUnsupported;
+    private bool _defenderUnsupported;
+
     public MetricsCollector(ILogger<MetricsCollector> logger) => _logger = logger;
+
+    /// <summary>
+    /// İsteğe bağlı bir yoklamayı kalıcı olarak devre dışı bırakır ve sebebini BİR KEZ
+    /// günlüğe yazar.
+    /// </summary>
+    private void DisableProbe(ref bool flag, string probeName, Exception ex)
+    {
+        flag = true;
+        _logger.LogInformation(
+            "{Probe} bu makinede desteklenmiyor ({Reason}); bir daha denenmeyecek.",
+            probeName, ex.Message.Trim());
+    }
 
     /// <summary>Yeni bir metrik örneği toplar.</summary>
     public GuardMetric Collect()
@@ -72,37 +94,46 @@ public sealed class MetricsCollector
         }
         catch (Exception ex) { _logger.LogDebug(ex, "Disk metrik hatası."); }
 
-        // SMART arıza tahmini
-        try
+        // SMART arıza tahmini (isteğe bağlı — çoğu tüketici donanımında yok)
+        if (!_smartUnsupported)
         {
-            using var smart = new ManagementObjectSearcher(
-                @"\\.\root\wmi", "SELECT PredictFailure FROM MSStorageDriver_FailurePredictStatus");
-            foreach (var mo in smart.Get().Cast<ManagementObject>())
+            try
             {
-                if (Convert.ToBoolean(mo["PredictFailure"])) { smartFail = true; break; }
+                using var smart = new ManagementObjectSearcher(
+                    @"\\.\root\wmi", "SELECT PredictFailure FROM MSStorageDriver_FailurePredictStatus");
+                foreach (var mo in smart.Get().Cast<ManagementObject>())
+                {
+                    if (Convert.ToBoolean(mo["PredictFailure"])) { smartFail = true; break; }
+                }
             }
+            catch (Exception ex) { DisableProbe(ref _smartUnsupported, "SMART arıza tahmini", ex); }
         }
-        catch (Exception ex) { _logger.LogDebug(ex, "SMART sorgu başarısız (bazı makinelerde desteklenmez)."); }
 
-        // Batarya
-        try
+        // Batarya (isteğe bağlı — masaüstlerinde yok)
+        if (!_batteryUnsupported)
         {
-            using var bat = new ManagementObjectSearcher(
-                "SELECT EstimatedChargeRemaining FROM Win32_Battery");
-            var mo = bat.Get().Cast<ManagementObject>().FirstOrDefault();
-            if (mo is not null) battery = Convert.ToInt32(mo["EstimatedChargeRemaining"]);
+            try
+            {
+                using var bat = new ManagementObjectSearcher(
+                    "SELECT EstimatedChargeRemaining FROM Win32_Battery");
+                var mo = bat.Get().Cast<ManagementObject>().FirstOrDefault();
+                if (mo is not null) battery = Convert.ToInt32(mo["EstimatedChargeRemaining"]);
+            }
+            catch (Exception ex) { DisableProbe(ref _batteryUnsupported, "Batarya durumu", ex); }
         }
-        catch (Exception ex) { _logger.LogDebug(ex, "Batarya sorgusu başarısız."); }
 
-        // Defender imza yaşı
-        try
+        // Defender imza yaşı (isteğe bağlı — namespace bulunmayabilir)
+        if (!_defenderUnsupported)
         {
-            using var def = new ManagementObjectSearcher(
-                @"\\.\root\Microsoft\Windows\Defender", "SELECT AntivirusSignatureAge FROM MSFT_MpComputerStatus");
-            var mo = def.Get().Cast<ManagementObject>().FirstOrDefault();
-            if (mo is not null) sigAge = Convert.ToInt32(mo["AntivirusSignatureAge"]);
+            try
+            {
+                using var def = new ManagementObjectSearcher(
+                    @"\\.\root\Microsoft\Windows\Defender", "SELECT AntivirusSignatureAge FROM MSFT_MpComputerStatus");
+                var mo = def.Get().Cast<ManagementObject>().FirstOrDefault();
+                if (mo is not null) sigAge = Convert.ToInt32(mo["AntivirusSignatureAge"]);
+            }
+            catch (Exception ex) { DisableProbe(ref _defenderUnsupported, "Defender durumu", ex); }
         }
-        catch (Exception ex) { _logger.LogDebug(ex, "Defender durumu sorgusu başarısız."); }
 
         return new GuardMetric(
             DateTimeOffset.UtcNow, ramPct, ramFree, cpuPct,

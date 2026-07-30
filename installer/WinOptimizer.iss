@@ -120,10 +120,16 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 Filename: "{app}\{#MyAppServiceName}"; Parameters: "install-service"; \
     StatusMsg: "RealtimeGuard hizmeti kuruluyor..."; \
     Flags: runhidden waituntilterminated; Tasks: installservice
-; Kurulum sonu "uygulamayi baslat" kutusu. runasoriginaluser YOK: setup zaten yukseltilmis
-; ve App requireAdministrator; ayni hesapta ikinci bir UAC istemini onler.
+; Kurulum sonu "uygulamayi baslat" kutusu.
+;
+; shellexec ZORUNLU. Inno, postinstall girdilerini YUKSELTILMEMIS baglamda calistirir
+; (uygulamanin kurulumun admin token'ini miras almamasi icin). App.exe ise
+; requireAdministrator manifestine sahip; CreateProcess bu durumda UAC yukseltmesi
+; YAPAMAZ ve hata 740 (ERROR_ELEVATION_REQUIRED) doner — gercek makinede boyle oldu.
+; shellexec, CreateProcess yerine ShellExecuteEx kullandirir; o da manifesti gorup
+; UAC istemini gosterir ve uygulama duzgun acilir.
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; \
-    WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent
+    WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec
 
 [UninstallRun]
 ; [UninstallRun] girdileri dosyalar silinmeden ONCE calisir — exe hala yerinde.
